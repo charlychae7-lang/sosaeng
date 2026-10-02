@@ -340,7 +340,8 @@ function todayStr(){
 const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
 const VOICE = {
   ttsSupported: 'speechSynthesis' in window,
-  sttSupported: !!SpeechRec,
+  sttSupported: !!SpeechRec && !inIframe(), // 다른 페이지 안(iframe)에서는 마이크가 막혀 있음
+  embedded: inIframe(),
   koVoice: null,
   rate: parseFloat(safeGet('voiceRate')) || 0.9,
   handsFree: false,
@@ -439,7 +440,7 @@ function attachMic(field, label){
   const btn = el(`<button type="button" class="mic-btn" aria-label="말로 입력하기">🎤 ${label || '말로 입력'}</button>`);
   if(!VOICE.sttSupported){
     btn.classList.add('mic-unsupported');
-    btn.onclick = () => alert('이 브라우저는 음성 인식을 지원하지 않아요.\n입력창을 누른 뒤 키보드에 있는 마이크 버튼을 눌러 말씀해주세요.');
+    btn.onclick = () => (btn.title = '입력창을 누른 뒤 키보드의 마이크 버튼을 눌러 말씀해주세요.', btn.textContent = '🎤 키보드 마이크를 써주세요');
     return btn;
   }
   const idle = () => { btn.classList.remove('listening'); btn.textContent = `🎤 ${label || '말로 입력'}`; };
@@ -747,7 +748,7 @@ function renderHome(){
     const mb = el(`<button type="button" class="mic-btn">🎤 말로 마음 온도 알리기</button>`);
     const note = el(`<div class="muted" style="width:100%;text-align:center;font-size:0.85em;" role="status" aria-live="polite"></div>`);
     mb.onclick = () => {
-      if(!VOICE.sttSupported){ note.textContent = '이 브라우저는 음성 인식을 지원하지 않아요. 위의 얼굴 버튼을 눌러주세요.'; return; }
+      if(!VOICE.sttSupported){ note.textContent = '이 화면에서는 음성 인식을 쓸 수 없어요. 위의 얼굴 버튼을 눌러주세요.'; return; }
       if(mb.classList.contains('listening')){ stopDictation(); return; }
       stopDictation();
       mb.classList.add('listening'); mb.textContent = '⏹ 듣고 있어요…';
@@ -1011,7 +1012,7 @@ function renderChat(){
   function setStatus(t, kind){ statusEl.textContent = t || ''; statusEl.className = 'voice-status ' + (kind || ''); }
   if(!VOICE.sttSupported){
     hfBtn.disabled = true;
-    setStatus('이 브라우저는 음성 인식을 지원하지 않아요. 크롬·엣지·사파리에서 열거나, 입력창을 누른 뒤 키보드의 🎤 버튼을 이용해주세요.');
+    setStatus((VOICE.embedded ? '이 미리보기 화면에서는 마이크가 막혀 있어요. 답변 읽어주기는 쓸 수 있고, 말로 입력하시려면 입력창을 누른 뒤 키보드의 🎤 버튼을 이용해주세요. 음성 대화는 전체 화면(배포 주소)에서 가능합니다.' : '이 브라우저는 음성 인식을 지원하지 않아요. 크롬·엣지·사파리에서 열거나, 입력창을 누른 뒤 키보드의 🎤 버튼을 이용해주세요.'));
   }
 
   wrap.appendChild(el(`<p class="muted" id="weekGoalNote"></p>`));
