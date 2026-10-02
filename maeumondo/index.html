@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF5E9">
+<title>마음온도 — 신노년층 자각·역할 회복 프로그램</title>
+<style>
+  :root{
+    --paper:#FAF5E9;
+    --paper-2:#F2E8D6;
+    --card:#FFFDF8;
+    --ink:#2B2521;
+    --ink-soft:#5C5248;
+    --persimmon:#B3541E;
+    --persimmon-deep:#8F4118;
+    --indigo:#2F4468;
+    --indigo-soft:#E7ECF2;
+    --sage:#5F8467;
+    --sage-bg:#E7EFE6;
+    --alert:#A63A3A;
+    --alert-bg:#F5E4E1;
+    --line:#DCCFB4;
+    --radius:18px;
+    --font-size-base:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    font-size:var(--font-size-base);
+    line-height:1.6;
+    padding-bottom:env(safe-area-inset-bottom);
+    min-height:100vh;
+  }
+  h1,h2,h3{
+    font-family:"Noto Serif KR","Nanum Myeongjo",serif;
+    color:var(--ink);
+    margin:0 0 8px 0;
+  }
+  #app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;background:var(--paper);
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:10;
+  }
+  .topbar .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,var(--persimmon),var(--indigo));
+    flex-shrink:0;
+  }
+  .brand-title{font-family:"Noto Serif KR",serif;font-weight:700;font-size:1.15em;}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  .icon-btn{
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:12px;padding:8px 12px;font-size:0.85em;cursor:pointer;
+    font-family:inherit;
+  }
+  .icon-btn:hover{background:var(--paper-2);}
+
+  .view{padding:20px 18px 100px 18px;flex:1;}
+  .hidden{display:none !important;}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px;margin-bottom:16px;
+  }
+  .muted{color:var(--ink-soft);font-size:0.92em;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 20px;border-radius:14px;border:none;cursor:pointer;
+    font-family:inherit;font-size:1em;font-weight:600;min-height:52px;
+  }
+  .btn-primary{background:var(--persimmon);color:#fff;}
+  .btn-primary:hover{background:var(--persimmon-deep);}
+  .btn-secondary{background:var(--indigo-soft);color:var(--indigo);}
+  .btn-outline{background:transparent;border:1.5px solid var(--line);color:var(--ink);}
+  .btn-block{width:100%;}
+  .btn-lg{font-size:1.1em;padding:18px 22px;}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  input[type=text], textarea, select{
+    width:100%;font-family:inherit;font-size:1em;
+    padding:14px;border-radius:12px;border:1.5px solid var(--line);
+    background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:80px;}
+
+  .onboard-hero{text-align:center;padding:40px 10px 20px;}
+  .onboard-hero .brand-mark{width:64px;height:64px;margin:0 auto 18px;}
+  .anchor-quote{
+    font-family:"Noto Serif KR",serif;font-weight:700;font-size:1.05em;
+    color:var(--indigo);margin:14px 0 6px;line-height:1.5;
+  }
+  .role-choice{display:flex;flex-direction:column;gap:12px;margin-top:20px;}
+
+  .gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0 4px;}
+  .gauge-label{font-size:0.95em;color:var(--ink-soft);margin-top:8px;}
+  .gauge-value{font-family:"Noto Serif KR",serif;font-size:1.6em;font-weight:700;margin-top:2px;}
+
+  .emoji-row{display:flex;justify-content:space-between;gap:8px;margin-top:14px;}
+  .emoji-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:10px 4px;border-radius:14px;border:1.5px solid var(--line);
+    background:#fff;cursor:pointer;font-family:inherit;
+  }
+  .emoji-btn.selected{border-color:var(--persimmon);background:var(--paper-2);}
+  .emoji-btn .e{font-size:1.6em;}
+  .emoji-btn .l{font-size:0.75em;color:var(--ink-soft);text-align:center;}
+
+  .shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;}
+  .shortcut{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 14px;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);
+  }
+  .shortcut .tt{font-weight:700;margin-bottom:4px;display:block;}
+  .shortcut .ds{font-size:0.82em;color:var(--ink-soft);}
+
+  .safety-note{
+    background:var(--alert-bg);border:1px solid #E0BDB6;border-radius:14px;
+    padding:14px 16px;margin-top:18px;font-size:0.9em;color:var(--ink);
+  }
+  .safety-note b{color:var(--alert);}
+  .gratitude-note{
+    background:var(--sage-bg);border:1px solid #C9DBC6;border-radius:14px;
+    padding:14px 16px;margin:0 0 16px;font-size:0.9em;color:var(--ink);
+  }
+
+  .chat-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .chat-header select{width:auto;flex:1;}
+  .mode-badge{font-size:0.78em;font-weight:700;padding:5px 11px;border-radius:14px;white-space:nowrap;}
+  .mode-mirror{background:var(--indigo-soft);color:var(--indigo);}
+  .mode-bridge{background:var(--alert-bg);color:var(--alert);}
+  .chat-log{display:flex;flex-direction:column;gap:12px;margin-bottom:14px;}
+  .chat-divider{display:flex;align-items:center;gap:10px;margin:6px 0;}
+  .chat-divider .line{flex:1;height:1px;background:var(--line);}
+  .chat-divider span{
+    font-size:0.8em;color:var(--ink-soft);background:var(--paper-2);
+    padding:4px 12px;border-radius:12px;white-space:nowrap;
+  }
+  .msg{max-width:80%;padding:12px 15px;border-radius:16px;line-height:1.55;white-space:pre-wrap;}
+  .msg.ai{align-self:flex-start;background:var(--indigo-soft);color:var(--ink);border-bottom-left-radius:4px;}
+  .msg.user{align-self:flex-end;background:#FBEADD;color:var(--ink);border-bottom-right-radius:4px;}
+  .msg.crisis{align-self:stretch;background:var(--alert-bg);border:1px solid #E0BDB6;max-width:100%;}
+  .wrapup-card{
+    align-self:stretch;background:var(--sage-bg);border:1px solid #C9DBC6;
+    border-radius:16px;padding:14px 16px;max-width:100%;
+  }
+  .wrapup-card .wu-text{margin-bottom:10px;}
+  .wrapup-card .wu-actions{display:flex;gap:10px;}
+  .wrapup-card .wu-actions button{flex:1;min-height:44px;}
+  .chat-input-row{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:10px 0;background:var(--paper);align-items:flex-end;}
+  .chat-input-row textarea{flex:1;min-height:52px;max-height:120px;}
+  .typing{color:var(--ink-soft);font-size:0.85em;font-style:italic;}
+
+  .voice-toggle{display:flex;align-items:center;gap:6px;font-size:0.78em;color:var(--ink-soft);white-space:nowrap;cursor:pointer;user-select:none;}
+  .voice-toggle input{width:auto;margin:0;}
+  .replay-btn{
+    align-self:flex-end;margin-top:4px;border:none;background:none;color:var(--ink-soft);
+    font-size:0.78em;cursor:pointer;padding:2px 4px;
+  }
+  .replay-btn:hover{color:var(--indigo);}
+  .voice-note{font-size:0.78em;color:var(--ink-soft);margin:4px 0 0;}
+
+  .journal-entry{border-left:3px solid var(--persimmon);padding-left:12px;margin-bottom:14px;}
+  .journal-date{font-size:0.8em;color:var(--ink-soft);}
+
+  .week-row{
+    display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);
+  }
+  .week-row:last-child{border-bottom:none;}
+  .week-badge{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85em;
+    background:var(--paper-2);color:var(--ink-soft);border:1.5px solid var(--line);
+  }
+  .week-badge.done{background:var(--sage);color:#fff;border-color:var(--sage);}
+  .week-badge.current{background:var(--persimmon);color:#fff;border-color:var(--persimmon);}
+  .week-title{font-weight:600;}
+  .week-goal{font-size:0.85em;color:var(--ink-soft);}
+  .week-toggle{margin-left:auto;}
+
+  .bottomnav{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;
+    background:var(--card);border-top:1px solid var(--line);z-index:20;
+    display:flex;max-width:520px;padding-bottom:env(safe-area-inset-bottom);
+  }
+  .navbtn{
+    flex:1;border:none;background:none;padding:10px 4px 12px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-family:inherit;font-size:0.78em;color:var(--ink-soft);cursor:pointer;
+  }
+  .navbtn .ic{font-size:1.3em;}
+  .navbtn.active{color:var(--persimmon);font-weight:700;}
+
+  .fac-card{display:flex;align-items:center;gap:14px;}
+  .fac-avatar{
+    width:44px;height:44px;border-radius:50%;background:var(--indigo-soft);color:var(--indigo);
+    display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;
+  }
+  .fac-name{font-weight:700;}
+  .fac-meta{font-size:0.82em;color:var(--ink-soft);}
+  .flag-badge{
+    background:var(--alert);color:#fff;font-size:0.75em;padding:4px 10px;
+    border-radius:20px;font-weight:700;margin-left:auto;white-space:nowrap;
+  }
+  .ok-badge{
+    background:var(--sage-bg);color:var(--sage);font-size:0.75em;padding:4px 10px;
+    border-radius:20px;font-weight:700;margin-left:auto;white-space:nowrap;
+  }
+  .link-badge{
+    background:#E4EEF3;color:#2A6F86;font-size:0.75em;padding:4px 10px;
+    border-radius:20px;font-weight:700;margin-left:auto;white-space:nowrap;
+  }
+  .privacy-note{font-size:0.85em;color:var(--ink-soft);background:var(--paper-2);padding:12px 14px;border-radius:12px;margin-bottom:16px;}
+  .card label{display:block;margin:10px 0 4px;}
+  .card label:first-of-type{margin-top:0;}
+
+  .mic-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:1.5px solid var(--indigo);background:var(--indigo-soft);color:var(--indigo);
+    border-radius:14px;padding:10px 14px;min-height:44px;font-family:inherit;font-size:0.9em;font-weight:700;cursor:pointer;
+  }
+  .mic-btn.listening{background:var(--alert);border-color:var(--alert);color:#fff;animation:pulse 1.2s infinite;}
+  .mic-btn.mic-unsupported{opacity:0.6;}
+  .mic-chat{min-height:52px;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(166,58,58,.45);}50%{box-shadow:0 0 0 8px rgba(166,58,58,0);}}
+  .field-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center;}
+  .chat-input-btns{display:flex;flex-direction:column;gap:6px;}
+  .voice-box{margin-bottom:8px;}
+  .voice-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .voice-row select{width:auto;padding:6px 8px;font-size:0.95em;}
+  .handsfree-card{margin:8px 0 12px;}
+  .voice-status{min-height:1.4em;margin-top:8px;font-size:0.9em;color:var(--ink-soft);text-align:center;}
+  .voice-status.listening{color:var(--alert);font-weight:700;}
+  .hero-voice{background:linear-gradient(135deg,var(--persimmon),var(--indigo));color:#fff;border:none;}
+  .hero-voice .tt{color:#fff;font-size:1.15em;}
+  .hero-voice .ds{color:#F4EBDD;}
+  .btn:focus-visible,.mic-btn:focus-visible,.navbtn:focus-visible,.emoji-btn:focus-visible,.shortcut:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--indigo);outline-offset:2px;}
+  a.btn{text-decoration:none;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ 신(新) 5축 + 0단계 감사를 반영한 8강 흐름 ============ */
+const WEEKS = [
+  {n:1, title:"감사로 여는 마음", axis:"0단계 · 감사 / 1축 마인드", goal:"AI와의 첫 만남, 시대적 감사로 시작", hint:"살아오시며 감사했던 순간이 있다면, 한 가지만 떠올려주시겠어요?"},
+  {n:2, title:"마음 표현하기", axis:"1축 · 마인드", goal:"자기 욕구 인식, 가까운 이들과의 관계 돌아보기", hint:"요즘 마음이 어떠세요? 가까운 분과의 사이는 어떠신가요?"},
+  {n:3, title:"메타인지 기초", axis:"1축 · 마인드", goal:"생각을 알아차리는 연습", hint:"방금 드신 그 생각, 어디서 비롯된 걸까요?"},
+  {n:4, title:"좋아함과 잘함 찾기", axis:"2축 · 의미", goal:"좋아하는 것·잘하는 것·하고 싶은 것 탐색, 5년 후 비전화", hint:"젊었을 때 제일 자신 있었던 일은 무엇이었어요?"},
+  {n:5, title:"기억을 자산으로", axis:"3축 · 기억", goal:"경력과 노하우를 지금 쓸 자산으로 재구성", hint:"그 기술, 지금도 손이 기억하고 있을까요?"},
+  {n:6, title:"관계의 회복과 확장", axis:"4축 · 공동체", goal:"안부 나누기, 오프라인 모임 연계", hint:"요즘 다시 만나고 싶은 사람이 있다면 누구인가요?"},
+  {n:7, title:"역할로 잇기", axis:"5축 · 역할", goal:"지역 활동 연계 준비, 인계 구조 소개", hint:"이 이야기가 지역에서 쓰인다면 어떤 모습이면 좋을까요?"},
+  {n:8, title:"발표와 다짐", axis:"통합 · 되돌아보기", goal:"8강 돌아보기, 다음 걸음 그려보기", hint:"8강을 지나며 가장 크게 달라진 건 무엇인가요?"},
+];
+
+const MOODS = [
+  {v:5, e:"😊", l:"아주 좋음"},
+  {v:4, e:"🙂", l:"좋음"},
+  {v:3, e:"😐", l:"보통"},
+  {v:2, e:"😔", l:"속상함"},
+  {v:1, e:"😢", l:"많이 힘듦"},
+];
+
+const RISK_PATTERNS = ["죽고 싶", "죽고싶", "사라지고 싶", "사라지고싶", "그만 살고 싶", "살기 싫", "없어지고 싶", "다 끝내고 싶", "자살", "목숨을 끊", "죽어버리", "죽을까", "세상을 떠나고 싶", "살고 싶지 않"];
+
+const RISK_SLA = {
+  high: {label:"고위험", sla:"즉시 대응 (수 시간 이내)"},
+  medium: {label:"중위험", sla:"24시간 이내"},
+  low: {label:"저위험", sla:"48시간 이내 또는 익일 회차"},
+};
+
+// 대화가 계속 부정적인 정서로만 흘러가지 않도록 — 디폴트셋팅을 통한 치우침 예방 장치
+const NEGATIVE_WORDS = ["힘들", "속상", "외롭", "우울", "지치", "힘없", "허무", "쓸쓸", "서럽", "답답", "무기력"];
+const NEGATIVE_STREAK_THRESHOLD = 3;
+
+const SESSION_WRAP_THRESHOLD = 8;
+const OFFLINE_SUGGESTIONS = [
+  "가족에게 안부 전화 한 통 해보시는 건 어떨까요?",
+  "이웃분과 잠깐 인사를 나눠보시는 건 어떨까요?",
+  "손주에게 짧은 문자 한 줄 보내보시는 건 어떨까요?",
+  "경로당 친구분께 안부를 여쭤보시는 건 어떨까요?",
+  "오늘 나눈 이야기를 가까운 분께 한번 들려주시는 건 어떨까요?",
+];
+
+let state = {
+  role: null,
+  name: "",
+  view: "home",
+  fontScale: parseFloat(safeGet('fontScale')) || 1,
+  cleanup: null,
+  autoVoice: false,
+  chatWeek: 1,
+  chatHistory: [],
+  sending: false,
+  pendingPrompt: "",
+};
+
+function esc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function el(html){
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstChild;
+}
+
+/* ============ 저장소 — 이 브라우저(기기)에만 저장됨 ============
+   원본은 window.storage(shared 플래그)를 썼으나, 이 환경에서는 제공되지 않아
+   조용히 실패하고 있었음. localStorage로 교체해 실제로 동작하게 함.
+   ※ shared=true였던 항목(registry/summary/risklog/legacynotice)은
+     "진행자 화면"이 참고하는 항목이라는 표시로 남겨두되, 지금은 참여자와
+     진행자가 같은 기기/브라우저를 쓸 때만 서로의 데이터를 볼 수 있다. */
+function safeGet(key){
+  try{ return localStorage.getItem('maeumondo:'+key); }catch(e){ return null; }
+}
+function safeSet(key, value){
+  try{ localStorage.setItem('maeumondo:'+key, value); }catch(e){ console.warn('storage write failed', e); }
+}
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+"."+String(d.getMonth()+1).padStart(2,'0')+"."+String(d.getDate()).padStart(2,'0');
+}
+
+/* ============ 음성 — 브라우저 내장 Web Speech API ============
+   · 듣기(TTS): speechSynthesis — 문장 단위로 끊어 읽어 긴 답변도 중간에 멈추지 않게 함
+   · 말하기(STT): SpeechRecognition(ko-KR) — 받아쓰기 버튼, 그리고 "음성 대화 모드"
+     (마음이가 말하고 → 자동으로 듣기 시작 → 말씀이 끝나면 자동 전송 → 다시 마음이가 말함)
+   ※ 음성 인식은 Chrome·Edge·Safari(https 또는 localhost)에서 동작합니다. 지원되지 않는
+     브라우저에서는 기기 키보드의 마이크 버튼 안내로 대체됩니다. */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+const VOICE = {
+  ttsSupported: 'speechSynthesis' in window,
+  sttSupported: !!SpeechRec,
+  koVoice: null,
+  rate: parseFloat(safeGet('voiceRate')) || 0.9,
+  handsFree: false,
+};
+function inIframe(){ try{ return window.self !== window.top; }catch(e){ return true; } }
+
+if(VOICE.ttsSupported){
+  const pickVoice = () => {
+    const voices = window.speechSynthesis.getVoices();
+    VOICE.koVoice = voices.find(v => v.lang === 'ko-KR') || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ko')) || null;
+  };
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
+let speakToken = 0;
+function splitSentences(text){
+  const parts = text.replace(/\s+/g,' ').match(/[^.!?。？！\n]+[.!?。？！]*/g) || [text];
+  return parts.map(p => p.trim()).filter(Boolean);
+}
+/* 소리 내어 읽기 — 끝나면(또는 중단되면) resolve */
+function speakText(text){
+  return new Promise(resolve => {
+    if(!VOICE.ttsSupported || !text){ resolve(); return; }
+    try{
+      window.speechSynthesis.cancel();
+      const token = ++speakToken;
+      const chunks = splitSentences(text);
+      let i = 0;
+      const next = () => {
+        if(token !== speakToken){ resolve(); return; }
+        if(i >= chunks.length){ resolve(); return; }
+        const u = new SpeechSynthesisUtterance(chunks[i++]);
+        u.lang = 'ko-KR';
+        if(VOICE.koVoice) u.voice = VOICE.koVoice;
+        u.rate = VOICE.rate;
+        u.onend = next;
+        u.onerror = () => resolve();
+        window.speechSynthesis.speak(u);
+      };
+      setTimeout(next, 60);
+    }catch(e){ console.warn('TTS failed', e); resolve(); }
+  });
+}
+function stopSpeaking(){
+  speakToken++;
+  if(VOICE.ttsSupported){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+}
+function loadVoiceOutputPref(){ return safeGet('voiceOutput') === '1'; }
+function saveVoiceOutputPref(on){ safeSet('voiceOutput', on ? '1' : '0'); }
+
+const STT_ERRORS = {
+  'not-allowed': inIframe()
+    ? '마이크를 쓸 수 없어요. 이 화면이 다른 페이지 안에 들어 있어서 그럴 수 있어요. 새 창(전체 화면)에서 열어주세요.'
+    : '마이크 사용이 허용되지 않았어요. 주소창 왼쪽의 자물쇠 또는 설정에서 마이크를 "허용"으로 바꿔주세요.',
+  'service-not-allowed': '이 기기에서는 음성 인식을 쓸 수 없어요. 키보드의 마이크 버튼을 이용해주세요.',
+  'audio-capture': '마이크를 찾을 수 없어요. 마이크 연결을 확인해주세요.',
+  'network': '인터넷 연결이 불안정해서 음성을 글자로 바꾸지 못했어요.',
+};
+/* 음성 인식 한 번 듣기. handlers: onInterim(text) onFinal(text) onEnd() onError(code, message)
+   반환: {stop(), abort()} */
+function listenOnce(handlers){
+  if(!VOICE.sttSupported){ handlers.onError && handlers.onError('unsupported', '이 브라우저는 음성 인식을 지원하지 않아요. 키보드의 마이크 버튼을 이용해주세요.'); handlers.onEnd && handlers.onEnd(); return {stop(){},abort(){}}; }
+  stopSpeaking(); // 마이크가 스피커 소리를 다시 듣지 않도록
+  const rec = new SpeechRec();
+  rec.lang = 'ko-KR';
+  rec.interimResults = true;
+  rec.continuous = false;
+  rec.maxAlternatives = 1;
+  let finalText = '', gotFinal = false, errored = false;
+  rec.onresult = ev => {
+    let interim = '';
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const r = ev.results[i];
+      if(r.isFinal){ finalText += r[0].transcript; gotFinal = true; }
+      else interim += r[0].transcript;
+    }
+    handlers.onInterim && handlers.onInterim((finalText + interim).trim());
+  };
+  rec.onerror = ev => {
+    errored = true;
+    handlers.onError && handlers.onError(ev.error, ev.error === 'no-speech' ? '말씀이 들리지 않았어요.' : (ev.error === 'aborted' ? '' : (STT_ERRORS[ev.error] || '음성 인식 중 문제가 생겼어요.')));
+  };
+  rec.onend = () => {
+    if(gotFinal && finalText.trim()) handlers.onFinal && handlers.onFinal(finalText.trim());
+    else if(!errored) handlers.onError && handlers.onError('no-speech', '말씀이 들리지 않았어요.');
+    handlers.onEnd && handlers.onEnd();
+  };
+  try{ rec.start(); }catch(e){ handlers.onError && handlers.onError('start-failed', '마이크를 시작하지 못했어요.'); handlers.onEnd && handlers.onEnd(); }
+  return { stop(){ try{ rec.stop(); }catch(e){} }, abort(){ try{ rec.abort(); }catch(e){} } };
+}
+
+/* 입력칸 옆 "🎤 말로 입력" 버튼 — 말씀하신 내용이 입력칸에 이어서 적힙니다 */
+let activeDictation = null;
+function stopDictation(){ if(activeDictation){ activeDictation.abort(); activeDictation = null; } }
+function attachMic(field, label){
+  const btn = el(`<button type="button" class="mic-btn" aria-label="말로 입력하기">🎤 ${label || '말로 입력'}</button>`);
+  if(!VOICE.sttSupported){
+    btn.classList.add('mic-unsupported');
+    btn.onclick = () => alert('이 브라우저는 음성 인식을 지원하지 않아요.\n입력창을 누른 뒤 키보드에 있는 마이크 버튼을 눌러 말씀해주세요.');
+    return btn;
+  }
+  const idle = () => { btn.classList.remove('listening'); btn.textContent = `🎤 ${label || '말로 입력'}`; };
+  btn.onclick = () => {
+    if(btn.classList.contains('listening')){ stopDictation(); idle(); return; }
+    stopDictation();
+    const base = field.value ? field.value.replace(/\s+$/,'') + ' ' : '';
+    btn.classList.add('listening'); btn.textContent = '⏹ 듣고 있어요… (누르면 끝)';
+    activeDictation = listenOnce({
+      onInterim: t => { field.value = base + t; },
+      onFinal: t => { field.value = base + t; field.dispatchEvent(new Event('input')); },
+      onError: (code, msg) => { if(msg && code !== 'no-speech') alert(msg); },
+      onEnd: () => { idle(); activeDictation = null; },
+    });
+  };
+  return btn;
+}
+
+function registerParticipant(name){
+  let list = [];
+  try{ list = JSON.parse(safeGet('registry') || '[]'); }catch(e){ list = []; }
+  if(!list.includes(name)){ list.push(name); safeSet('registry', JSON.stringify(list)); }
+}
+
+function loadSummary(name){
+  const raw = safeGet('summary:'+name);
+  if(!raw) return {mood:null, moodDate:null, currentWeek:1, riskFlag:false, riskNote:null};
+  try{ return JSON.parse(raw); }catch(e){ return {mood:null, moodDate:null, currentWeek:1, riskFlag:false, riskNote:null}; }
+}
+function saveSummary(name, patch){
+  const next = Object.assign({}, loadSummary(name), patch);
+  safeSet('summary:'+name, JSON.stringify(next));
+  return next;
+}
+function loadCheckins(name){ try{ return JSON.parse(safeGet('checkins:'+name) || '[]'); }catch(e){ return []; } }
+function loadJournal(name){ try{ return JSON.parse(safeGet('journal:'+name) || '[]'); }catch(e){ return []; } }
+function loadChat(name){ try{ return JSON.parse(safeGet('chat:'+name) || '[]'); }catch(e){ return []; } }
+function loadProgress(name){ try{ return JSON.parse(safeGet('progress:'+name) || '{}'); }catch(e){ return {}; } }
+function loadStrengthCards(name){ try{ return JSON.parse(safeGet('strengthcards:'+name) || '[]'); }catch(e){ return []; } }
+function loadGratitude(name){ try{ return JSON.parse(safeGet('gratitude:'+name) || '[]'); }catch(e){ return []; } }
+function addStrengthCard(name, text){
+  const cards = loadStrengthCards(name);
+  const monthKey = new Date().toISOString().slice(0,7);
+  cards.unshift({month: monthKey, text, date: todayStr()});
+  safeSet('strengthcards:'+name, JSON.stringify(cards));
+  return cards;
+}
+function loadRiskLog(name){ try{ return JSON.parse(safeGet('risklog:'+name) || '[]'); }catch(e){ return []; } }
+function addRiskLog(name, entry){
+  const log = loadRiskLog(name);
+  log.unshift(entry);
+  safeSet('risklog:'+name, JSON.stringify(log));
+}
+
+function hasRisk(text){
+  const t = text.replace(/\s+/g,'');
+  return RISK_PATTERNS.some(p => t.includes(p.replace(/\s+/g,'')));
+}
+function evaluateRisk(name, text, source){
+  const hit = hasRisk(text);
+  if(hit){
+    saveSummary(name, {riskFlag: true, riskLevel: 'high', riskNote: `${source} 중 고위험 신호 감지`, riskDate: todayStr()});
+  }
+  return hit;
+}
+function checkConsecutiveLowMood(name){
+  const checkins = loadCheckins(name);
+  const last2 = checkins.slice(-2);
+  const last1 = checkins.slice(-1);
+  if(last2.length === 2 && last2.every(c => c.mood <= 2)){
+    saveSummary(name, {riskFlag: true, riskLevel: 'medium', riskNote: '최근 2회 연속 저조한 마음 온도 — 지속적 무기력 신호', riskDate: todayStr()});
+    return 'medium';
+  }
+  if(last1.length === 1 && last1[0].mood === 1){
+    const cur = loadSummary(name);
+    if(!cur.riskFlag){
+      saveSummary(name, {riskFlag: true, riskLevel: 'low', riskNote: '일시적으로 마음 온도가 많이 낮음 — 다음 회차 확인 권장', riskDate: todayStr()});
+      return 'low';
+    }
+  }
+  return false;
+}
+
+/* 기억(3축) 축 — "오늘의 질문" */
+const SPECIAL_DATE_PROMPTS = {
+  "01-01": "새해 첫날이면 어떤 마음으로 하루를 시작하셨어요?",
+  "03-01": "삼일절이네요. 어릴 적 이 날을 어떻게 보내셨는지 기억나세요?",
+  "05-05": "어린이날이에요. 그 시절 자녀분과 함께한 하루가 기억나시나요?",
+  "05-08": "어버이날이네요. 부모님께 어떤 마음을 전하고 싶으셨어요?",
+  "06-06": "현충일이에요. 이 날과 관련해 떠오르는 기억이 있으신가요?",
+  "06-25": "6월 25일이네요. 그 시절 이야기를 들려주실 수 있으실까요?",
+  "08-15": "광복절이에요. 이 날에 얽힌 가족의 이야기가 있으신가요?",
+  "10-03": "개천절이에요. 어릴 적 명절이나 국경일은 어떻게 보내셨어요?",
+  "10-09": "한글날이네요. 처음 글을 배우셨던 기억이 있으신가요?",
+  "12-25": "성탄절이에요. 어릴 적 이맘때 풍경이 기억나시나요?",
+};
+const GENERIC_MEMORY_PROMPTS = [
+  "오늘 같은 날씨였던 어느 하루가 떠오르시나요?",
+  "가장 자주 드셨던 음식 중 지금도 그리운 게 있으신가요?",
+  "처음 살던 동네는 어떤 모습이었나요?",
+  "가장 기억에 남는 여행은 언제였나요?",
+  "젊은 시절 가장 자신 있었던 일은 무엇이었나요?",
+  "지금도 기억나는 노래가 있으신가요?",
+  "가장 고마웠던 사람은 누구였나요?",
+  "처음 월급을 받으셨을 때 기분이 어떠셨어요?",
+  "가장 자랑스러웠던 순간은 언제였나요?",
+];
+function getTodayPrompt(){
+  const d = new Date();
+  const mmdd = String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  if(SPECIAL_DATE_PROMPTS[mmdd]) return SPECIAL_DATE_PROMPTS[mmdd];
+  const dayOfYear = Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000);
+  return GENERIC_MEMORY_PROMPTS[dayOfYear % GENERIC_MEMORY_PROMPTS.length];
+}
+
+function recordMood(v){
+  const checkins = loadCheckins(state.name);
+  checkins.push({date: todayStr(), mood: v});
+  safeSet('checkins:'+state.name, JSON.stringify(checkins));
+  saveSummary(state.name, {mood: v, moodDate: todayStr()});
+  checkConsecutiveLowMood(state.name);
+  render();
+}
+/* 말씀을 마음 온도(1~5)로 해석 — 확실하지 않으면 null */
+function moodFromSpeech(t){
+  const x = t.replace(/\s+/g,'');
+  if(/많이힘|너무힘|죽겠|최악|우울|눈물|괴로/.test(x)) return 1;
+  if(/속상|힘들|힘드|외롭|쓸쓸|서럽|답답|안좋|별로|지쳐|지치/.test(x)) return 2;
+  if(/아주좋|너무좋|최고|행복|매우좋|기뻐|신나/.test(x)) return 5;
+  if(/좋아|좋습|좋네|괜찮|편안|감사|즐거/.test(x)) return 4;
+  if(/보통|그저그|그냥그|그럭저럭|평범|무난/.test(x)) return 3;
+  return null;
+}
+function render(){
+  if(state.cleanup){ state.cleanup(); state.cleanup = null; }
+  stopDictation(); stopSpeaking();
+  const app = document.getElementById('app');
+  app.innerHTML = "";
+  window.scrollTo(0,0);
+  document.documentElement.style.setProperty('--font-size-base', (18*state.fontScale)+'px');
+
+  if(!state.role){ app.appendChild(renderOnboarding()); return; }
+  if(state.role === 'facilitator'){
+    app.appendChild(renderTopbar());
+    app.appendChild(renderFacilitator());
+    return;
+  }
+  app.appendChild(renderTopbar());
+  const viewWrap = el(`<div class="view"></div>`);
+  if(state.view === 'home') viewWrap.appendChild(renderHome());
+  if(state.view === 'chat') viewWrap.appendChild(renderChat());
+  if(state.view === 'journal') viewWrap.appendChild(renderJournal());
+  if(state.view === 'progress') viewWrap.appendChild(renderProgress());
+  app.appendChild(viewWrap);
+  app.appendChild(renderBottomNav());
+}
+
+function renderOnboarding(){
+  const wrap = el(`
+    <div class="view onboard-hero">
+      <div class="brand-mark"></div>
+      <h1>마음온도</h1>
+      <p class="anchor-quote">당신은 도움받는 존재가 아니라,<br>지금 이 사회를 만든 사람입니다</p>
+      <p class="muted">8강 교육에서 나눈 이야기가 여기서도 계속 이어집니다. 오늘 수업이 끝난 뒤에도, 다음 수업 전까지 이 공간이 곁에 있을게요.</p>
+      <div class="role-choice"></div>
+    </div>
+  `);
+  const choice = wrap.querySelector('.role-choice');
+
+  const pWrap = el(`<div></div>`);
+  const nameInput = el(`<input type="text" aria-label="성함" placeholder="성함을 알려주세요 (예: 김순자)" />`);
+  nameInput.value = safeGet('lastName') || '';
+  const pBtn = el(`<button class="btn btn-primary btn-block btn-lg" style="margin-top:10px;">참여자로 시작하기</button>`);
+  pWrap.appendChild(el(`<div class="card" style="text-align:left;"><h3>👤 참여자로 시작</h3><p class="muted">오늘의 마음을 기록하고 AI와 대화를 나눠요</p></div>`));
+  pWrap.lastChild.appendChild(nameInput);
+  { const mrow = el(`<div class="field-actions"></div>`); mrow.appendChild(attachMic(nameInput, '말로 성함 입력')); pWrap.lastChild.appendChild(mrow); }
+  pWrap.lastChild.appendChild(el(`<p class="muted" style="font-size:0.78em;margin-top:8px;">본 도구는 의료적 진단을 하지 않는 보조적 심리지원 도구입니다. 사적인 대화 내용은 외부로 전달되지 않으며, 위험 신호가 발견되면 요약 정보만 담당자에게 공유될 수 있습니다.</p>`));
+  pWrap.lastChild.appendChild(pBtn);
+  pBtn.onclick = () => {
+    const name = nameInput.value.trim();
+    if(!name){ nameInput.style.borderColor = 'var(--alert)'; return; }
+    state.name = name;
+    safeSet('lastName', name);
+    state.role = 'participant';
+    registerParticipant(name);
+    const sum = loadSummary(name);
+    state.chatWeek = sum.currentWeek || 1;
+    render();
+  };
+  choice.appendChild(pWrap);
+
+  const fBtn = el(`<button class="btn btn-secondary btn-block btn-lg">진행자로 살펴보기</button>`);
+  const fCard = el(`<div class="card" style="text-align:left;"><h3>🧑‍🏫 진행자로 보기</h3><p class="muted">참여자들의 마음 온도와 진행 상황을 살펴봐요<br><span style="font-size:0.85em;">(개인 대화 내용이 아닌 요약 지표만 표시됩니다)</span></p></div>`);
+  fCard.appendChild(fBtn);
+  fBtn.onclick = () => { state.role = 'facilitator'; render(); };
+  choice.appendChild(fCard);
+
+  return wrap;
+}
+
+function renderTopbar(){
+  const bar = el(`
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark" style="width:30px;height:30px;"></div>
+        <div class="brand-title">마음온도</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="fontDown">가-</button>
+        <button class="icon-btn" id="fontUp">가+</button>
+        <button class="icon-btn" id="switchRole">${state.role==='facilitator' ? '참여자 화면' : '진행자 화면'}</button>
+      </div>
+    </div>
+  `);
+  bar.querySelector('#fontDown').onclick = () => { state.fontScale = Math.max(0.85, state.fontScale - 0.1); safeSet('fontScale', state.fontScale); render(); };
+  bar.querySelector('#fontUp').onclick = () => { state.fontScale = Math.min(1.5, state.fontScale + 0.1); safeSet('fontScale', state.fontScale); render(); };
+  bar.querySelector('#switchRole').onclick = () => { state.role = state.role === 'facilitator' ? null : 'facilitator'; render(); };
+  return bar;
+}
+
+function renderBottomNav(){
+  const items = [
+    {k:'home', ic:'🏠', l:'홈'},
+    {k:'chat', ic:'💬', l:'AI 대화'},
+    {k:'journal', ic:'🗂️', l:'경험 아카이브'},
+    {k:'progress', ic:'🗓️', l:'진행현황'},
+  ];
+  const nav = el(`<div class="bottomnav"></div>`);
+  items.forEach(it => {
+    const b = el(`<button class="navbtn ${state.view===it.k?'active':''}"><span class="ic">${it.ic}</span><span>${it.l}</span></button>`);
+    b.onclick = () => { state.view = it.k; render(); };
+    nav.appendChild(b);
+  });
+  return nav;
+}
+
+function renderHome(){
+  const wrap = el(`<div></div>`);
+  wrap.appendChild(el(`<h2>안녕하세요, ${esc(state.name)}님</h2>`));
+  wrap.appendChild(el(`<p class="muted">오늘 하루, 마음은 어떠셨나요?</p>`));
+
+  const bannerSlot = el(`<div id="bannerSlot"></div>`);
+  wrap.appendChild(bannerSlot);
+
+  /* 음성으로 바로 시작 */
+  const heroVoice = el(`<button class="shortcut hero-voice" style="width:100%;margin-bottom:16px;" id="heroVoice"><span class="tt">🗣️ 말로 이야기 시작하기</span><span class="ds">글씨를 쓰지 않아도 괜찮아요. 마음이가 말하고, 어르신도 말씀하시면 돼요.</span></button>`);
+  heroVoice.onclick = () => { state.view = 'chat'; state.autoVoice = true; saveVoiceOutputPref(true); render(); };
+  wrap.appendChild(heroVoice);
+
+  /* 0단계 — 오늘의 감사 */
+  const gratCard = el(`
+    <div class="card">
+      <h3 style="font-size:1em;margin-top:0;">🙏 오늘의 감사</h3>
+      <p class="muted" style="margin:0 0 10px;">작게라도 감사했던 순간이 있으셨나요? 한 줄이면 충분해요.</p>
+      <textarea id="gratInput" placeholder="오늘, 감사했던 순간을 적어주세요"></textarea>
+      <div class="field-actions"><button class="btn btn-secondary" id="gratSave">기록하기</button></div>
+    </div>
+  `);
+  gratCard.querySelector('.field-actions').prepend(attachMic(gratCard.querySelector('#gratInput')));
+  gratCard.querySelector('#gratSave').onclick = () => {
+    const ta = gratCard.querySelector('#gratInput');
+    const text = ta.value.trim();
+    if(!text) return;
+    const list = loadGratitude(state.name);
+    list.unshift({date: todayStr(), text});
+    safeSet('gratitude:'+state.name, JSON.stringify(list));
+    ta.value = '';
+    bannerSlot.prepend(el(`<div class="gratitude-note"><b>기록되었습니다.</b> 오늘의 감사가 경험 아카이브에 남았어요.</div>`));
+  };
+  wrap.appendChild(gratCard);
+
+  const gaugeCard = el(`
+    <div class="card">
+      <div class="gauge-wrap">
+        <svg width="180" height="100" viewBox="0 0 180 100">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#A63A3A"/>
+              <stop offset="50%" stop-color="#B3541E"/>
+              <stop offset="100%" stop-color="#2F4468"/>
+            </linearGradient>
+          </defs>
+          <path d="M 10 95 A 80 80 0 0 1 170 95" fill="none" stroke="#E7DFC9" stroke-width="14" stroke-linecap="round"/>
+          <path id="gaugeArc" d="M 10 95 A 80 80 0 0 1 170 95" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"/>
+        </svg>
+        <div class="gauge-value" id="gaugeVal">—</div>
+        <div class="gauge-label">최근 마음 온도</div>
+      </div>
+      <div class="emoji-row" id="emojiRow"></div>
+      <div class="field-actions" style="justify-content:center;" id="moodVoiceSlot"></div>
+      <div class="muted" id="trendNote" style="text-align:center;margin-top:10px;font-size:0.85em;"></div>
+    </div>
+  `);
+  wrap.appendChild(gaugeCard);
+
+  const emojiRow = gaugeCard.querySelector('#emojiRow');
+  MOODS.forEach(m => {
+    const b = el(`<button class="emoji-btn"><span class="e">${m.e}</span><span class="l">${m.l}</span></button>`);
+    b.onclick = () => recordMood(m.v);
+    emojiRow.appendChild(b);
+  });
+
+  {
+    const slot = gaugeCard.querySelector('#moodVoiceSlot');
+    const mb = el(`<button type="button" class="mic-btn">🎤 말로 마음 온도 알리기</button>`);
+    const note = el(`<div class="muted" style="width:100%;text-align:center;font-size:0.85em;" role="status" aria-live="polite"></div>`);
+    mb.onclick = () => {
+      if(!VOICE.sttSupported){ note.textContent = '이 브라우저는 음성 인식을 지원하지 않아요. 위의 얼굴 버튼을 눌러주세요.'; return; }
+      if(mb.classList.contains('listening')){ stopDictation(); return; }
+      stopDictation();
+      mb.classList.add('listening'); mb.textContent = '⏹ 듣고 있어요…';
+      const ask = () => new Promise(r => { VOICE.ttsSupported ? speakText('오늘 마음은 어떠세요? 좋다, 보통이다, 힘들다 처럼 편하게 말씀해주세요.').then(r) : r(); });
+      let started = true;
+      ask().then(() => {
+        if(!mb.isConnected || !mb.classList.contains('listening')) return;
+        activeDictation = listenOnce({
+          onFinal: t => {
+            if(hasRisk(t)){
+              evaluateRisk(state.name, t, '음성 체크인');
+              note.textContent = '많이 힘드신 마음이 느껴져요. 자살예방상담전화 109로 언제든 전화하셔도 괜찮아요.';
+              speakText('많이 힘드신 마음이 느껴져요. 자살예방상담전화 일공구로 언제든 전화하셔도 괜찮아요.');
+              return;
+            }
+            const v = moodFromSpeech(t);
+            if(v){ const lb = MOODS.find(m => m.v === v); speakText(`${lb.l}이시군요. 기록해둘게요.`); recordMood(v); }
+            else { note.textContent = `"${t}" — 어떤 마음인지 잘 모르겠어요. 얼굴 버튼을 눌러주세요.`; }
+          },
+          onError: (code, msg) => { if(msg) note.textContent = msg + ' 얼굴 버튼을 눌러 알려주셔도 좋아요.'; },
+          onEnd: () => { mb.classList.remove('listening'); mb.textContent = '🎤 말로 마음 온도 알리기'; activeDictation = null; },
+        });
+      });
+    };
+    slot.appendChild(mb); slot.appendChild(note);
+  }
+
+  const promptCard = el(`
+    <div class="card" style="background:var(--indigo-soft);border-color:#C9D6E4;">
+      <h3 style="font-size:1em;margin-top:0;">📅 오늘의 질문 (3축 · 기억)</h3>
+      <p style="margin:6px 0 12px;">${esc(getTodayPrompt())}</p>
+      <div class="field-actions"><button class="btn btn-secondary" id="usePromptBtn">이 질문으로 마음이와 이야기하기</button><button class="mic-btn" id="readPrompt" type="button">🔊 질문 듣기</button></div>
+    </div>
+  `);
+  promptCard.querySelector('#readPrompt').onclick = () => speakText(getTodayPrompt());
+  promptCard.querySelector('#usePromptBtn').onclick = () => {
+    state.pendingPrompt = getTodayPrompt();
+    state.view = 'chat';
+    render();
+  };
+  wrap.appendChild(promptCard);
+
+  // 4축 공동체 — 모임 체크인
+  const meetingCard = el(`
+    <div class="card">
+      <h3 style="font-size:1em;margin-top:0;">🤝 오프라인 모임에 다녀오셨나요?</h3>
+      <button class="btn btn-outline btn-block" id="meetingBtn">네, 다녀왔어요</button>
+    </div>
+  `);
+  meetingCard.querySelector('#meetingBtn').onclick = () => {
+    let log = [];
+    try{ log = JSON.parse(safeGet('meetinglog:'+state.name) || '[]'); }catch(e){ log = []; }
+    log.unshift({date: todayStr()});
+    safeSet('meetinglog:'+state.name, JSON.stringify(log));
+    meetingCard.querySelector('#meetingBtn').textContent = '기록되었습니다. 다음에 마음이가 여쭤볼게요 :)';
+  };
+  wrap.appendChild(meetingCard);
+
+  // 2축 의미 — 강점 카드
+  const strengthCard = el(`
+    <div class="card">
+      <h3 style="font-size:1em;margin-top:0;">💎 오늘 발견한 나의 강점 (2·3축)</h3>
+      <p class="muted" id="strengthSummary" style="margin:0 0 8px;font-size:0.85em;"></p>
+      <textarea id="strengthInput" placeholder="예: 끝까지 포기하지 않는 것, 남을 잘 챙기는 것..."></textarea>
+      <div class="field-actions"><button class="btn btn-secondary" id="strengthSaveBtn">강점 카드에 담기</button></div>
+    </div>
+  `);
+  strengthCard.querySelector('.field-actions').prepend(attachMic(strengthCard.querySelector('#strengthInput')));
+  strengthCard.querySelector('#strengthSaveBtn').onclick = () => {
+    const ta = strengthCard.querySelector('#strengthInput');
+    const text = ta.value.trim();
+    if(!text) return;
+    addStrengthCard(state.name, text);
+    ta.value = '';
+    render();
+  };
+  wrap.appendChild(strengthCard);
+  {
+    const cards = loadStrengthCards(state.name);
+    const monthKey = new Date().toISOString().slice(0,7);
+    const thisMonth = cards.filter(c => c.month === monthKey);
+    strengthCard.querySelector('#strengthSummary').textContent =
+      thisMonth.length > 0 ? `이번 달 ${thisMonth.length}개의 강점을 발견하셨어요.` : '이번 달, 아직 발견된 강점이 없어요.';
+  }
+
+  const shortcuts = el(`
+    <div class="shortcut-grid">
+      <button class="shortcut" id="scChat"><span class="tt">💬 AI와 대화하기</span><span class="ds">오늘의 생각을 나눠요</span></button>
+      <button class="shortcut" id="scJournal"><span class="tt">🗂️ 경험 아카이브 보기</span><span class="ds">평생 쌓아가는 나의 이야기</span></button>
+      <button class="shortcut" id="scProgress"><span class="tt">🗓️ 진행현황</span><span class="ds">8강 여정 확인하기</span></button>
+      <button class="shortcut" id="scJournalWrite"><span class="tt">✍️ 오늘 한 줄 남기기</span><span class="ds">짧은 기록도 좋아요</span></button>
+    </div>
+  `);
+  shortcuts.querySelector('#scChat').onclick = () => { state.view='chat'; render(); };
+  shortcuts.querySelector('#scJournal').onclick = () => { state.view='journal'; render(); };
+  shortcuts.querySelector('#scProgress').onclick = () => { state.view='progress'; render(); };
+  shortcuts.querySelector('#scJournalWrite').onclick = () => { state.view='journal'; render(); setTimeout(() => { const t = document.getElementById('journalInput'); if(t) t.focus(); }, 50); };
+  wrap.appendChild(shortcuts);
+
+  wrap.appendChild(el(`
+    <div class="safety-note">
+      <b>마음이 많이 힘드실 땐</b><br>
+      자살예방상담전화 <b>109</b> (24시간, 비밀보장) · 정신건강상담전화 <b>1577-0199</b><br>
+      언제든 전화해서 이야기하셔도 괜찮아요.
+    </div>
+  `));
+
+  // 온도계 + 어제 대비 흐름
+  const sum = loadSummary(state.name);
+  const val = gaugeCard.querySelector('#gaugeVal');
+  const arc = gaugeCard.querySelector('#gaugeArc');
+  if(sum.mood){
+    const label = MOODS.find(m=>m.v===sum.mood);
+    val.textContent = label ? label.l : '—';
+    const pct = sum.mood/5;
+    arc.style.strokeDashoffset = 251 - (251*pct);
+    const sel = emojiRow.children[5-sum.mood];
+    if(sel) sel.classList.add('selected');
+  } else {
+    val.textContent = '아직 기록 전';
+  }
+  const checkins = loadCheckins(state.name);
+  const trendNote = gaugeCard.querySelector('#trendNote');
+  if(checkins.length >= 2){
+    const prev = checkins[checkins.length-2].mood;
+    const cur = checkins[checkins.length-1].mood;
+    if(cur > prev) trendNote.textContent = '어제보다 오늘, 마음이 조금 더 편안해 보이세요.';
+    else if(cur < prev) trendNote.textContent = '어제보다 오늘, 마음이 조금 무거우신 것 같아요.';
+    else trendNote.textContent = '어제와 비슷한 흐름이에요.';
+  }
+
+  // 5축 역할 — 진행자가 남긴 "활용 소식"
+  const legacyNote = safeGet('legacynotice:'+state.name);
+  if(legacyNote){
+    try{
+      const n = JSON.parse(legacyNote);
+      if(!n.read){
+        bannerSlot.appendChild(el(`
+          <div class="card" style="background:var(--sage-bg);border-color:#C9DBC6;">
+            <b>🌾 ${esc(state.name)}님의 이야기가 실제로 쓰였어요</b>
+            <p style="margin:6px 0 0;">${esc(n.message)}</p>
+          </div>
+        `));
+        safeSet('legacynotice:'+state.name, JSON.stringify(Object.assign({}, n, {read:true})));
+      }
+    }catch(e){}
+  }
+
+  // 4축 공동체 — 다른 참여자 소개
+  let names = [];
+  try{ names = JSON.parse(safeGet('registry') || '[]'); }catch(e){ names = []; }
+  const others = names.filter(n => n !== state.name);
+  if(others.length > 0){
+    const pick = others[Math.floor(Math.random()*others.length)];
+    bannerSlot.appendChild(el(`
+      <div class="card" style="background:var(--paper-2);">
+        <h3 style="font-size:1em;margin-top:0;">🤝 함께해요</h3>
+        <p style="margin:0;">${esc(pick)}님도 요즘 마음온도를 함께 하고 계세요. 다음 모임에서 마주치시면 반갑게 인사해보세요.</p>
+      </div>
+    `));
+  }
+
+  return wrap;
+}
+
+/* ============ 마음이 응답 ============
+   1순위: Claude 아티팩트 런타임(claude.use('sample')) — 게시된 아티팩트 안에서 실행될 때
+   2순위: window.MAEUM_CHAT_ENDPOINT(POST {system, messages} → {text}) — 직접 호스팅 시 연결
+   3순위: 기기 안에서 동작하는 간단한 "거울 모드" 응답 — 연결이 없어도 대화가 끊기지 않도록 */
+const POSITIVE_WORDS = ["좋", "기쁘", "행복", "감사", "고마", "즐거", "뿌듯", "다행", "편안", "웃"];
+function localMirrorReply(text, week, negativeStreak, turn){
+  const w = WEEKS.find(x => x.n === week) || WEEKS[0];
+  const snippet = text.replace(/\s+/g,' ').trim();
+  const quote = snippet.length > 28 ? snippet.slice(0, 28) + '…' : snippet;
+  const neg = NEGATIVE_WORDS.some(x => text.includes(x));
+  const pos = POSITIVE_WORDS.some(x => text.includes(x));
+  let lead;
+  if(neg) lead = `"${quote}" 하고 말씀해주셨네요. 그런 마음이 드셨군요. 말씀해주셔서 고맙습니다.`;
+  else if(pos) lead = `"${quote}" 하고 말씀해주셨네요. 듣는 저도 마음이 따뜻해져요.`;
+  else lead = `"${quote}" 하고 말씀해주셨네요. 차분히 들었어요.`;
+  let ask;
+  if(negativeStreak >= NEGATIVE_STREAK_THRESHOLD) ask = '그 마음은 충분히 이해돼요. 혹시 요즘 작게라도 고마웠던 순간이나, 스스로 잘 해냈다 싶은 일이 있으셨나요?';
+  else ask = w.hint;
+  const share = (turn % 4 === 3) ? ' 오늘 나눈 이야기를 가까운 분께도 들려드리면 좋겠어요.' : '';
+  return `${lead}${share} ${ask}`;
+}
+async function getAssistantReply(instructions, turns, text, week, negativeStreak, turnNo){
+  const primed = [
+    { role: 'user', content: instructions + '\n\n(위 지침을 확인했다면, 다음 참여자 메시지부터 지침에 따라 자연스럽게 응답해주세요. 이 안내 메시지 자체에는 답하지 마세요.)' },
+    { role: 'assistant', content: '네, 준비됐습니다.' },
+    ...turns,
+  ];
+  try{
+    if(typeof claude !== 'undefined' && claude.use){
+      const sample = await claude.use('sample');
+      if(sample){
+        const result = await sample(primed, { modelTier: 'default', cache: false });
+        if(result && result.text) return result.text;
+      }
+    }
+    if(window.MAEUM_CHAT_ENDPOINT){
+      const r = await fetch(window.MAEUM_CHAT_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({system: instructions, messages: turns})});
+      if(r.ok){ const j = await r.json(); if(j && j.text) return j.text; }
+    }
+  }catch(e){ console.warn('AI unavailable, using local mirror reply', e); }
+  return localMirrorReply(text, week, negativeStreak, turnNo);
+}
+
+const STOP_WORDS = ["그만", "끝낼게", "끝내", "종료", "다음에 할게", "여기까지", "마칠게"];
+function renderChat(){
+  const wrap = el(`<div></div>`);
+  const header = el(`
+    <div class="chat-header">
+      <select id="weekSelect" aria-label="강 선택"></select>
+      <span id="modeBadge" class="mode-badge mode-mirror">🪞 거울 모드</span>
+    </div>
+  `);
+  const sel = header.querySelector('#weekSelect');
+  WEEKS.forEach(w => {
+    const o = el(`<option value="${w.n}">${w.n}강 · ${w.title}</option>`);
+    if(w.n === state.chatWeek) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.onchange = () => { state.chatWeek = parseInt(sel.value); saveSummary(state.name, {currentWeek: state.chatWeek}); updateWeekNote(); };
+  wrap.appendChild(header);
+
+  let voiceOutputOn = loadVoiceOutputPref();
+  /* 음성 설정 */
+  const voiceBox = el(`<div class="voice-box"></div>`);
+  if(VOICE.ttsSupported){
+    const row = el(`
+      <div class="voice-row">
+        <label class="voice-toggle"><input type="checkbox" id="voiceOutputToggle"> 🔊 답변을 소리로 듣기</label>
+        <label class="voice-toggle">속도
+          <select id="rateSel" aria-label="읽는 속도">
+            <option value="0.75">느리게</option><option value="0.9">보통</option><option value="1.1">빠르게</option>
+          </select>
+        </label>
+        <button type="button" class="replay-btn" id="stopTalk">⏹ 멈추기</button>
+      </div>`);
+    const chk = row.querySelector('#voiceOutputToggle');
+    chk.checked = voiceOutputOn;
+    chk.onchange = ev => { voiceOutputOn = ev.target.checked; saveVoiceOutputPref(voiceOutputOn); if(!voiceOutputOn) stopSpeaking(); };
+    const rs = row.querySelector('#rateSel');
+    rs.value = String([0.75,0.9,1.1].reduce((a,b) => Math.abs(b-VOICE.rate) < Math.abs(a-VOICE.rate) ? b : a));
+    rs.onchange = () => { VOICE.rate = parseFloat(rs.value); safeSet('voiceRate', rs.value); speakText('이 속도로 읽어드릴게요.'); };
+    row.querySelector('#stopTalk').onclick = stopSpeaking;
+    voiceBox.appendChild(row);
+  }
+  wrap.appendChild(voiceBox);
+
+  /* 음성 대화 모드 */
+  const hfCard = el(`
+    <div class="handsfree-card">
+      <button type="button" class="btn btn-lg btn-block btn-primary" id="hfBtn">🗣️ 음성으로 대화하기</button>
+      <div class="voice-status" id="voiceStatus" role="status" aria-live="polite"></div>
+    </div>`);
+  wrap.appendChild(hfCard);
+  const hfBtn = hfCard.querySelector('#hfBtn');
+  const statusEl = hfCard.querySelector('#voiceStatus');
+  function setStatus(t, kind){ statusEl.textContent = t || ''; statusEl.className = 'voice-status ' + (kind || ''); }
+  if(!VOICE.sttSupported){
+    hfBtn.disabled = true;
+    setStatus('이 브라우저는 음성 인식을 지원하지 않아요. 크롬·엣지·사파리에서 열거나, 입력창을 누른 뒤 키보드의 🎤 버튼을 이용해주세요.');
+  }
+
+  wrap.appendChild(el(`<p class="muted" id="weekGoalNote"></p>`));
+  wrap.appendChild(el(`<div class="safety-note" style="margin:0 0 12px;font-size:0.82em;">본 도구는 의료적 진단을 하지 않는 보조적 심리지원 도구입니다.</div>`));
+
+  function setMode(mode){
+    const badge = header.querySelector('#modeBadge');
+    if(mode === 'bridge'){ badge.textContent = '🌉 가교 모드로 전환됨'; badge.className = 'mode-badge mode-bridge'; }
+    else { badge.textContent = '🪞 거울 모드'; badge.className = 'mode-badge mode-mirror'; }
+  }
+
+  const log = el(`<div class="chat-log" id="chatLog"></div>`);
+  wrap.appendChild(log);
+
+  const inputRow = el(`
+    <div class="chat-input-row">
+      <textarea id="chatInput" aria-label="마음이에게 하고 싶은 말" placeholder="오늘 있었던 일이나 생각을 편하게 적거나 말씀해주세요"></textarea>
+      <div class="chat-input-btns">
+        <button class="btn btn-primary" id="sendBtn">보내기</button>
+      </div>
+    </div>
+  `);
+  wrap.appendChild(inputRow);
+  const input = inputRow.querySelector('#chatInput');
+  const sendBtn = inputRow.querySelector('#sendBtn');
+  const micBtn = attachMic(input, '말하기');
+  micBtn.classList.add('mic-chat');
+  inputRow.querySelector('.chat-input-btns').prepend(micBtn);
+  if(!VOICE.sttSupported){
+    wrap.appendChild(el(`<p class="voice-note">🎤 음성으로 입력하시려면, 입력창을 누른 뒤 <b>기기 키보드에 있는 마이크 버튼</b>을 눌러 말씀해주세요.</p>`));
+  }
+  if(state.pendingPrompt){ input.value = state.pendingPrompt; state.pendingPrompt = ""; }
+
+  function updateWeekNote(){
+    const w = WEEKS.find(x=>x.n===state.chatWeek);
+    wrap.querySelector('#weekGoalNote').textContent = w ? `${w.n}강 · ${w.axis} — ${w.title} (${w.goal})` : '';
+  }
+  updateWeekNote();
+  const toBottom = () => { requestAnimationFrame(() => { const last = log.lastElementChild; if(last) last.scrollIntoView({block:'end', behavior:'smooth'}); }); };
+
+  /* ---------- 음성 대화 루프 ---------- */
+  let listener = null, noSpeechCount = 0, wrapPending = null;
+  function stopHandsFree(msg){
+    VOICE.handsFree = false;
+    if(listener){ listener.abort(); listener = null; }
+    stopSpeaking();
+    hfBtn.textContent = '🗣️ 음성으로 대화하기';
+    hfBtn.classList.remove('btn-secondary'); hfBtn.classList.add('btn-primary');
+    setStatus(msg || '');
+  }
+  function listenTurn(){
+    if(!VOICE.handsFree || !wrap.isConnected) return;
+    setStatus('🎤 듣고 있어요… 편하게 말씀하세요. (끝내시려면 "그만"이라고 말씀하세요)', 'listening');
+    listener = listenOnce({
+      onInterim: t => { input.value = t; },
+      onFinal: t => {
+        noSpeechCount = 0;
+        input.value = t;
+        if(STOP_WORDS.some(w => t.includes(w)) && t.length <= 14){ input.value = ''; stopHandsFree('음성 대화를 마쳤어요. 오늘도 이야기 나눠주셔서 고마워요.'); speakText('오늘도 이야기 나눠주셔서 고마워요.'); return; }
+        setStatus('마음이가 생각하고 있어요…');
+        handleSend();
+      },
+      onError: (code, msg) => {
+        if(code === 'no-speech'){
+          noSpeechCount++;
+          if(noSpeechCount >= 3) stopHandsFree('한참 말씀이 없으셔서 음성 대화를 잠시 멈췄어요. 다시 하고 싶으실 때 버튼을 눌러주세요.');
+          else if(VOICE.handsFree) setTimeout(listenTurn, 300);
+          return;
+        }
+        if(code === 'aborted') return;
+        stopHandsFree(msg);
+      },
+    });
+  }
+  /* 마음이가 말을 마치면 이어서 듣기 */
+  function afterAssistantSpoke(){ if(VOICE.handsFree) setTimeout(listenTurn, 400); }
+  hfBtn.onclick = () => {
+    if(VOICE.handsFree){ stopHandsFree('음성 대화를 멈췄어요.'); return; }
+    stopDictation();
+    VOICE.handsFree = true; noSpeechCount = 0;
+    hfBtn.textContent = '⏹ 음성 대화 끝내기';
+    hfBtn.classList.remove('btn-primary'); hfBtn.classList.add('btn-secondary');
+    const last = log.querySelector('.msg.ai:last-of-type, .msg.crisis:last-of-type');
+    const first = state.chatHistory.length === 0 ? greeting : (last ? last.textContent : '네, 편하게 말씀해주세요.');
+    setStatus('마음이가 말하고 있어요…');
+    if(VOICE.ttsSupported) speakText(first).then(afterAssistantSpoke); else afterAssistantSpoke();
+  };
+
+  function addBubble(role, text, opts){
+    const { autoSpeak = false } = opts || {};
+    const cls = role === 'user' ? 'user' : (role === 'crisis' ? 'crisis' : 'ai');
+    const b = el(`<div class="msg ${cls}"></div>`);
+    b.textContent = text;
+    log.appendChild(b);
+    if(role !== 'user' && VOICE.ttsSupported){
+      const replay = el(`<button class="replay-btn" type="button">🔊 다시 듣기</button>`);
+      replay.onclick = () => speakText(text);
+      log.appendChild(replay);
+    }
+    if(role !== 'user' && autoSpeak){
+      if(VOICE.ttsSupported && (voiceOutputOn || VOICE.handsFree)){ setStatus(VOICE.handsFree ? '마음이가 말하고 있어요…' : ''); speakText(text).then(afterAssistantSpoke); }
+      else afterAssistantSpoke();
+    }
+    toBottom();
+    return b;
+  }
+
+  function addWrapUpPrompt(){
+    const text = '오늘 이야기를 많이 나눠주셨네요. 여기서 잠시 마무리해볼까요, 아니면 조금 더 이야기하고 싶으신가요?';
+    const card = el(`
+      <div class="wrapup-card">
+        <div class="wu-text"></div>
+        <div class="wu-actions">
+          <button class="btn btn-secondary" id="wuStop">네, 오늘은 여기까지</button>
+          <button class="btn btn-outline" id="wuContinue">조금 더 이야기하고 싶어요</button>
+        </div>
+      </div>
+    `);
+    card.querySelector('.wu-text').textContent = text;
+    log.appendChild(card);
+    toBottom();
+    const stop = () => {
+      const suggestion = OFFLINE_SUGGESTIONS[Math.floor(Math.random()*OFFLINE_SUGGESTIONS.length)];
+      card.remove(); wrapPending = null;
+      const msg = `오늘도 마음을 나눠주셔서 감사해요. ${suggestion}`;
+      stopHandsFree();
+      addBubble('assistant', msg, {autoSpeak:true});
+      state.chatHistory.push({role:'assistant', content: msg, date: todayStr(), week: state.chatWeek});
+      safeSet('chat:'+state.name, JSON.stringify(state.chatHistory));
+    };
+    const cont = () => { card.remove(); wrapPending = null; addBubble('assistant', '네, 편하게 계속 이야기해주세요.', {autoSpeak:true}); };
+    card.querySelector('#wuStop').onclick = stop;
+    card.querySelector('#wuContinue').onclick = cont;
+    wrapPending = {stop, cont, card};
+    if(VOICE.handsFree && VOICE.ttsSupported) speakText(text + ' "여기까지" 또는 "더 이야기할래요"라고 말씀해주세요.').then(afterAssistantSpoke);
+    else if(voiceOutputOn && VOICE.ttsSupported) speakText(text);
+  }
+
+  let sessionTurns = 0;
+  let negativeStreak = 0;
+  let lastDividerKey = null;
+  function addDividerIfNeeded(dateStr, weekNum){
+    const label = dateStr ? (weekNum ? `${weekNum}강 · ${dateStr}` : dateStr) : '이전 기록';
+    if(label === lastDividerKey) return;
+    lastDividerKey = label;
+    const div = el(`<div class="chat-divider"></div>`);
+    div.appendChild(el(`<span class="line"></span>`));
+    div.appendChild(el(`<span>${esc(label)}</span>`));
+    div.appendChild(el(`<span class="line"></span>`));
+    log.appendChild(div);
+  }
+
+  const greeting = `안녕하세요 ${state.name}님, 오늘도 만나서 반갑습니다. 요즘 마음속에 자주 떠오르는 생각이 있으신가요? 편하게 말씀해 주세요.`;
+  const history = loadChat(state.name);
+  state.chatHistory = history;
+  if(history.length === 0){
+    addDividerIfNeeded(todayStr(), state.chatWeek);
+    addBubble('assistant', greeting);
+  } else {
+    history.forEach(m => { addDividerIfNeeded(m.date, m.week); addBubble(m.role === 'assistant' ? 'assistant' : 'user', m.content); });
+  }
+  if(state.autoVoice){ state.autoVoice = false; if(VOICE.sttSupported) setTimeout(() => hfBtn.click(), 200); }
+
+  async function handleSend(){
+    const text = input.value.trim();
+    if(!text || state.sending) return;
+    if(activeDictation) stopDictation();
+    stopSpeaking();
+    input.value = '';
+
+    /* 마무리 질문에 말씀/글로 답한 경우 */
+    if(wrapPending){
+      const wp = wrapPending;
+      if(/여기까지|마무리|그만|끝|네/.test(text) && !/더/.test(text)){ addBubble('user', text); wp.stop(); return; }
+      if(/더|계속|이야기/.test(text)){ addBubble('user', text); wp.cont(); return; }
+      wp.card.remove(); wrapPending = null;
+    }
+
+    setMode('mirror');
+    const today = todayStr();
+    addDividerIfNeeded(today, state.chatWeek);
+    addBubble('user', text);
+    state.chatHistory.push({role:'user', content: text, date: today, week: state.chatWeek});
+    safeSet('chat:'+state.name, JSON.stringify(state.chatHistory));
+    saveSummary(state.name, {currentWeek: state.chatWeek});
+
+    if(NEGATIVE_WORDS.some(w => text.includes(w))){ negativeStreak++; } else { negativeStreak = 0; }
+
+    const hitRisk = evaluateRisk(state.name, text, 'AI 대화');
+    if(hitRisk){
+      setMode('bridge');
+      const crisisMsg = "많이 힘든 마음이 느껴집니다. 그 마음을 말씀해주셔서 감사합니다. 지금 이 순간, 자살예방상담전화 109(24시간, 비밀보장) 또는 정신건강위기상담전화 1577-0199로 전화해서 이야기 나눠보시는 것을 권해드리고 싶어요. 곁에 있는 가족이나 담당 선생님께도 지금 마음을 알려주시면 좋겠습니다.";
+      const cb = addBubble('crisis', crisisMsg);
+      cb.appendChild(el(`<div style="margin-top:10px;"><a class="btn btn-primary btn-block" href="tel:109">📞 109에 전화하기</a></div>`));
+      state.chatHistory.push({role:'assistant', content: crisisMsg, date: today, week: state.chatWeek});
+      safeSet('chat:'+state.name, JSON.stringify(state.chatHistory));
+      /* 위기 상황에서는 자동 음성 대화를 이어가지 않고, 안내를 한 번 읽어준 뒤 멈춘다 */
+      stopHandsFree('위험 신호가 감지되어 음성 대화를 멈췄어요. 위 번호로 연락해주세요.');
+      if(VOICE.ttsSupported) speakText(crisisMsg);
+      return;
+    }
+
+    sessionTurns++;
+    const sum = loadSummary(state.name);
+    saveSummary(state.name, {chatTurns: (sum.chatTurns||0) + 1});
+
+    if(sessionTurns > 0 && sessionTurns % SESSION_WRAP_THRESHOLD === 0){ addWrapUpPrompt(); return; }
+
+    state.sending = true;
+    const typingEl = el(`<div class="typing">생각을 정리하고 있어요...</div>`);
+    log.appendChild(typingEl);
+    toBottom();
+
+    try{
+      const w = WEEKS.find(x=>x.n===state.chatWeek);
+
+      // 할루시네이션 방지 — 참여자가 실제로 남긴 기록만 "근거 자료"로 주입
+      const groundStrengths = loadStrengthCards(state.name).slice(0,5);
+      const groundJournal = loadJournal(state.name).slice(0,3);
+      const groundGratitude = loadGratitude(state.name).slice(0,3);
+      let groundBlock = "";
+      if(groundStrengths.length || groundJournal.length || groundGratitude.length){
+        groundBlock += "\n다음은 참여자가 실제로 기록한 내용입니다(이 안의 내용만 사실로 참고하고, 여기 없는 세부사항은 지어내지 마세요):\n";
+        groundStrengths.forEach(s => { groundBlock += `- [${s.date} 강점 기록] ${s.text}\n`; });
+        groundJournal.forEach(j => { groundBlock += `- [${j.date} 저널] ${j.text}\n`; });
+        groundGratitude.forEach(g => { groundBlock += `- [${g.date} 감사 기록] ${g.text}\n`; });
+      }
+
+      const instructions = `당신은 지역사회 어르신들을 위한 AI 마음대화·메타인지 코치입니다. 이름은 "마음이"입니다.
+
+당신은 두 가지 모드로 작동합니다.
+- 거울 모드(평상시 기본값): 판단이나 조언 없이, 반영적 질문을 통해 어르신 스스로 자신을 들여다보게 돕습니다. 답을 대신 주지 않습니다.
+- 가교 모드(위험신호 감지 시로 한정): 오프라인 연결(가족·전문기관 등)을 능동적으로 제안하는 태도로 전환합니다. 이 모드는 시스템이 위험 표현을 감지했을 때만 별도로 작동하며, 지금은 해당하지 않습니다.
+
+원칙:
+1. 거울 모드에서는 답을 대신 주는 것이 아니라, 질문을 통해 어르신 스스로 생각하고 돌아보게 돕습니다.
+2. 절대 의학적 진단이나 "치료", "진단", "예방", "환자", "처방" 같은 표현을 쓰지 않습니다. "회복", "발견", "보완", "정서적 완화", "성장" 같은 표현을 사용합니다.
+3. 어르신이 이해하기 쉬운 짧고 다정한 문장(2~4문장)으로 답합니다. 존댓말을 사용합니다.${VOICE.handsFree ? ' 지금은 음성 대화 중이므로 소리 내어 읽기 좋게 목록·기호·이모지 없이 말하듯이 짧게(2~3문장) 답합니다.' : ''}
+4. 이번 회차 주제는 "${w.n}강 · ${w.axis} — ${w.title}"(${w.goal})입니다. 참고 질문 예시: "${w.hint}". 이 주제와 자연스럽게 연결하되, 어르신이 다른 이야기를 하고 싶어하면 그 이야기를 따라갑니다.
+5. 대화 끝에는 항상 열린 질문 하나를 덧붙여 다음 생각을 이끌어냅니다.
+6. 당신은 진단명이나 위험도 점수를 산출하지 않습니다. 위험 여부 판단과 실제 개입은 전적으로 사회복지사·정신건강 전문가가 담당합니다.
+7. 당신은 전문 상담사를 대체하지 않으며, 실제 상담사·사회복지사의 보조 도구임을 항상 기억합니다.
+8. "저만 있으면 돼요", "저랑만 이야기해요" 같은 독점적·낭만적 표현을 절대 쓰지 않습니다. 대화가 이어지는 중간중간(매번은 아니고, 자연스러운 흐름에서 가끔) 지금 나눈 이야기를 가족·이웃·친구 같은 실제 사람과도 나눠보시길 부드럽게 제안합니다.
+9. 참여자가 말하지 않은 사실(날짜, 역사적 세부사항, 가족관계, 과거 발언 등)을 지어내거나 추측해서 단정적으로 말하지 않습니다. 확실하지 않으면 "제가 잘못 기억했다면 알려주세요" 같은 식으로 확인을 구합니다.
+10. 아래 "참여자 실제 기록"을 참고할 때는 그 안의 표현을 존중해서 참고하고, "~라고 하셨었죠"처럼 출처가 참여자 본인임을 분명히 하는 어법을 씁니다.
+11. 음성 인식으로 입력된 글은 띄어쓰기·오탈자가 어색할 수 있습니다. 의미를 너그럽게 해석하되 확실하지 않으면 부드럽게 되물어주세요.
+${negativeStreak >= NEGATIVE_STREAK_THRESHOLD ? `12. 최근 대화에서 힘든 감정이 여러 차례 이어지고 있습니다(디폴트셋팅: 치우침 예방). 그 감정을 축소하거나 무시하지 말고 충분히 공감해주세요 — 다만 다음 질문에서는 감정을 더 캐묻기보다, 작은 강점이나 감사했던 순간, 다른 관점을 자연스럽게 찾아보는 방향으로 부드럽게 전환해주세요. 억지로 밝은 척하게 만들지 말고, 균형을 찾도록 돕는다는 느낌으로요.` : ''}${groundBlock}
+
+지금부터 참여자와의 실제 대화가 이어집니다. 위 지침을 따라 응답하세요.`;
+
+      const recentTurns = state.chatHistory.slice(-12).map(m => ({role: m.role, content: m.content}));
+      const replyText = await getAssistantReply(instructions, recentTurns, text, state.chatWeek, negativeStreak, sessionTurns);
+      typingEl.remove();
+      addBubble('assistant', replyText, {autoSpeak:true});
+      state.chatHistory.push({role:'assistant', content: replyText, date: today, week: state.chatWeek});
+      safeSet('chat:'+state.name, JSON.stringify(state.chatHistory));
+    }catch(e){
+      typingEl.remove();
+      addBubble('assistant', "지금은 대화를 이어가기 어렵네요. 잠시 후 다시 시도해 주세요.", {autoSpeak:true});
+      console.error(e);
+    }
+    state.sending = false;
+  }
+
+  sendBtn.onclick = handleSend;
+  input.addEventListener('keydown', (ev) => { if(ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing){ ev.preventDefault(); handleSend(); } });
+
+  /* 화면을 벗어나면 음성 정리 */
+  state.cleanup = () => { VOICE.handsFree = false; if(listener) listener.abort(); stopDictation(); stopSpeaking(); };
+  return wrap;
+}
+
+function renderJournal(){
+  const wrap = el(`<div></div>`);
+  wrap.appendChild(el(`<h2>나의 경험 아카이브</h2>`));
+  wrap.appendChild(el(`<p class="muted">8강을 마치신 뒤에도 이 공간은 계속 이어집니다 — 평생 쌓여가는 나만의 기록이에요.</p>`));
+
+  const addCard = el(`
+    <div class="card">
+      <h3 style="font-size:1em;">오늘 한 줄 남기기</h3>
+      <textarea id="journalInput" placeholder="오늘의 생각이나 이야기를 자유롭게 적어주세요"></textarea>
+      <div class="field-actions"><button class="btn btn-primary" id="journalSave">기록 저장하기</button></div>
+    </div>
+  `);
+  addCard.querySelector('.field-actions').prepend(attachMic(addCard.querySelector('#journalInput')));
+  addCard.querySelector('#journalSave').onclick = () => {
+    const ta = addCard.querySelector('#journalInput');
+    const text = ta.value.trim();
+    if(!text) return;
+    const entries = loadJournal(state.name);
+    entries.unshift({date: todayStr(), text});
+    safeSet('journal:'+state.name, JSON.stringify(entries));
+    evaluateRisk(state.name, text, '경험 아카이브 기록');
+    ta.value = '';
+    render();
+  };
+  wrap.appendChild(addCard);
+
+  const gratCard = el(`<div class="card"><h3 style="font-size:1em;">🙏 그동안의 감사</h3><div id="gratList"></div></div>`);
+  wrap.appendChild(gratCard);
+  {
+    const list = loadGratitude(state.name);
+    const listEl = gratCard.querySelector('#gratList');
+    if(list.length === 0) listEl.appendChild(el(`<p class="muted">아직 기록된 감사가 없어요.</p>`));
+    list.forEach(g => listEl.appendChild(el(`<div class="journal-entry"><div class="journal-date">${g.date}</div><div>${esc(g.text)}</div></div>`)));
+  }
+
+  const strengthListCard = el(`<div class="card"><h3 style="font-size:1em;">💎 그동안 발견한 나의 강점</h3><div id="strengthList"></div></div>`);
+  wrap.appendChild(strengthListCard);
+  {
+    const cards = loadStrengthCards(state.name);
+    const listEl = strengthListCard.querySelector('#strengthList');
+    if(cards.length === 0) listEl.appendChild(el(`<p class="muted">아직 담긴 강점 카드가 없어요. 홈 화면에서 오늘 발견한 강점을 남겨보세요.</p>`));
+    cards.forEach(c => listEl.appendChild(el(`<div class="journal-entry"><div class="journal-date">${c.date}</div><div>${esc(c.text)}</div></div>`)));
+  }
+
+  const listCard = el(`<div class="card"><h3 style="font-size:1em;">지난 기록</h3><div id="journalList"></div></div>`);
+  wrap.appendChild(listCard);
+  {
+    const entries = loadJournal(state.name);
+    const listEl = listCard.querySelector('#journalList');
+    if(entries.length === 0) listEl.appendChild(el(`<p class="muted">아직 기록이 없어요. 위에서 오늘의 이야기를 남겨보세요.</p>`));
+    entries.forEach(en => listEl.appendChild(el(`<div class="journal-entry"><div class="journal-date">${en.date}</div><div>${esc(en.text)}</div></div>`)));
+  }
+
+  const exportCard = el(`
+    <div class="card">
+      <h3 style="font-size:1em;">내 기록 내보내기</h3>
+      <p class="muted">지금까지의 감사·강점·기록을 텍스트 파일로 저장할 수 있어요.</p>
+      <button class="btn btn-outline btn-block" id="exportBtn">내 기록 다운로드</button>
+    </div>
+  `);
+  exportCard.querySelector('#exportBtn').onclick = async () => {
+    const lines = [`마음온도 — ${state.name}님의 기록`, '내보낸 날짜: ' + todayStr(), ''];
+    lines.push('[감사 기록]');
+    loadGratitude(state.name).forEach(g => lines.push(`- (${g.date}) ${g.text}`));
+    lines.push('', '[강점카드]');
+    loadStrengthCards(state.name).forEach(c => lines.push(`- (${c.date}) ${c.text}`));
+    lines.push('', '[지난 기록]');
+    loadJournal(state.name).forEach(j => lines.push(`- (${j.date}) ${j.text}`));
+    const text = lines.join('\n');
+    const filename = `마음온도_${state.name}_기록.txt`;
+    try{
+      if(typeof claude !== 'undefined' && claude.use){
+        const downloads = await claude.use('downloads');
+        if(downloads){ await downloads.save({ filename, data: text }); return; }
+      }
+    }catch(e){ console.warn('downloads unavailable', e); }
+    const url = URL.createObjectURL(new Blob([text], {type:'text/plain;charset=utf-8'}));
+    const a = document.createElement('a'); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+  wrap.appendChild(exportCard);
+
+  return wrap;
+}
+
+function renderProgress(){
+  const wrap = el(`<div></div>`);
+  wrap.appendChild(el(`<h2>8강 진행현황</h2>`));
+  wrap.appendChild(el(`<p class="muted">이 8강은 마음온도와 만나는 첫걸음이에요. 다 마치신 뒤에도 홈 화면 체크인과 경험 아카이브는 계속 이어집니다.</p>`));
+  const card = el(`<div class="card"></div>`);
+  wrap.appendChild(card);
+  const progress = loadProgress(state.name);
+  const sum = loadSummary(state.name);
+  WEEKS.forEach(w => {
+    const done = !!progress[w.n];
+    const isCurrent = w.n === (sum.currentWeek || 1) && !done;
+    const row = el(`
+      <div class="week-row">
+        <div class="week-badge ${done?'done':''} ${isCurrent?'current':''}">${done ? '✓' : w.n}</div>
+        <div>
+          <div class="week-title">${w.axis} · ${w.title}</div>
+          <div class="week-goal">${w.goal}</div>
+        </div>
+        <button class="btn btn-outline week-toggle" style="min-height:36px;padding:8px 14px;font-size:0.85em;">${done?'완료됨':'완료 표시'}</button>
+      </div>
+    `);
+    row.querySelector('.week-toggle').onclick = () => {
+      const p = loadProgress(state.name);
+      p[w.n] = !p[w.n];
+      safeSet('progress:'+state.name, JSON.stringify(p));
+      if(p[w.n]) saveSummary(state.name, {currentWeek: Math.min(8, w.n+1)});
+      render();
+    };
+    card.appendChild(row);
+  });
+  return wrap;
+}
+
+function renderFacilitator(){
+  const wrap = el(`<div class="view"></div>`);
+  wrap.appendChild(el(`<h2>진행자 화면</h2>`));
+  wrap.appendChild(el(`<div class="privacy-note">개인 대화 내용은 비공개로 유지되며, 이 화면에는 마음 온도 요약과 위험 신호 여부만 표시됩니다. 위험 신호가 표시되면 반드시 담당자가 직접 확인 후 대응해 주세요.<br><br><b>※ 1차 프로토타입 한계:</b> 지금은 참여자와 같은 기기·브라우저에서 입력된 기록만 이 화면에서 볼 수 있어요. 기기를 넘나드는 실시간 연동은 다음 단계 과제입니다.</div>`));
+
+  const alertSection = el(`<div id="facAlerts"></div>`);
+  const rosterSection = el(`<div id="facRoster"></div>`);
+  wrap.appendChild(alertSection);
+  wrap.appendChild(rosterSection);
+
+  function buildContactForm(name){
+    return el(`
+      <div class="card" style="border:1.5px solid var(--alert);">
+        <h3 style="font-size:1em;color:var(--alert);">📋 대응 기록 남기기 — ${esc(name)}</h3>
+        <p class="muted" style="margin-top:-6px;">위험신호 대응 매뉴얼 표준 양식에 맞춰 기록합니다.</p>
+        <label class="muted" style="font-size:0.85em;">확인 결과 요약 (원문 인용 없이)</label>
+        <textarea id="fSummary" placeholder="예: 전화 연락, 최근 외로움을 느낀다고 하심"></textarea>
+        <label class="muted" style="font-size:0.85em;">취한 조치</label>
+        <textarea id="fAction" placeholder="예: 안부 확인, 109 안내"></textarea>
+        <label class="muted" style="font-size:0.85em;">연계 기관 (해당 시)</label>
+        <textarea id="fAgency" placeholder="예: OO정신건강복지센터"></textarea>
+        <label class="muted" style="font-size:0.85em;">후속 계획</label>
+        <textarea id="fPlan" placeholder="예: 1주간 매일 안부 확인"></textarea>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-primary" id="fSave">기록 저장 후 확인 완료로 표시</button>
+          <button class="btn btn-outline" id="fCancel">취소</button>
+        </div>
+      </div>
+    `);
+  }
+
+  let names = [];
+  try{ names = JSON.parse(safeGet('registry') || '[]'); }catch(e){ names = []; }
+  if(names.length === 0){
+    alertSection.appendChild(el(`<div class="card muted">아직 등록된 참여자가 없어요. 참여자 화면에서 이름을 입력하면 이곳에 표시됩니다.</div>`));
+    return wrap;
+  }
+
+  const summaries = names.map(name => ({name, sum: loadSummary(name)}));
+  const flagged = summaries.filter(x => x.sum.riskFlag).sort((a,b) => {
+    const order = {high:0, medium:1, low:2};
+    return (order[a.sum.riskLevel]??3) - (order[b.sum.riskLevel]??3);
+  });
+  const ok = summaries.filter(x => !x.sum.riskFlag);
+
+  if(flagged.length > 0){
+    alertSection.appendChild(el(`<h3 style="color:var(--alert);">🔔 확인이 필요한 알림 (${flagged.length}건)</h3>`));
+    for(const {name, sum} of flagged){
+      const tier = RISK_SLA[sum.riskLevel] || RISK_SLA.medium;
+      const tierColor = sum.riskLevel === 'high' ? 'var(--alert)' : (sum.riskLevel === 'low' ? '#B8860B' : '#C6631E');
+      const card = el(`
+        <div class="card fac-card" style="border-color:${tierColor};background:var(--alert-bg);">
+          <div class="fac-avatar" style="background:${tierColor};color:#fff;">${esc(name.slice(0,1))}</div>
+          <div>
+            <div class="fac-name">${esc(name)} <span style="font-weight:700;color:${tierColor};font-size:0.8em;">· ${tier.label}</span></div>
+            <div class="fac-meta">${esc(sum.riskNote || '위험 신호 감지')} ${sum.riskDate ? '· '+sum.riskDate : ''}</div>
+            <div class="fac-meta" style="font-weight:700;">대응 시한: ${tier.sla}</div>
+          </div>
+          <span class="flag-badge" style="background:${tierColor};">확인 필요</span>
+        </div>
+      `);
+      const actionRow = el(`<div style="display:flex;gap:10px;margin:-8px 0 16px;"><button class="btn btn-outline btn-block" id="btnRespond">지금 대응 기록 남기기</button></div>`);
+      alertSection.appendChild(card);
+      alertSection.appendChild(actionRow);
+      actionRow.querySelector('#btnRespond').onclick = () => {
+        const form = buildContactForm(name);
+        actionRow.replaceWith(form);
+        form.querySelector('#fCancel').onclick = () => render();
+        form.querySelector('#fSave').onclick = () => {
+          const entry = {
+            date: todayStr(),
+            summary: form.querySelector('#fSummary').value.trim(),
+            action: form.querySelector('#fAction').value.trim(),
+            agency: form.querySelector('#fAgency').value.trim(),
+            plan: form.querySelector('#fPlan').value.trim(),
+          };
+          addRiskLog(name, entry);
+          saveSummary(name, {riskFlag: false, riskLevel: null});
+          render();
+        };
+      };
+    }
+  }
+
+  rosterSection.appendChild(el(`<h3 style="margin-top:${flagged.length>0?'20px':'0'};">전체 참여자 현황</h3>`));
+  for(const {name, sum} of ok){
+    const moodLabel = sum.mood ? MOODS.find(m=>m.v===sum.mood) : null;
+    const showLinkNudge = (sum.chatTurns||0) >= 40;
+    const card = el(`
+      <div class="card fac-card">
+        <div class="fac-avatar">${esc(name.slice(0,1))}</div>
+        <div>
+          <div class="fac-name">${esc(name)}</div>
+          <div class="fac-meta">${sum.currentWeek||1}강 진행 중 · 최근 마음 온도: ${moodLabel ? moodLabel.e+' '+moodLabel.l : '기록 없음'} ${sum.moodDate ? '('+sum.moodDate+')' : ''}</div>
+        </div>
+        ${showLinkNudge ? '<span class="link-badge">🌱 연결 확장 제안</span>' : '<span class="ok-badge">양호</span>'}
+      </div>
+    `);
+    rosterSection.appendChild(card);
+    const legacyRow = el(`<button class="btn btn-outline btn-block" style="margin:-8px 0 16px;font-size:0.85em;">🌾 활용 소식 남기기 (5축 · 역할)</button>`);
+    rosterSection.appendChild(legacyRow);
+    legacyRow.onclick = () => {
+      const form = el(`
+        <div class="card" style="border:1.5px solid var(--sage);margin:-8px 0 16px;">
+          <h3 style="font-size:0.95em;margin-top:0;">${esc(name)}님께 전할 활용 소식</h3>
+          <textarea id="legacyMsg" placeholder="예: OO님의 이야기가 후배 귀농인 3분께 큰 도움이 되었어요"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-primary" id="legacySave">전달하기</button>
+            <button class="btn btn-outline" id="legacyCancel">취소</button>
+          </div>
+        </div>
+      `);
+      legacyRow.replaceWith(form);
+      form.querySelector('#legacyCancel').onclick = () => render();
+      form.querySelector('#legacySave').onclick = () => {
+        const msg = form.querySelector('#legacyMsg').value.trim();
+        if(!msg) return;
+        safeSet('legacynotice:'+name, JSON.stringify({message: msg, date: todayStr(), read: false}));
+        render();
+      };
+    };
+  }
+
+  return wrap;
+}
+
+render();
+</script>
+</body>
+</html>
