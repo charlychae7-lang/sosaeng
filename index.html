@@ -35,7 +35,7 @@ h1,h2,h3,h4{text-wrap:balance;letter-spacing:-.025em;line-height:1.2}
 .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gut)}
 
 /* ---------- Header ---------- */
-header{position:sticky;top:0;z-index:1000;background:rgba(10,12,9,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line-ink);color:var(--paper)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:1000;background:rgba(10,12,9,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line-ink);color:var(--paper)}
 .nav{max-width:var(--maxw);margin:0 auto;padding:.8rem var(--gut);display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .logo{display:flex;align-items:center;gap:.7rem;font-weight:900;font-size:1.1rem;letter-spacing:-.02em;background:none;border:0;color:inherit;cursor:pointer}
 .logo-mark{display:grid;place-items:center;width:34px;height:34px;background:var(--lime);color:var(--ink);font-size:1rem;font-weight:900;transform:rotate(-6deg);transition:transform .25s}
@@ -98,7 +98,7 @@ main{min-height:70vh}
 .phero .eyebrow{color:var(--lime)}
 
 /* ---------- Home hero ---------- */
-.hero{position:relative;background:var(--ink);color:var(--paper);overflow:hidden;min-height:calc(100svh - 64px);display:flex;align-items:center}
+.hero{position:relative;background:var(--ink);color:var(--paper);overflow:hidden;min-height:min(calc(100svh - 64px),44rem);display:flex;align-items:center}
 .hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.95}
 .hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(10,12,9,.86),rgba(10,12,9,.2) 70%);pointer-events:none}
 .hero-in{position:relative;z-index:2;padding-block:clamp(3rem,8vw,6rem)}
@@ -773,7 +773,7 @@ footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5r
     navItems.forEach(function(n){n.classList.toggle('active',n.dataset.page===id)});
     setMenu(false);
     window.scrollTo({top:0,behavior:'auto'});
-    if(push!==false && location.hash!=='#'+id) history.pushState(null,'','#'+id);
+    if(push!==false && location.hash!=='#'+id){ try{ history.pushState(null,'','#'+id); }catch(e){} }
     document.title = (id==='home'?'':$('.nav-item[data-page="'+id+'"]').textContent+' · ')+'소생커뮤니티 협동조합';
     observe(); netState();
   }
@@ -957,6 +957,7 @@ footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5r
   $('#prog-close').addEventListener('click',function(){closeOv(pOv)});
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(bOv.classList.contains('open')) closeOv(bOv); if(pOv.classList.contains('open')) closeOv(pOv); setMenu(false); } });
 
+  setTimeout(function(){ $$('.page.active .reveal').forEach(function(el){el.classList.add('in')}); },2200);
   /* ---------- Init ---------- */
   showPage((location.hash||'#home').slice(1),false);
 })();
