@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 인생 이야기 — 생애주기 연표</title>
+<style>
+:root{--bg:#f7f4ef;--surface:#fff;--border:#e2ddd5;--border-lt:#ede9e2;--text:#1a1814;--text2:#5a5550;--text3:#9a948e;--green:#2b5f3c;--green-lt:#e8f2ec;--green-md:#c6dece;--amber:#8a6200;--r:12px;--sh:0 2px 16px rgba(0,0,0,.07);}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+.nav{position:sticky;top:0;z-index:100;background:rgba(247,244,239,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;height:50px;}
+.nav-t{font-size:14px;font-weight:700;letter-spacing:-.3px;}
+.nav-r{display:flex;gap:7px;}
+.nbtn{height:28px;padding:0 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;}
+.nbtn:hover{border-color:var(--green);color:var(--green);}
+.nbtn.p{background:var(--green);color:#fff;border-color:var(--green);}
+.nbtn.p:hover{opacity:.88;color:#fff;}
+.app{max-width:880px;margin:0 auto;padding:1.75rem 1.25rem 5rem;}
+.hero{text-align:center;padding:2rem 0 1.75rem;}
+.hero-s{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+.hero h1{font-size:26px;font-weight:700;line-height:1.35;margin-bottom:8px;letter-spacing:-.5px;}
+.hero p{font-size:13px;color:var(--text2);line-height:1.8;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:.9rem;}
+.inp-sec{padding:1.5rem;margin-bottom:1.25rem;}
+.ig-row{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;}
+.ig{display:flex;flex-direction:column;gap:5px;flex:1;min-width:88px;}
+.ig label{font-size:11px;color:var(--text2);font-weight:600;}
+.ig select,.ig input[type=text]{height:36px;border:1px solid var(--border);border-radius:7px;padding:0 9px;font-size:13px;background:#faf9f6;color:var(--text);}
+.ig select:focus,.ig input:focus{outline:none;border-color:var(--green);}
+.gtoggle{display:flex;gap:5px;}
+.gb{flex:1;height:36px;border:1px solid var(--border);border-radius:7px;background:#faf9f6;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.gb.on{background:var(--text);color:#fff;border-color:var(--text);}
+.gen-btn{height:36px;padding:0 20px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.gen-btn:hover{opacity:.88;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem;}
+.sbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;}
+.sn{font-size:24px;font-weight:700;color:var(--green);line-height:1;}
+.sl{font-size:11px;color:var(--text3);margin-top:4px;}
+.fbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.1rem;align-items:center;}
+.fbar-l{font-size:11px;color:var(--text3);margin-right:2px;}
+.ftag{height:24px;padding:0 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:11px;color:var(--text2);cursor:pointer;font-weight:600;transition:all .12s;}
+.ftag.on{background:var(--green);color:#fff;border-color:var(--green);}
+.tl-wrap{display:none;}
+.tl-wrap.v{display:block;}
+.tl-row{display:flex;position:relative;}
+.tl-l{width:64px;flex-shrink:0;padding-top:12px;text-align:right;padding-right:11px;}
+.tl-yr{font-size:12px;font-weight:700;color:var(--text2);display:block;}
+.tl-age{font-size:10px;color:var(--text3);}
+.tl-m{width:16px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border);margin-top:15px;flex-shrink:0;}
+.dot.ms{width:11px;height:11px;background:var(--green);margin-top:13px;}
+.dot.hm{background:var(--amber);}
+.tl-line{width:1px;flex:1;background:var(--border-lt);margin-top:2px;}
+.tl-r{flex:1;min-width:0;padding:7px 0 11px 13px;}
+.ms-tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;background:var(--green-lt);color:var(--green);border:1px solid var(--green-md);font-weight:700;margin-bottom:5px;}
+.h-item{font-size:12px;color:var(--text2);line-height:1.55;padding:1.5px 0;}
+.h-item::before{content:"·  ";color:var(--text3);}
+.memo{width:100%;border:1px solid var(--border-lt);border-radius:7px;padding:7px 9px;font-size:12px;font-family:inherit;background:#faf9f6;color:var(--text);resize:vertical;min-height:48px;line-height:1.65;transition:border-color .15s,background .15s;margin-top:5px;}
+.memo:focus{outline:none;border-color:var(--amber);background:#fff;}
+.memo::placeholder{color:var(--text3);font-size:11px;}
+.memo-lbl{font-size:10px;color:var(--text3);margin-top:2px;padding-left:2px;}
+.photo-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;}
+.pthumb{width:58px;height:58px;border-radius:7px;object-fit:cover;border:1px solid var(--border);cursor:pointer;}
+.pthumb:hover{opacity:.85;}
+.padd{width:58px;height:58px;border-radius:7px;border:1px dashed var(--border);background:var(--bg);color:var(--text3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.padd:hover{border-color:var(--green);color:var(--green);}
+.sum-wrap{display:none;margin-top:1.75rem;padding:1.5rem;}
+.sum-wrap.v{display:block;}
+.sum-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:8px;}
+.sum-hd h2{font-size:16px;font-weight:700;}
+.sum-btns{display:flex;gap:7px;}
+.sbtn{height:30px;padding:0 12px;border:1px solid var(--border);border-radius:7px;background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);}
+.sbtn:hover{border-color:var(--green);color:var(--green);}
+.sbtn.p{background:var(--green);color:#fff;border-color:var(--green);}
+.sbtn.p:hover{opacity:.88;color:#fff;}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.1rem;}
+.tab{padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.on{color:var(--green);border-bottom-color:var(--green);}
+.panel{display:none;}
+.panel.on{display:block;}
+.story{font-size:13px;line-height:2;white-space:pre-wrap;background:#faf9f6;border:1px solid var(--border-lt);border-radius:8px;padding:1.1rem;min-height:100px;}
+.share-box{padding:.9rem;background:var(--green-lt);border-radius:8px;}
+.share-box p{font-size:12px;color:var(--green);margin-bottom:9px;font-weight:600;}
+.slink-row{display:flex;gap:7px;align-items:center;}
+.slink{flex:1;height:32px;border:1px solid var(--green-md);border-radius:6px;padding:0 9px;font-size:11px;background:#fff;color:var(--text2);min-width:0;}
+.smethods{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;}
+.sm{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;border:1px solid var(--green-md);background:#fff;font-size:12px;font-weight:600;color:var(--green);cursor:pointer;}
+.sm:hover{background:var(--green);color:#fff;}
+.share-note{font-size:11px;color:var(--text3);margin-top:9px;}
+.modal-bg{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r);padding:1.25rem;max-width:460px;width:90%;max-height:80vh;overflow-y:auto;}
+.modal h3{font-size:14px;font-weight:700;margin-bottom:.75rem;}
+.modal img{width:100%;border-radius:8px;margin-bottom:.75rem;}
+.mc{width:100%;height:34px;border:1px solid var(--border);border-radius:7px;background:var(--bg);cursor:pointer;font-size:13px;color:var(--text2);}
+@media(max-width:580px){.stats{grid-template-columns:repeat(2,1fr);}.hero h1{font-size:21px;}.ig-row{flex-direction:column;align-items:stretch;}.gen-btn{width:100%;}}
+@media print{.nav,.inp-sec,.fbar,.memo-lbl,.padd,.nbtn,.sbtn{display:none!important;}.tl-wrap,.sum-wrap{display:block!important;}.tl-row{break-inside:avoid;}body{background:#fff;}.memo{border:none;background:none;resize:none;}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-t">나의 인생 이야기 연표</div>
+  <div class="nav-r">
+    <button class="nbtn" onclick="scrollToSum()">이야기 보기</button>
+    <button class="nbtn p" onclick="openShare()">가족과 공유</button>
+  </div>
+</nav>
+
+<div class="app">
+  <div class="hero">
+    <div class="hero-s">My Life Story</div>
+    <h1>역사 속에 새겨진<br>나의 인생 이야기</h1>
+    <p>생년월일을 입력하면 내가 살아온 시간 속 역사 사건과 나의 기억을<br>함께 엮어 소중한 인생 연표를 만들어 드립니다</p>
+  </div>
+
+  <div class="card inp-sec">
+    <div class="sec-label">기본 정보 입력</div>
+    <div class="ig-row">
+      <div class="ig" style="min-width:105px;"><label for="by">태어난 해</label><select id="by"></select></div>
+      <div class="ig" style="flex:.5;min-width:70px;"><label for="bm">월</label><select id="bm"></select></div>
+      <div class="ig" style="flex:.5;min-width:70px;"><label for="bd">일</label><select id="bd"></select></div>
+      <div class="ig" style="max-width:120px;"><label>성별</label>
+        <div class="gtoggle">
+          <button class="gb on" id="gm" onclick="sg('male')">남성</button>
+          <button class="gb" id="gf" onclick="sg('female')">여성</button>
+        </div>
+      </div>
+      <div class="ig" style="min-width:100px;max-width:130px;"><label for="uname">이름 (선택)</label><input type="text" id="uname" placeholder="홍길동" maxlength="20"></div>
+      <button class="gen-btn" id="genBtn" onclick="generate()">연표 만들기 →</button>
+    </div>
+  </div>
+
+  <div class="tl-wrap" id="tlW">
+    <div class="stats" id="statsG"></div>
+    <div class="fbar">
+      <span class="fbar-l">보기 방식:</span>
+      <button class="ftag on" onclick="setF('all',this)">전체</button>
+      <button class="ftag" onclick="setF('ms',this)">이정표만</button>
+      <button class="ftag" onclick="setF('memo',this)">기록한 해</button>
+      <button class="ftag" onclick="setF('decade',this)">10년 단위</button>
+    </div>
+    <div id="tlR"></div>
+  </div>
+
+  <div class="card sum-wrap" id="sumW">
+    <div class="sum-hd">
+      <h2>✍️ 나의 인생 이야기</h2>
+      <div class="sum-btns">
+        <button class="sbtn p" onclick="buildStory()">초안 생성</button>
+        <button class="sbtn" onclick="copyS(this)">복사</button>
+        <button class="sbtn" onclick="window.print()">인쇄/저장</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab on" onclick="sTab('draft',this)">이야기 초안</div>
+      <div class="tab" onclick="sTab('script',this)">영상 원고</div>
+      <div class="tab" onclick="sTab('share',this)">가족 공유</div>
+    </div>
+    <div class="panel on" id="p-draft">
+      <div class="story" id="s-draft">각 연도의 메모 칸에 기억을 입력한 후 "초안 생성" 버튼을 눌러주세요.
+
+💡 기억이 잘 안 나신다면:
+· 그 시절 살던 동네, 학교 이름
+· 기억에 남는 선생님이나 친구
+· 가족과의 특별한 순간
+· 그 해 사회 사건에 대한 나의 기억</div>
+    </div>
+    <div class="panel" id="p-script">
+      <div class="story" id="s-script">초안 생성 후 영상 나레이션 원고가 만들어집니다.
+
+💡 활용 방법:
+1. 원고를 복사하여 영상 편집 도구에 붙여넣기
+2. 각 단락이 하나의 영상 장면입니다
+3. 사진 첨부 연도는 해당 사진을 배경으로 활용하세요</div>
+    </div>
+    <div class="panel" id="p-share">
+      <div class="share-box">
+        <p>가족과 나의 인생 이야기를 공유해 보세요</p>
+        <div class="slink-row">
+          <input class="slink" id="slinkInput" readonly value="연표 생성 후 공유 링크가 만들어집니다">
+          <button class="sbtn" onclick="copyLink(this)">복사</button>
+        </div>
+        <div class="smethods">
+          <div class="sm" onclick="shareKakao()">💬 카카오톡</div>
+          <div class="sm" onclick="shareEmail()">📧 이메일</div>
+          <div class="sm" onclick="shareSMS()">📱 문자</div>
+          <div class="sm" onclick="window.print()">📄 PDF 저장</div>
+        </div>
+      </div>
+      <p class="share-note">※ 공유 링크는 메모 데이터를 URL에 담아 전달합니다(사진 제외). 내용이 많을 경우 이메일/PDF 저장을 권장합니다.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="pModal" onclick="if(event.target===this)closeM()">
+  <div class="modal">
+    <h3 id="mTitle">사진</h3>
+    <img id="mImg" src="" alt="">
+    <button class="mc" onclick="closeM()">닫기</button>
+  </div>
+</div>
+
+<script>
+const NOW=new Date().getFullYear();
+const LS='lifestory.v1';
+const byS=document.getElementById('by'),bmS=document.getElementById('bm'),bdS=document.getElementById('bd');
+for(let y=1930;y<=1975;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'년';byS.appendChild(o);}
+byS.value=1950;
+for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'월';bmS.appendChild(o);}
+for(let d=1;d<=31;d++){const o=document.createElement('option');o.value=d;o.textContent=d+'일';bdS.appendChild(o);}
+
+let gender='male',birthYear=1950,memos={},photos={};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function sg(g){gender=g;document.getElementById('gm').classList.toggle('on',g==='male');document.getElementById('gf').classList.toggle('on',g==='female');}
+
+function getMilestones(by,g){
+  const sn=by<=1989?'국민학교':'초등학교';
+  const ms=[{y:by,l:'출생',i:'🌱'},{y:by+7,l:sn+' 입학',i:'✏️'},{y:by+13,l:'중학교 입학',i:'📚'},{y:by+16,l:'고등학교 입학',i:'🎒'},{y:by+19,l:'대학·사회 진출',i:'🎓'}];
+  if(g==='male') ms.push({y:by+21,l:'군 복무',i:'🪖'});
+  ms.push({y:by+25,l:'사회생활 시작',i:'💼'},{y:by+30,l:'결혼 시기',i:'💍'},{y:by+35,l:'가정 안정기',i:'🏠'},{y:by+40,l:'중년기',i:'🌳'},{y:by+50,l:'50대 황금기',i:'🌅'},{y:by+60,l:'환갑',i:'🎊'},{y:by+70,l:'70대 원로기',i:'🌸'});
+  return ms;
+}
+
+const FB={
+  1930:["일제강점기 황국신민화 정책","만주사변 발발(1931)"],1935:["손기정 베를린올림픽 금메달","중일전쟁 발발(1937)"],
+  1940:["창씨개명 강제 실시","태평양전쟁 발발(1941)"],1945:["8·15 광복","미·소 분할 점령","건국준비위원회 조직"],
+  1946:["미·소 공동위원회","좌우 대립 심화"],1947:["미·소 공동위원회 결렬","유엔 한국임시위원단"],
+  1948:["5·10 총선","대한민국 정부 수립","북한 정권 수립"],1949:["농지개혁법 통과","김구 암살"],
+  1950:["6·25 한국전쟁 발발","인천상륙작전","중국군 개입·1·4후퇴"],1951:["서울 재수복","휴전 협상 시작"],
+  1952:["이승만 부산 정치파동","전쟁 포로 협상"],1953:["휴전협정 조인(7.27)","한미상호방위조약 체결"],
+  1954:["사사오입 개헌","한미방위조약 발효"],1955:["민주당 창당","원조 경제 체제"],
+  1956:["정부통령 선거·장면 당선","혁신 세력 부상"],1957:["원조 감소 경제 위기"],
+  1958:["진보당 사건·조봉암 구속","국가보안법 강화"],1959:["조봉암 처형","경향신문 폐간"],
+  1960:["3·15 부정선거","4·19 혁명·이승만 하야","제2공화국 출범"],
+  1961:["5·16 군사쿠데타","경제개발 5개년계획 수립"],1962:["제1차 경제개발계획 시작","통화개혁"],
+  1963:["박정희 대통령 당선","서독 광부·간호사 파견"],1964:["한일협정 반대 6·3 사태","월남전 파병"],
+  1965:["한일협정 조인","베트남 파병"],1966:["경제성장률 12.7%","KIST 설립"],
+  1967:["제2차 경제개발계획","6·8 부정선거"],1968:["1·21 사태·무장공비 침투","향토예비군 창설"],
+  1969:["3선개헌","수출 7억달러 달성"],1970:["새마을운동","경부고속도로 개통","전태일 분신"],
+  1971:["박정희 3선 당선","광주대단지 사건"],1972:["7·4 남북공동성명","10월 유신 선포"],
+  1973:["1차 오일쇼크","중화학공업 육성"],1974:["육영수 여사 피격","민청학련 사건"],
+  1975:["긴급조치 9호","인혁당 사형","베트남 공산화"],1976:["3·1 민주구국선언","수출 100억달러"],
+  1977:["부가가치세 도입","의료보험 시작"],1978:["YH 무역 사건","2차 오일쇼크"],
+  1979:["부마항쟁","박정희 피살(10·26)","12·12 군사반란"],
+  1980:["5·18 광주민주화운동","전두환 집권","삼청교육대"],
+  1981:["전두환 정부 출범","언론통폐합"],1982:["프로야구 출범","야간통행금지 해제"],
+  1983:["KAL 007 격추","아웅산 테러","이산가족 찾기 방송"],1984:["학원 자율화","민주화운동 재개"],
+  1985:["2·12 총선·신민당 약진","구로동맹파업"],1986:["서울 아시안게임","건국대 사태"],
+  1987:["6월 민주항쟁","6·29 직선제 개헌","노동자 대투쟁"],
+  1988:["서울올림픽","5공 비리 청문회","노태우 정부"],
+  1989:["북방외교·헝가리 수교","전교조 설립"],1990:["3당 합당·민자당","소련 수교"],
+  1991:["남북한 유엔 동시가입","소련 해체"],1992:["김영삼 당선","한중 수교"],
+  1993:["문민정부·금융실명제","하나회 숙군"],1994:["성수대교 붕괴","김일성 사망"],
+  1995:["삼풍백화점 붕괴","전두환·노태우 구속"],1996:["OECD 가입","노동법 날치기"],
+  1997:["IMF 외환위기","김대중 당선","기업 연쇄 도산"],1998:["국민의 정부·금 모으기 운동"],
+  1999:["인터넷 보급","제1 연평해전","벤처 붐"],2000:["6·15 남북공동선언","남북 정상회담"],
+  2001:["9·11 테러 충격","인터넷 경제 성장"],2002:["한일 월드컵 4강","노무현 당선"],
+  2003:["참여정부 출범","이라크전 파병"],2004:["탄핵·열린우리당 총선","경부고속철 개통"],
+  2005:["황우석 논문 조작","한류 아시아 확산"],2006:["북핵 1차 실험","집값 급등"],
+  2007:["이명박 당선","남북 2차 정상회담","태안 기름 유출"],
+  2008:["이명박 정부","금융위기","쇠고기 촛불집회"],2009:["쌍용차 파업","노무현 서거"],
+  2010:["천안함 피격","연평도 포격","지방선거"],2011:["나꼼수 열풍","동일본 대지진"],
+  2012:["박근혜 당선","여수 세계박람회"],2013:["박근혜 정부","국정원 댓글 공작"],
+  2014:["세월호 참사","지방선거"],2015:["메르스 유행","한일 위안부 합의"],
+  2016:["촛불혁명","박근혜 탄핵소추"],2017:["박근혜 탄핵 인용","문재인 정부"],
+  2018:["평창 동계올림픽","4·27 판문점 선언"],2019:["일본 수출규제·불매운동","조국 사태"],
+  2020:["코로나19 팬데믹","총선 민주당 압승"],2021:["백신 접종","LH 투기","부동산 폭등"],
+  2022:["윤석열 당선","이태원 참사"],2023:["강제징용 해법","의대 갈등 시작"],
+  2024:["총선 야당 압승","의사 파업","12·3 비상계엄"],
+  2025:["탄핵 인용","조기 대선","경제 불확실성"],2026:["현재 — 나의 이야기 계속","AI 변혁 시대"]
+};
+function getFB(y){
+  if(FB[y]) return FB[y];
+  const ks=Object.keys(FB).map(Number).sort((a,b)=>a-b);
+  for(let i=ks.length-1;i>=0;i--) if(ks[i]<=y) return FB[ks[i]].map(e=>`(${ks[i]}년) ${e}`);
+  return ["해당 시기 역사 자료"];
+}
+
+const memoCount=()=>Object.values(memos).filter(v=>v&&v.trim()).length;
+
+function save(){
+  try{localStorage.setItem(LS,JSON.stringify({by:+byS.value,bm:+bmS.value,bd:+bdS.value,g:gender,nm:document.getElementById('uname').value,memos}));}catch(e){}
+}
+
+function generate(){
+  const btn=document.getElementById('genBtn');
+  birthYear=parseInt(byS.value);
+  const age=NOW-birthYear;
+  const ms=getMilestones(birthYear,gender);
+  const msMap={};ms.forEach(m=>{msMap[m.y]=m;});
+  const maxY=Math.min(birthYear+80,NOW);
+  const years=[];for(let y=birthYear;y<=maxY;y++) years.push(y);
+
+  document.getElementById('statsG').innerHTML=`
+    <div class="sbox"><div class="sn">${age}</div><div class="sl">현재 나이</div></div>
+    <div class="sbox"><div class="sn">${maxY-birthYear+1}</div><div class="sl">살아온 햇수</div></div>
+    <div class="sbox"><div class="sn">${ms.filter(m=>m.y<=maxY).length}</div><div class="sl">주요 이정표</div></div>
+    <div class="sbox"><div class="sn" id="memoN">${memoCount()}</div><div class="sl">기록한 해</div></div>`;
+
+  const tlR=document.getElementById('tlR');tlR.innerHTML='';
+  years.forEach((year,idx)=>{
+    const m=msMap[year],at=year-birthYear,has=!!(memos[year]&&memos[year].trim());
+    const row=document.createElement('div');
+    row.className='tl-row';row.dataset.year=year;row.dataset.ms=m?'1':'0';row.dataset.dec=at%10===0?'1':'0';
+    row.innerHTML=`<div class="tl-l"><span class="tl-yr">${year}</span><span class="tl-age">(${at}세)</span></div>
+<div class="tl-m"><div class="dot${m?' ms':has?' hm':''}" id="dot${year}"></div>${idx<years.length-1?'<div class="tl-line"></div>':''}</div>
+<div class="tl-r">
+${m?`<div class="ms-tag">${m.i} ${esc(m.l)}</div>`:''}
+<div>${getFB(year).map(e=>`<div class="h-item">${esc(e)}</div>`).join('')}</div>
+<textarea class="memo" id="m${year}" rows="2" placeholder="이 해의 기억, 경험, 감정을 적어주세요..." data-year="${year}">${esc(memos[year]||'')}</textarea>
+<div class="memo-lbl">나의 이야기</div>
+<div class="photo-row" id="pr${year}">
+<button class="padd" data-add="${year}" title="사진 추가">+</button>
+</div>
+<input type="file" style="display:none" id="fi${year}" accept="image/*" data-year="${year}">
+</div>`;
+    tlR.appendChild(row);
+    const pr=row.querySelector('.photo-row'),add=pr.querySelector('.padd');
+    (photos[year]||[]).forEach(p=>pr.insertBefore(thumb(p,year),add));
+  });
+
+  document.getElementById('tlW').className='tl-wrap v';
+  document.getElementById('sumW').classList.add('v');
+  makeLink();save();
+  btn.textContent='연표 다시 만들기';
+}
+
+function thumb(src,year){
+  const img=document.createElement('img');
+  img.className='pthumb';img.src=src;img.alt=year+'년 사진';
+  img.onclick=()=>openM(src,year+'년 사진');
+  return img;
+}
+
+const tlR=document.getElementById('tlR');
+tlR.addEventListener('input',e=>{
+  if(e.target.classList.contains('memo')) saveMemo(+e.target.dataset.year,e.target.value);
+});
+tlR.addEventListener('click',e=>{
+  const b=e.target.closest('[data-add]');
+  if(b) document.getElementById('fi'+b.dataset.add).click();
+});
+tlR.addEventListener('change',e=>{
+  if(e.target.type==='file') handleP(+e.target.dataset.year,e.target);
+});
+
+function saveMemo(year,val){
+  memos[year]=val;
+  const d=document.getElementById('dot'+year);
+  if(d&&!d.classList.contains('ms')) d.classList.toggle('hm',!!val.trim());
+  const n=document.getElementById('memoN');
+  if(n) n.textContent=memoCount();
+  save();
+}
+
+function handleP(year,inp){
+  const f=inp.files[0];if(!f) return;
+  const rdr=new FileReader();
+  rdr.onload=e=>{
+    (photos[year]=photos[year]||[]).push(e.target.result);
+    const pr=document.getElementById('pr'+year);
+    pr.insertBefore(thumb(e.target.result,year),pr.querySelector('.padd'));
+    inp.value='';
+  };
+  rdr.readAsDataURL(f);
+}
+
+function setF(type,btn){
+  document.querySelectorAll('.ftag').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.tl-row').forEach(r=>{
+    const y=parseInt(r.dataset.year);
+    let show=true;
+    if(type==='ms') show=r.dataset.ms==='1';
+    else if(type==='memo') show=!!(memos[y]&&memos[y].trim());
+    else if(type==='decade') show=r.dataset.dec==='1'||r.dataset.ms==='1';
+    r.style.display=show?'flex':'none';
+  });
+}
+
+function buildStory(){
+  const nm=document.getElementById('uname').value.trim()||'나';
+  const by=birthYear,bm=parseInt(bmS.value),bd=parseInt(bdS.value),age=NOW-by;
+  const gl=gender==='male'?'남성':'여성';
+  const ym=Object.entries(memos).filter(([,v])=>v&&v.trim()).sort((a,b)=>a[0]-b[0]);
+
+  let draft=`${nm}의 인생 이야기\n${'━'.repeat(30)}\n\n`;
+  draft+=`저는 ${by}년 ${bm}월 ${bd}일에 태어났습니다.\n올해 ${age}세가 되는 ${gl}으로, 격동의 한국 현대사와 함께 살아왔습니다.\n\n`;
+  if(ym.length){
+    ym.forEach(([y,v])=>{draft+=`【${y}년 · ${y-by}세】\n${v.trim()}\n\n`;});
+    draft+=`${'━'.repeat(30)}\n\n이처럼 ${age}년의 세월을 살아온 ${nm}의 이야기는\n소중한 기록이자 후손에게 전하는 살아있는 역사입니다.`;
+  } else draft+='연도별 메모를 입력하시면 이야기가 완성됩니다.';
+
+  let script=`[영상 나레이션 원고]\n${'─'.repeat(30)}\n\n[도입부 — 잔잔한 배경음악]\n"${by}년 ${bm}월, 한 생명이 세상에 태어났습니다."\n\n`;
+  ym.forEach(([y,v],i)=>{
+    script+=`[장면 ${i+1} — ${y}년 (${y-by}세)]${photos[y]?.length?' (사진 활용)':''}\n"${v.trim()}"\n\n`;
+  });
+  script+=`[마무리 — 감동적 배경음악]\n"이것이 ${nm}의 ${age}년 인생 이야기입니다."`;
+
+  document.getElementById('s-draft').textContent=draft;
+  document.getElementById('s-script').textContent=script;
+}
+
+function flash(b,t){const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,2000);}
+function copyText(t,b){
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>flash(b,'복사됨 ✓'),()=>flash(b,'복사 실패'));
+}
+function copyS(b){
+  buildStory();
+  const p=document.querySelector('.panel.on .story');
+  if(p) copyText(p.textContent,b);
+}
+
+function sTab(id,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');document.getElementById('p-'+id).classList.add('on');
+}
+
+function makeLink(){
+  const out=document.getElementById('slinkInput');
+  try{
+    const data={by:birthYear,bm:+bmS.value,bd:+bdS.value,g:gender,nm:document.getElementById('uname').value,memos};
+    const enc=btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    out.value=location.href.split(/[?#]/)[0]+'?d='+enc;
+  }catch(e){out.value='메모가 많으면 이메일/PDF 공유를 이용하세요.';}
+}
+function copyLink(b){makeLink();copyText(document.getElementById('slinkInput').value,b);}
+function scrollToSum(){document.getElementById('sumW').scrollIntoView({behavior:'smooth'});}
+function openShare(){
+  if(!document.getElementById('sumW').classList.contains('v')){alert('먼저 "연표 만들기"를 눌러주세요.');return;}
+  makeLink();sTab('share',document.querySelectorAll('.tab')[2]);scrollToSum();
+}
+function shareKakao(){
+  buildStory();
+  const t=document.getElementById('s-draft').textContent;
+  if(navigator.share){navigator.share({title:'나의 인생 이야기',text:t,url:document.getElementById('slinkInput').value}).catch(()=>{});}
+  else alert('카카오톡 공유는 휴대폰의 공유 기능에서 지원됩니다.\n링크를 복사해 카카오톡에 붙여넣어 주세요.');
+}
+function shareEmail(){buildStory();const nm=document.getElementById('uname').value||'나';location.href=`mailto:?subject=${encodeURIComponent(nm+'의 인생 이야기')}&body=${encodeURIComponent(document.getElementById('s-draft').textContent)}`;}
+function shareSMS(){makeLink();location.href=`sms:?body=${encodeURIComponent('나의 인생 이야기: '+document.getElementById('slinkInput').value)}`;}
+
+function openM(src,title){document.getElementById('mImg').src=src;document.getElementById('mTitle').textContent=title;document.getElementById('pModal').classList.add('open');}
+function closeM(){document.getElementById('pModal').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+['by','bm','bd'].forEach(id=>document.getElementById(id).addEventListener('change',save));
+document.getElementById('uname').addEventListener('input',save);
+
+// 복원: 공유 링크(?d=) 우선, 없으면 이 기기에 저장된 기록
+function restore(d){
+  if(!d||!(d.by>=1930&&d.by<=1975)) return false;
+  byS.value=d.by;bmS.value=+d.bm||1;bdS.value=+d.bd||1;sg(d.g==='female'?'female':'male');
+  document.getElementById('uname').value=String(d.nm||'').slice(0,20);
+  memos={};
+  if(d.memos&&typeof d.memos==='object') for(const [k,v] of Object.entries(d.memos)) if(/^\d{4}$/.test(k)&&typeof v==='string') memos[k]=v;
+  return true;
+}
+(()=>{
+  let d=null;
+  const p=new URLSearchParams(location.search).get('d');
+  try{
+    if(p){let s=p.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';d=JSON.parse(decodeURIComponent(escape(atob(s))));}
+    else{const s=localStorage.getItem(LS);if(s)d=JSON.parse(s);}
+  }catch(e){}
+  if(restore(d)) generate();
+})();
+</script>
+</body>
+</html>
