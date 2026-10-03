@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>순환지도</title>
+<meta name="description" content="물질에서 사회 시스템까지, 사고의 순환을 따라가며 내 생각의 흐름을 추적하고 구조를 읽는 앱">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2f1ec;--surface:#fff;--surface-2:#eceae2;--ink:#23262b;--ink-soft:#5b5f66;--ink-faint:#8a8d93;
+  --accent:#2f4b7c;--accent-soft:#e8edf5;--accent-2:#3f7a63;--accent-2-soft:#e6f0ea;
+  --accent-3:#7a5c8e;--accent-3-soft:#efe7f2;--warn:#b4541a;--warn-soft:#fbeadb;--line:#dcdacf;
+  --serif:"Noto Serif KR","Nanum Myeongjo",serif;--sans:"Noto Sans KR","Pretendard",-apple-system,BlinkMacSystemFont,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1b1d22;--surface:#232529;--surface-2:#2a2c31;--ink:#e9e8e3;--ink-soft:#aaadb3;--ink-faint:#7d8087;
+  --accent:#8fb0e6;--accent-soft:#28324a;--accent-2:#8ecab0;--accent-2-soft:#213229;--accent-3:#c3a7d6;--accent-3-soft:#332839;
+  --warn:#e8a06a;--warn-soft:#3a2b1f;--line:#3a3c42}}
+:root[data-theme="dark"]{
+  --bg:#1b1d22;--surface:#232529;--surface-2:#2a2c31;--ink:#e9e8e3;--ink-soft:#aaadb3;--ink-faint:#7d8087;
+  --accent:#8fb0e6;--accent-soft:#28324a;--accent-2:#8ecab0;--accent-2-soft:#213229;--accent-3:#c3a7d6;--accent-3-soft:#332839;
+  --warn:#e8a06a;--warn-soft:#3a2b1f;--line:#3a3c42}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6}
+button,input,textarea,select{font:inherit;color:inherit}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header.top{padding:28px 0 8px}
+.brand{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700;margin:0 0 6px}
+h1{font-family:var(--serif);font-size:clamp(24px,5vw,34px);line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.tag{color:var(--ink-soft);font-size:14.5px;margin:0;max-width:60ch}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;cursor:pointer;font-size:13px}
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-top:14px}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;padding-top:6px}
+.tab{border:0;background:none;padding:10px 14px;font-size:14.5px;font-weight:500;color:var(--ink-soft);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+main{padding:22px 0 80px}
+h2{font-family:var(--serif);font-size:21px;margin:0 0 6px}
+h3{font-family:var(--serif);font-size:16px;margin:0 0 8px}
+.sub{color:var(--ink-soft);font-size:14px;margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.today{background:linear-gradient(165deg,var(--accent-soft),var(--surface));border:1px solid var(--accent-soft);border-radius:14px;padding:16px 20px;margin-bottom:18px}
+.today b{font-family:var(--serif);font-size:17px;display:block;margin:4px 0 10px;line-height:1.5}
+.formula{font-size:13.5px;font-weight:600;color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 16px;line-height:1.8}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .btn{color:#0f1420}}
+:root[data-theme=dark] .btn{color:#0f1420}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn:disabled{opacity:.4;cursor:default}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--ink-soft)}
+.seg button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+svg.map{width:100%;height:auto;display:block}
+svg.map text{font-family:var(--sans)}
+.node{cursor:pointer}
+.node rect{fill:var(--surface);stroke:var(--line);stroke-width:1.2;transition:.15s}
+.node:hover rect,.node:focus rect{stroke:var(--accent);stroke-width:2}
+.node.sel rect{stroke:var(--accent);stroke-width:2.5;fill:var(--accent-soft)}
+.node text{font-size:12.5px;fill:var(--ink);pointer-events:none}
+.node.soc rect{fill:var(--accent-3-soft)}
+.node.soc.sel rect{fill:var(--accent-3-soft);stroke:var(--accent-3)}
+.node.soc:hover rect{stroke:var(--accent-3)}
+.node .badge{fill:var(--warn);}
+.node .badge-t{fill:#fff;font-size:10px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer}
+.chip[aria-pressed=true],.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.chip.sub-chip{background:var(--accent-2-soft);border-color:transparent;color:var(--accent-2)}
+.detail .kicker{font-size:11.5px;letter-spacing:.1em;font-weight:700;color:var(--accent);margin:0 0 4px}
+.detail.soc .kicker{color:var(--accent-3)}
+.detail p{margin:0 0 10px;font-size:14.5px}
+.ask{background:var(--accent-2-soft);border-radius:10px;padding:10px 14px;font-size:14px;margin:10px 0}
+.ask b{color:var(--accent-2)}
+.ref{font-size:12.5px;color:var(--ink-soft);border-left:3px solid var(--line);padding-left:10px;margin-top:8px}
+.legend{font-size:12.5px;color:var(--ink-faint);margin-top:8px}
+/* tracer */
+.stepper{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.dot{flex:1;min-width:26px;height:6px;border-radius:3px;background:var(--line);border:0;padding:0;cursor:pointer}
+.dot.done{background:var(--accent-2)}.dot.cur{background:var(--accent)}
+label.f{display:block;font-weight:700;font-size:14px;margin:14px 0 4px}
+.hint{font-size:12.5px;color:var(--ink-faint);font-weight:400;display:block}
+input[type=text],textarea,select{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;font-size:14.5px}
+textarea{min-height:72px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.warn{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:6px 10px;font-size:13px;margin-top:6px}
+.row{display:flex;gap:10px;justify-content:space-between;margin-top:20px;flex-wrap:wrap}
+.radio{display:flex;gap:8px;flex-wrap:wrap}
+.q-node{font-size:11px;font-weight:700;color:var(--accent-3);background:var(--accent-3-soft);border-radius:6px;padding:1px 7px;margin-left:6px}
+.listrow{display:flex;gap:6px;margin-bottom:6px}
+/* result */
+.res h3{margin-top:16px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.flow span.n{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px 9px}
+.flow span.n.hit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.insights{background:var(--accent-3-soft);border-radius:12px;padding:12px 16px;margin:14px 0;font-size:14px}
+.insights li{margin-bottom:4px}
+/* board */
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.cols{grid-template-columns:1fr}}
+.col{border-radius:14px;padding:14px}
+.col.known{background:var(--accent-2-soft)}.col.open{background:var(--accent-3-soft)}.col.philo{background:var(--accent-soft)}
+.col h3{display:flex;justify-content:space-between}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:14px}
+.item .meta{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.conf{letter-spacing:2px;cursor:pointer;color:var(--accent);font-size:13px;border:0;background:none;padding:0}
+.item .src{font-size:12px;color:var(--ink-faint)}
+.add{display:flex;gap:6px;margin-top:8px}
+/* records */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{font-family:var(--serif);font-size:26px;display:block}
+.stat span{font-size:12.5px;color:var(--ink-soft)}
+.bar{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:5px}
+.bar i{display:block;height:10px;border-radius:5px;background:var(--accent-2)}
+.bar span.l{width:96px;flex:none}
+.case{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.case:last-child{border:0}
+.badge-l{font-size:11.5px;border-radius:6px;padding:1px 8px;font-weight:700}
+.badge-l.p{background:var(--accent-soft);color:var(--accent)}.badge-l.s{background:var(--accent-3-soft);color:var(--accent-3)}
+.empty{color:var(--ink-faint);font-size:14px;padding:12px 0}
+footer{margin-top:40px;font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand">
+    <div>
+      <p class="eyebrow">사고의 순환 지도 · 앱</p>
+      <h1>순환지도</h1>
+      <p class="tag">작은 것이 쌓여 전혀 다른 전체가 되고, 그 전체가 다시 작은 것을 바꾼다. 이 순환 위에서 내 생각과 우리 사회의 구조를 함께 읽는 도구.</p>
+    </div>
+    <button class="icon-btn" id="theme" aria-label="테마 전환">◐ 테마</button>
+  </div>
+</div></header>
+<nav class="tabs"><div class="wrap" role="tablist" id="tabs"></div></nav>
+<main><div class="wrap" id="view"></div></main>
+<div class="wrap"><footer>
+  이 앱은 진행 중인 사유의 도구입니다. ① 확립된 과학적 사실과 열린 철학적 질문을 섞지 않기, ② 층위 사이의 관계를 일방향 인과가 아니라 상호작용으로 이해하기 — 이 두 원칙을 지킵니다. 모든 기록은 이 기기의 브라우저에만 저장됩니다.
+</footer></div>
+
+<script>
+'use strict';
+/* ================= 데이터 ================= */
+const SUBSTRATE=[
+ {id:'qf',t:'양자장',s:'입자는 장의 들뜬 상태라는 현대 물리의 관점. 물질은 단단한 덩어리가 아니라 관계와 상호작용의 구조다.',r:'F. Wilczek, The Lightness of Being (2008)'},
+ {id:'pt',t:'입자',s:'기본입자들의 상호작용이 원자를 이룬다.',r:'B. Greene, The Fabric of the Cosmos (2004)'},
+ {id:'at',t:'원자',s:'결합 방식(관계와 조직)이 달라지면 성질이 달라진다.',r:'P. W. Anderson, "More Is Different" (1972)'},
+ {id:'ml',t:'분자',s:'수소와 산소는 기체지만 특정하게 결합하면 물이 된다 — 창발의 첫 예.',r:'D. Meadows, Thinking in Systems (2008)'},
+ {id:'ce',t:'세포',s:'에너지·물질·정보를 교환하며 자기 상태를 유지한다. 물질에서 생명으로 넘어가는 첫 경계. 생명의 기원은 아직 열린 연구 영역.',r:'Alberts et al., Molecular Biology of the Cell (2014)'},
+ {id:'ne',t:'신경세포',s:'정보를 전달하는 데 특화된 세포. 물질의 세계가 정보의 세계로 넘어가기 시작한다.',r:'Kandel et al., Principles of Neural Science (2021)'},
+ {id:'nn',t:'신경망',s:'전기 신호(세포 안)와 화학 신호(세포 사이)가 이어지며 활동이 만들어진다. 생각을 화학물질 하나로 환원해서는 안 된다.',r:'A. Damasio, Descartes\' Error (1994)'},
+ {id:'br',t:'뇌',s:'신경망 전체와 신체·기억·환경이 얽혀 감정과 생각이 나타난다.',r:'Kandel et al. (2021)'}
+];
+const INNER=[
+ {id:'stim',t:'자극',s:'외부에서 오는 사건·빛·소리·말. 아직 의미가 붙기 전의 사실.',ask:'카메라가 찍었다면 무엇이 찍혔을까? 평가와 추측을 빼고 적어보세요.',r:'Anil Seth, Being You (2021)'},
+ {id:'sense',t:'감각',s:'자극이 신경 신호로 바뀐 것. 외부에 사건이 있는 것과 내가 그것을 경험하는 것은 같지 않다.',ask:'지금 몸은 무엇을 느끼고 있나요? (긴장·열감·호흡…)',r:'C. Frith, Making Up the Mind (2007)'},
+ {id:'mem',t:'기억·감정',s:'과거의 경험, 그때의 감정, 지금의 욕구와 기대가 현재의 감각에 함께 작용한다. 우리는 현재를 경험하면서 과거를 함께 경험한다. 감정과 생각은 분리되지 않는다.',ask:'이 장면이 떠올리게 하는 과거는? 지금 내가 원하는 것은 무엇인가요?',r:'LeDoux, The Emotional Brain (1996) · Barrett, How Emotions Are Made (2017)'},
+ {id:'interp',t:'해석',s:'사실과 생각 사이의 다리. 같은 사실에 여러 해석이 가능하다. ("무시했나?" vs "못 봤겠지")',ask:'같은 사실에 대한 다른 해석을 두 개 더 만든다면?',r:'A. Beck (1976) · A. Ellis ABC 모델'},
+ {id:'thought',t:'생각',s:'현실의 복사가 아니라 의미 부여의 결과. 내 "원래 이런 생각"의 "원래"는 어디서 만들어졌을까.',ask:'이 생각은 어디서 배운 것일까요? (가족·교육·문화·미디어)',r:'P. Bourdieu, Outline of a Theory of Practice (1977)'},
+ {id:'judge',t:'판단',s:'빠르고 자동적인 시스템 1과 멈춰서 검토하는 시스템 2. 일상의 대부분은 시스템 1이 처리한다. 확증편향·손실회피·동조가 개입한다.',ask:'"잠깐, 정말 그런가?" 반대 근거를 하나 찾는다면?',r:'D. Kahneman, Thinking, Fast and Slow (2011)'},
+ {id:'choice',t:'선택',s:'가능한 행동들 중 하나를 고르는 지점. 판단이 습관이 되면 선택지가 보이지 않게 된다.',ask:'선택지는 몇 개였나요? 보이지 않던 선택지는?'},
+ {id:'action',t:'행동',s:'눈에 보이는 유일한 층. 그 아래에는 보이지 않는 흐름이 있다.',ask:'이 행동은 다음 순환에 어떤 재료를 남기나요?'},
+ {id:'result',t:'결과',s:'행동이 세계에 남긴 변화. 결과는 새로운 경험의 재료가 된다.',ask:'기대한 결과와 실제 결과의 차이는?'},
+ {id:'exp',t:'경험',s:'결과가 뇌와 마음을 바꾸고, 새로운 생각으로 돌아온다. 직선이 아니라 순환이다.',ask:'이 경험은 어떤 생각을 강화하거나 약화시키나요?',r:'R. Merton, "The Self-Fulfilling Prophecy" (1948)'}
+];
+const OUTER=[
+ {id:'rep',t:'반복',s:'한 사람의 생각과 행동이 되풀이되기 시작한다.',ask:'이 행동은 얼마나 자주, 누구에게서 반복되나요?'},
+ {id:'habit',t:'습관',s:'반복이 자동화되어 더 이상 선택처럼 느껴지지 않는다.',ask:'이 습관이 생기기 전에는 무엇이 있었나요?'},
+ {id:'group',t:'집단행동',s:'여러 사람의 행동이 서로를 모방하고 강화한다 (동조).',ask:'누가 먼저 시작했고, 누가 따라 했나요?'},
+ {id:'culture',t:'문화·규범',s:'집단의 행동이 "원래 그런 것"이라는 감각이 된다.',ask:'"원래 그래"라고 말해지는 것은 무엇인가요?',r:'Berger & Luckmann, The Social Construction of Reality (1966)'},
+ {id:'org',t:'조직관행',s:'규범이 일하는 방식, 평가, 보상으로 굳는다.',ask:'무엇이 보상받고 무엇이 불이익을 받나요?'},
+ {id:'inst',t:'제도',s:'관행이 규칙·법·정책으로 명문화된다.',ask:'이 제도를 유지시키는 사람들의 사고방식은?'},
+ {id:'sys',t:'사회 시스템',s:'요소들이 만든 전체. 부분의 합이 아닌 새로운 성질(창발)을 가진다.',ask:'이 시스템의 목적은 실제로 무엇인가요? (선언된 목적 말고)',r:'D. Meadows (2008) · A. Giddens, The Constitution of Society (1984)'},
+ {id:'env',t:'환경',s:'시스템이 개인에게 돌아오는 자리. 환경이 새로운 경험을 만들고 다시 생각을 바꾼다.',ask:'이 환경에서 어떤 생각이 "자연스러워"지나요?'}
+];
+const ALL=[...INNER.map(n=>({...n,k:'p'})),...OUTER.map(n=>({...n,k:'s'}))];
+const NODE=Object.fromEntries(ALL.map(n=>[n.id,n]));
+const EMOTIONS=['불안','분노','서운함','수치심','두려움','슬픔','외로움','기대','기쁨','안도','혼란','무력감'];
+const BIASES=[
+ ['confirm','확증편향','내 결론을 뒷받침하는 근거만 골랐다'],
+ ['loss','손실회피','얻는 것보다 잃을 것이 더 크게 보였다'],
+ ['conform','동조','다들 그렇게 해서 따랐다'],
+ ['habit','습관','생각 없이 늘 하던 대로 했다'],
+ ['mind','독심술','상대 속마음을 단정했다'],
+ ['feel','감정적 추론','그렇게 느껴져서 사실이라 믿었다'],
+ ['bw','흑백 사고','전부 아니면 전무로 보았다'],
+ ['past','과거 투사','과거 경험이 현재를 덮어썼다']
+];
+const DESCENT=[
+ ['d1','무슨 일이 일어나고 있는가?','stim'],['d2','왜 이런 현상이 반복되는가?','rep'],
+ ['d3','어떤 행동이 반복되고 있는가?','action'],['d4','그 행동을 만드는 생각은 무엇인가?','thought'],
+ ['d5','그 생각은 어떤 경험·감정·기억에서 만들어졌는가?','mem'],['d6','그 경험을 만든 환경과 제도는 무엇인가?','inst'],
+ ['d7','그 제도를 유지시키는 사람들의 사고방식은 무엇인가?','culture']
+];
+const DAILY=[
+ '지금 가장 신경 쓰이는 일에서, 사실만 한 줄로 적는다면?','오늘 내가 한 판단 중 시스템 1이 한 것은 무엇이었나?',
+ '최근 "원래 그래"라고 말한 것은? 그 "원래"는 어디서 왔을까?','같은 일을 다르게 해석한 사람은 무엇을 보고 있었을까?',
+ '반복되는 나의 행동 하나가 누구의 환경을 만들고 있나?','내가 틀렸다면, 어떤 근거가 그것을 보여줄까?',
+ '지금 느끼는 감정은 어떤 과거 장면과 닮았나?','오늘의 경험은 어떤 생각을 강화했나?',
+ '내가 속한 조직에서 보상받는 행동은 무엇인가?','이 문제를 "사람"이 아니라 "흐름"으로 본다면?',
+ '내가 쓰는 제도·규칙 중 목적을 잃은 것은?','작은 요소 하나를 바꾸면 전체의 어떤 성질이 바뀔까?',
+ '지금 알고 있는 것과 아직 모르는 것을 구분해 적는다면?','오늘 한 번의 순환을 다르게 돌린다면 어디에서?'
+];
+const FLAGWORDS=['항상','절대','일부러','무시','때문에','분명','당연','늘 ','하필','역시','싫어','원래','틀림없','일부러','고의','마음에 안','잘난 척','이기적'];
+const SEED_LEDGER=[
+ ['known','물질은 원자와 기본입자 등의 구조로 설명된다',5],['known','생명체는 세포를 기본 단위로 한다',5],
+ ['known','뇌는 신경세포와 신경망으로 구성된다',5],['known','신경계에서는 전기적·화학적 신호가 작동한다',5],
+ ['known','뇌 활동과 감정·기억·인지·행동 사이에는 밀접한 관계가 있다',4],['known','경험은 이후의 학습과 행동에 영향을 준다',4],
+ ['known','인간의 판단에는 여러 인지적 편향이 존재한다',4],
+ ['open','생명은 정확히 어떤 과정으로 처음 발생했는가?',1],['open','물리적 뇌 활동이 어떻게 주관적 경험이 되는가?',1],
+ ['open','의식은 정확히 무엇인가?',1],['open','‘나’라는 자아는 어떻게 형성되는가?',1],
+ ['philo','자유의지는 어느 정도 가능한가?',1],['philo','생각은 뇌 활동과 정확히 어떤 관계인가?',1],
+ ['philo','마음을 물리적 과정만으로 완전히 설명할 수 있는가?',1]
+];
+const COL={known:['비교적 확실히 아는 것','known'],open:['열린 과학적 질문','open'],philo:['철학적 해석의 영역','philo']};
+
+/* ================= 상태 ================= */
+const LS='cyclemap.v1';
+let S=load();
+function load(){try{const d=JSON.parse(localStorage.getItem(LS));if(d&&d.cases)return d}catch(e){}
+  return {cases:[],draft:null,ledger:SEED_LEDGER.map(([k,t,c],i)=>({id:'s'+i,k,t,c,src:''})),theme:null}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+const ui={tab:'map',sel:null,mode:'p',overlay:false,step:0,viewCase:null};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ================= 탭 ================= */
+const TABS=[['map','지도'],['trace','순환 추적'],['board','아는 것·열린 질문'],['log','기록·통찰']];
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="tab" role="tab" aria-selected="${ui.tab===k}" data-tab="${k}">${l}</button>`).join('');
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab]');if(t){go(t.dataset.tab)}
+});
+function go(tab){ui.tab=tab;renderTabs();render();window.scrollTo({top:0})}
+
+/* ================= 지도 ================= */
+function touched(c){
+  const t=new Set();
+  if(c.fact)t.add('stim');if(c.sense)t.add('sense');
+  if(c.memory||c.desire||(c.emotions&&c.emotions.length))t.add('mem');
+  if(c.interps&&c.interps.filter(x=>x).length)t.add('interp');
+  if(c.thought)t.add('thought');if(c.judgement)t.add('judge');if(c.choice)t.add('choice');
+  if(c.action)t.add('action');if(c.result)t.add('result');if(c.experience)t.add('exp');
+  return t;
+}
+function heat(){
+  const fill={},iv={};
+  S.cases.forEach(c=>{touched(c).forEach(n=>fill[n]=(fill[n]||0)+1);if(c.node)iv[c.node]=(iv[c.node]||0)+1});
+  return {fill,iv};
+}
+function mapSVG(opts={}){
+  const C=380,ri=165,ro=305,H=opts.overlay?heat():null;
+  const pos=(r,a)=>[C+r*Math.cos(a*Math.PI/180),C+r*Math.sin(a*Math.PI/180)];
+  const items=[];
+  INNER.forEach((n,i)=>items.push({...n,k:'p',r:ri,a:-90+i*36}));
+  OUTER.forEach((n,i)=>items.push({...n,k:'s',r:ro,a:162+i*45}));
+  const W=n=>Math.max(50,n.t.length*13.5+18);
+  let arcs='';
+  const ring=(arr,r,col,mk)=>arr.forEach((n,i)=>{
+    const m=arr[(i+1)%arr.length];
+    if(n.k==='s'&&i===arr.length-1)return;
+    const pad=(w)=>(w/2+5)/r*180/Math.PI;
+    const a1=n.a+pad(W(n)),a2=m.a+360*(m.a<n.a?1:0)-pad(W(m));
+    const [x1,y1]=pos(r,a1),[x2,y2]=pos(r,a2);
+    arcs+=`<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.5" marker-end="url(#${mk})"/>`;
+  });
+  const inn=items.filter(x=>x.k==='p'),out=items.filter(x=>x.k==='s');
+  ring(inn,ri,'var(--ink-soft)','ar');ring(out,ro,'var(--accent-3)','ar3');
+  const P=id=>{const n=items.find(x=>x.id===id);return pos(n.r,n.a)};
+  const [ax,ay]=P('action'),[bx,by]=P('rep'),[ex,ey]=P('env'),[fx,fy]=P('exp');
+  arcs+=`<path d="M${ax} ${ay} L${bx} ${by}" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 3" fill="none" marker-end="url(#arf)"/>`;
+  arcs+=`<path d="M${ex} ${ey} Q ${C-30} ${C+170} ${fx} ${fy}" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 3" fill="none" marker-end="url(#arf)"/>`;
+  const nodes=items.map(n=>{
+    const [x,y]=pos(n.r,n.a),w=W(n);
+    const sel=ui.sel===n.id?' sel':'';
+    let op='',bd='';
+    if(H){const f=H.fill[n.id]||0,v=H.iv[n.id]||0;
+      if(f)op=`<rect x="${-w/2}" y="-14" width="${w}" height="28" rx="9" fill="var(--accent-2)" opacity="${Math.min(.15+f*.12,.6)}" style="pointer-events:none;stroke:none"/>`;
+      if(v)bd=`<circle class="badge" cx="${w/2-2}" cy="-12" r="8"/><text class="badge-t" x="${w/2-2}" y="-8.5" text-anchor="middle">${v}</text>`}
+    return `<g class="node${n.k==='s'?' soc':''}${sel}" tabindex="0" role="button" aria-label="${esc(n.t)}" data-node="${n.id}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><rect x="${-w/2}" y="-14" width="${w}" height="28" rx="9"/>${op}<text text-anchor="middle" y="4.5">${esc(n.t)}</text>${bd}</g>`;
+  }).join('');
+  return `<svg class="map" viewBox="0 0 760 760" role="img" aria-label="개인 순환(안쪽)과 사회 순환(바깥쪽)이 맞물린 사고의 순환 지도">
+  <defs>
+   <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ink-soft)"/></marker>
+   <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent-3)"/></marker>
+   <marker id="arf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
+  </defs>
+  <circle cx="${C}" cy="${C}" r="${ri-50}" fill="var(--accent-soft)" opacity=".6"/>
+  <text x="${C}" y="${C-4}" text-anchor="middle" font-size="22" font-weight="700" fill="var(--accent)" style="font-family:var(--serif)">인간</text>
+  <text x="${C}" y="${C+18}" text-anchor="middle" font-size="11.5" fill="var(--ink-soft)">두 순환이 만나는 자리</text>
+  ${arcs}${nodes}</svg>`;
+}
+function detailHTML(){
+  if(!ui.sel){
+    return `<div class="detail"><p class="kicker">안내</p><h3>노드를 눌러 보세요</h3>
+    <p>안쪽 고리는 <b>한 사람 안의 순환</b>, 바깥 고리는 <b>사회의 순환</b>입니다. 행동이 반복되어 시스템이 되고, 시스템이 만든 환경이 다시 경험이 됩니다.</p>
+    <p>아래 ‘토대’ 칩에서는 양자장에서 뇌까지, 순환이 올라서는 바닥을 볼 수 있어요.</p></div>`;
+  }
+  const sub=SUBSTRATE.find(x=>x.id===ui.sel);
+  const n=sub||NODE[ui.sel];
+  const soc=n.k==='s';
+  const cnt=S.cases.filter(c=>touched(c).has(n.id)||c.node===n.id).length;
+  return `<div class="detail${soc?' soc':''}"><p class="kicker">${sub?'토대 · 물질→생명':(soc?'사회 순환':'개인 순환')}</p>
+  <h3>${esc(n.t)}</h3><p>${esc(n.s)}</p>
+  ${n.ask?`<div class="ask"><b>이 지점의 질문</b><br>${esc(n.ask)}</div>`:''}
+  ${n.r?`<div class="ref">참고: ${esc(n.r)}</div>`:''}
+  ${sub?'':`<p class="legend">내 기록 중 ${cnt}건이 이 지점을 지나갑니다.</p>
+  <button class="btn sm" data-startnode="${n.id}">이 지점에서 순환 추적 시작</button>`}</div>`;
+}
+function renderMap(){
+  const d=new Date(),doy=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+  const q=DAILY[doy%DAILY.length];
+  $('#view').innerHTML=`
+  <div class="today"><span class="eyebrow">오늘의 순환 질문</span><b>${esc(q)}</b>
+   <button class="btn sm" data-startq="1">이 질문으로 추적 시작</button></div>
+  <p class="formula">요소가 쌓인다 → 질적으로 다른 전체가 나타난다 → 그 전체가 다시 요소를 바꾼다 → 반복된다</p>
+  <div class="toolbar"><div class="seg"><button aria-pressed="${ui.overlay}" data-overlay="1">내 기록 겹쳐보기</button></div>
+   <span class="legend" style="margin:0">주황 숫자 = 그 지점을 개입 지점으로 고른 횟수 · 초록 음영 = 기록에서 자주 채운 지점</span></div>
+  <div class="grid2"><div class="card">${mapSVG({overlay:ui.overlay})}</div>
+  <div style="display:grid;gap:14px"><div class="card" id="detail">${detailHTML()}</div>
+   <div class="card"><h3>토대 — 물질에서 생명, 뇌까지</h3>
+    <div class="chips">${SUBSTRATE.map(s=>`<button class="chip sub-chip" data-node="${s.id}">${s.t}</button>`).join('<span style="color:var(--ink-faint)">→</span>')}</div>
+    <p class="legend">같은 구조가 반복됩니다. 입자·세포·뉴런이 요소면 물질과 생명의 이야기, 한 사람의 생각과 행동이 요소면 사회의 이야기. 위 층은 아래 층을 일방적으로 만들지 않고, 층위끼리 서로 영향을 줍니다.</p></div>
+  </div></div>`;
+}
+document.addEventListener('click',e=>{
+  const n=e.target.closest('[data-node]');
+  if(n&&ui.tab==='map'){ui.sel=n.dataset.node;renderMap();return}
+  if(e.target.closest('[data-overlay]')){ui.overlay=!ui.overlay;renderMap();return}
+  const sn=e.target.closest('[data-startnode]');
+  if(sn){newDraft({node:sn.dataset.startnode});go('trace');return}
+  if(e.target.closest('[data-startq]')){const d=new Date(),doy=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+    newDraft({title:DAILY[doy%DAILY.length]});go('trace')}
+});
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('g[data-node]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+});
+
+/* ================= 순환 추적 ================= */
+function newDraft(init={}){
+  S.draft={id:uid(),level:'p',emotions:[],interps:['','',''],biases:[],system:'',loop:'',intensity:5,...init};ui.step=0;ui.viewCase=null;save();
+}
+const STEPS=[
+ {t:'① 사건 — 사실만',f:[
+  {k:'title',l:'이 순환의 이름',type:'text',ph:'예: 회의에서 내 의견이 묻혔다'},
+  {k:'level',l:'어떤 층위의 이야기인가요?',type:'radio',o:[['p','개인 안의 순환'],['s','사회·조직의 순환']]},
+  {k:'fact',l:'사실 (자극)',h:'카메라가 찍었다면 무엇이 찍혔을까? 평가·추측·의도 해석을 빼고.',type:'area',flag:true}]},
+ {t:'② 감각과 내면',f:[
+  {k:'sense',l:'몸의 감각',h:'긴장, 열감, 호흡, 두근거림…',type:'area'},
+  {k:'emotions',l:'감정',type:'tags',o:EMOTIONS},
+  {k:'intensity',l:'감정의 세기',type:'range'},
+  {k:'memory',l:'떠오르는 과거',h:'이 장면이 닮은 이전의 경험은?',type:'area'},
+  {k:'desire',l:'지금의 욕구·기대',h:'나는 무엇을 바랐나?',type:'area'}]},
+ {t:'③ 해석의 다리',f:[
+  {k:'interps',l:'같은 사실에 대한 해석들',h:'최소 3개. 첫 번째는 지금 떠오른 해석, 나머지는 의도적으로 다르게.',type:'list'},
+  {k:'chosen',l:'실제로 내가 믿은 해석은?',type:'chosen'}]},
+ {t:'④ 생각 → 판단 → 행동',f:[
+  {k:'thought',l:'생각',h:'그 해석에서 나온 문장 그대로',type:'area'},
+  {k:'judgement',l:'판단',type:'area'},
+  {k:'system',l:'이 판단은 어떤 모드였나?',type:'radio',o:[['s1','시스템 1 · 자동적, 빠름'],['s2','시스템 2 · 멈춰서 검토함']]},
+  {k:'choice',l:'선택 — 어떤 선택지가 있었나?',type:'area'},
+  {k:'action',l:'실제 행동',type:'area'}]},
+ {t:'⑤ 결과와 다음 순환',f:[
+  {k:'result',l:'결과',type:'area'},
+  {k:'experience',l:'새로운 경험 — 이것이 내 생각에 무엇을 남겼나?',type:'area'},
+  {k:'loop',l:'이 순환은 어디로 가고 있나요?',type:'radio',o:[['reinforce','스스로를 키운다(강화)'],['balance','스스로를 줄인다(균형)'],['unknown','아직 모르겠다']]},
+  {k:'loopWhy',l:'그렇게 생각하는 이유',type:'area'}]},
+ {t:'⑥ 사고의 한계 점검',f:[{k:'biases',l:'이 순환에 개입했을 수 있는 것',h:'해당하는 것을 모두 고르세요. 정답이 아니라 점검입니다.',type:'checks'}]},
+ {t:'⑦ 구조로 내려가기',f:DESCENT.map(([k,l,n])=>({k,l,node:n,type:'area',opt:true,h:'비워둬도 됩니다. 사회·조직 이야기라면 꼭 채워보세요.'}))},
+ {t:'⑧ 개입 — 다음 한 번의 순환',f:[
+  {k:'node',l:'가장 작게 바꿀 수 있는 지점',h:'모든 고리를 바꿀 필요 없이, 한 지점만.',type:'node'},
+  {k:'experiment',l:'다음에 해볼 작은 실험',h:'언제·어디서·무엇을 다르게?',type:'area'}]}
+];
+function flagged(t){return [...new Set(FLAGWORDS.filter(w=>t&&t.includes(w)).map(w=>w.trim()))]}
+function fieldHTML(f,d){
+  const v=d[f.k];
+  const L=`<label class="f" for="f_${f.k}">${esc(f.l)}${f.node?`<span class="q-node">${esc(NODE[f.node].t)}</span>`:''}${f.h?`<span class="hint">${esc(f.h)}</span>`:''}</label>`;
+  switch(f.type){
+   case 'text':return L+`<input type="text" id="f_${f.k}" data-f="${f.k}" value="${esc(v)}" placeholder="${esc(f.ph||'')}">`;
+   case 'area':{const fl=f.flag?flagged(v):[];
+     return L+`<textarea id="f_${f.k}" data-f="${f.k}">${esc(v)}</textarea>`+(f.flag?`<div class="warn" id="flag" ${fl.length?'':'hidden'}>해석이 섞였을 수 있는 말: <b>${fl.map(esc).join(', ')}</b> — 사실만 남기고 다시 적어볼까요?</div>`:'')}
+   case 'radio':return L+`<div class="radio">${f.o.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${v===k}" data-radio="${f.k}" data-v="${k}">${esc(l)}</button>`).join('')}</div>`;
+   case 'tags':return L+`<div class="chips">${f.o.map(o=>`<button type="button" class="chip" aria-pressed="${(v||[]).includes(o)}" data-tag="${f.k}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+   case 'range':return L+`<input type="range" min="0" max="10" id="f_${f.k}" data-f="${f.k}" data-num="1" value="${v??5}" style="width:100%"><div class="hint" id="rv">${v??5} / 10</div>`;
+   case 'list':return L+(v||[]).map((x,i)=>`<div class="listrow"><input type="text" data-li="${i}" value="${esc(x)}" placeholder="해석 ${i+1}"></div>`).join('')+`<button type="button" class="btn ghost sm" data-addli="1">+ 해석 추가</button>`;
+   case 'chosen':{const opts=(d.interps||[]).map((x,i)=>[i,x]).filter(([,x])=>x);
+     return L+(opts.length?`<select data-f="chosen" data-num="1"><option value="">선택…</option>${opts.map(([i,x])=>`<option value="${i}" ${String(v)===String(i)?'selected':''}>${esc(x)}</option>`).join('')}</select>`:'<div class="empty">위에 해석을 먼저 적어주세요.</div>')}
+   case 'checks':return L+BIASES.map(([k,t,s])=>`<label style="display:flex;gap:8px;margin:6px 0;cursor:pointer"><input type="checkbox" data-bias="${k}" ${(v||[]).includes(k)?'checked':''}><span><b>${t}</b> <span class="hint" style="display:inline">— ${s}</span></span></label>`).join('');
+   case 'node':return L+`<select data-f="node"><option value="">선택…</option>${[['개인 순환',INNER],['사회 순환',OUTER]].map(([g,a])=>`<optgroup label="${g}">${a.map(n=>`<option value="${n.id}" ${v===n.id?'selected':''}>${n.t}</option>`).join('')}</optgroup>`).join('')}</select>`+(v?`<div class="ask"><b>${esc(NODE[v].t)}</b> · ${esc(NODE[v].ask||NODE[v].s)}</div>`:'');
+  }
+}
+function renderTrace(){
+  if(ui.viewCase){return renderResult(S.cases.find(c=>c.id===ui.viewCase))}
+  const d=S.draft;
+  if(!d){
+    $('#view').innerHTML=`<div class="card"><h2>순환 추적</h2><p class="sub">하나의 사건을 붙잡고, 자극에서 경험까지 한 바퀴를 천천히 돌려봅니다. 사실과 해석을 나누고, 구조까지 내려갑니다. 약 5~10분.</p>
+    <button class="btn" id="newcase">새 순환 추적 시작</button></div>`;
+    return;
+  }
+  const st=STEPS[ui.step];
+  $('#view').innerHTML=`<div class="card"><div class="stepper">${STEPS.map((_,i)=>`<button class="dot ${i<ui.step?'done':''} ${i===ui.step?'cur':''}" data-goto="${i}" aria-label="${i+1}단계"></button>`).join('')}</div>
+   <h2>${st.t}</h2>${st.f.map(f=>fieldHTML(f,d)).join('')}
+   <div class="row"><div><button class="btn ghost" data-prev="1" ${ui.step===0?'disabled':''}>이전</button>
+   <button class="btn ghost" data-discard="1">버리기</button></div>
+   <button class="btn" data-next="1">${ui.step===STEPS.length-1?'완성 · 순환 카드 보기':'다음'}</button></div></div>`;
+}
+document.addEventListener('input',e=>{
+  const t=e.target,d=S.draft;if(!d||ui.tab!=='trace')return;
+  if(t.dataset.f){d[t.dataset.f]=t.dataset.num?Number(t.value):t.value;
+    if(t.dataset.f==='fact'){const fl=flagged(t.value),w=$('#flag');w.hidden=!fl.length;w.innerHTML=`해석이 섞였을 수 있는 말: <b>${fl.map(esc).join(', ')}</b> — 사실만 남기고 다시 적어볼까요?`}
+    if(t.dataset.f==='intensity')$('#rv').textContent=t.value+' / 10'}
+  if(t.dataset.li!==undefined)d.interps[+t.dataset.li]=t.value;
+  save();
+});
+document.addEventListener('change',e=>{
+  const t=e.target,d=S.draft;if(!d||ui.tab!=='trace')return;
+  if(t.dataset.bias){const s=new Set(d.biases);t.checked?s.add(t.dataset.bias):s.delete(t.dataset.bias);d.biases=[...s];save()}
+  if(t.dataset.f==='node'||t.dataset.f==='chosen'){d[t.dataset.f]=t.dataset.num?(t.value===''?'':Number(t.value)):t.value;save();if(t.dataset.f==='node')renderTrace()}
+});
+document.addEventListener('click',e=>{
+  if(ui.tab!=='trace')return;const d=S.draft,g=s=>e.target.closest(s);
+  if(g('#newcase')){newDraft();renderTrace();return}
+  if(g('[data-discard]')){if(confirm('이 추적을 버릴까요?')){S.draft=null;save();renderTrace()}return}
+  if(!d)return;
+  let b;
+  if(b=g('[data-radio]')){d[b.dataset.radio]=b.dataset.v;save();renderTrace()}
+  else if(b=g('[data-tag]')){const s=new Set(d[b.dataset.tag]||[]);s.has(b.dataset.v)?s.delete(b.dataset.v):s.add(b.dataset.v);d[b.dataset.tag]=[...s];save();renderTrace()}
+  else if(g('[data-addli]')){d.interps.push('');save();renderTrace()}
+  else if(b=g('[data-goto]')){ui.step=+b.dataset.goto;renderTrace()}
+  else if(g('[data-prev]')){ui.step=Math.max(0,ui.step-1);renderTrace();window.scrollTo({top:0})}
+  else if(g('[data-next]')){
+    if(ui.step<STEPS.length-1){ui.step++;renderTrace();window.scrollTo({top:0})}
+    else{finish()}
+  }
+});
+function finish(){
+  const d=S.draft;d.interps=(d.interps||[]).filter(x=>x.trim()||false).length?d.interps:d.interps;
+  if(!d.title)d.title=(d.fact||'제목 없는 순환').slice(0,30);
+  d.at=Date.now();S.cases=S.cases.filter(c=>c.id!==d.id);S.cases.unshift(d);
+  ui.viewCase=d.id;S.draft=null;save();renderTrace();window.scrollTo({top:0});
+}
+
+/* ================= 순환 카드 ================= */
+function insightsFor(c){
+  const out=[],n=(c.interps||[]).filter(x=>x&&x.trim()).length,hit=touched(c);
+  if(n>=3)out.push(`해석을 ${n}개 만들었습니다. 사실과 생각 사이에 ‘선택지’가 생겼어요.`);
+  else out.push('해석이 3개보다 적습니다. 다음엔 의도적으로 반대 해석을 하나 더 만들어보세요.');
+  if(c.system==='s1')out.push('판단이 시스템 1(자동)에서 나왔습니다. 정말 중요한 일이면 멈춰서 시스템 2로 한 번 더 확인할 가치가 있어요.');
+  if(c.system==='s2')out.push('멈춰서 검토한 판단이었습니다. 무엇이 멈추게 했는지 기억해두면 재사용할 수 있어요.');
+  if(c.loop==='reinforce')out.push('이 순환은 스스로를 키우는 고리입니다(강화). 가장 작은 지점 하나만 끊어도 전체 흐름이 바뀝니다.');
+  if(c.loop==='balance')out.push('스스로를 줄이는 고리(균형)입니다. 이 균형을 만든 요소를 다른 상황에도 쓸 수 있을지 보세요.');
+  if((c.biases||[]).length)out.push('점검된 사고의 한계: '+c.biases.map(k=>BIASES.find(b=>b[0]===k)[1]).join(', ')+'.');
+  if(c.flagFact)out.push('');
+  if(flagged(c.fact).length)out.push(`‘사실’ 칸에 해석 단어(${flagged(c.fact).join(', ')})가 섞여 있었습니다.`);
+  const dc=DESCENT.filter(([k])=>c[k]&&c[k].trim()).length;
+  if(dc)out.push(`구조로 ${dc}단계 내려갔습니다. ${dc<7?'아직 내려갈 수 있는 층이 남아 있어요.':'표면의 문제에서 구조의 문제까지 도달했습니다.'}`);
+  if(c.level==='s'&&dc<4)out.push('사회·조직 이야기인데 구조 질문에 덜 내려갔습니다. ⑦단계를 더 채워보세요.');
+  return out.filter(Boolean);
+}
+function renderResult(c){
+  if(!c){ui.viewCase=null;return renderTrace()}
+  const hit=touched(c),L=BIASES;
+  const sec=(t,v)=>v&&String(v).trim()?`<h3>${t}</h3><p style="margin:0;white-space:pre-wrap">${esc(v)}</p>`:'';
+  const flow=INNER.map(n=>`<span class="n ${hit.has(n.id)?'hit':''}">${n.t}</span>`).join('→');
+  const chosen=c.interps&&c.chosen!==''&&c.chosen!=null?c.interps[c.chosen]:'';
+  $('#view').innerHTML=`<div class="card res"><span class="badge-l ${c.level==='s'?'s':'p'}">${c.level==='s'?'사회 순환':'개인 순환'}</span>
+  <h2 style="margin-top:8px">${esc(c.title)}</h2><div class="flow">${flow}→<span class="n hit">다시 자극</span></div>
+  <div class="insights"><b>이 순환에서 읽히는 것</b><ul style="margin:6px 0 0;padding-left:18px">${insightsFor(c).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+  ${sec('사실',c.fact)}${sec('감각',c.sense)}
+  ${(c.emotions||[]).length?`<h3>감정 (${c.intensity}/10)</h3><div class="chips">${c.emotions.map(x=>`<span class="chip on">${esc(x)}</span>`).join('')}</div>`:''}
+  ${sec('떠오른 과거',c.memory)}${sec('욕구·기대',c.desire)}
+  ${(c.interps||[]).filter(x=>x).length?`<h3>해석들</h3><ol style="margin:0;padding-left:20px">${c.interps.filter(x=>x).map((x,i)=>`<li ${String(c.chosen)===String(c.interps.indexOf(x))?'style="font-weight:700"':''}>${esc(x)}</li>`).join('')}</ol>`:''}
+  ${sec('생각',c.thought)}${sec('판단',c.judgement)}${sec('선택지',c.choice)}${sec('행동',c.action)}${sec('결과',c.result)}${sec('새로운 경험',c.experience)}
+  ${DESCENT.some(([k])=>c[k])?`<h3>구조로 내려가기</h3>${DESCENT.filter(([k])=>c[k]).map(([k,q,n])=>`<p style="margin:0 0 8px"><b style="font-size:13px">${q}</b> <span class="q-node">${NODE[n].t}</span><br>${esc(c[k])}</p>`).join('')}`:''}
+  ${c.node?`<div class="ask"><b>개입 지점: ${esc(NODE[c.node].t)}</b><br>${esc(c.experiment||NODE[c.node].ask||'')}</div>`:''}
+  <div class="row"><div><button class="btn ghost" data-act="back">닫기</button> <button class="btn ghost" data-act="copy" data-id="${c.id}">마크다운 복사</button></div>
+  <div><button class="btn ghost" data-act="edit" data-id="${c.id}">수정</button> <button class="btn ghost" data-act="del" data-id="${c.id}">삭제</button></div></div></div>`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const id=b.dataset.id,a=b.dataset.act;
+  const c=S.cases.find(x=>x.id===id);
+  if(a==='back'){ui.viewCase=null;render()}
+  if(a==='open'){ui.viewCase=id;go('trace')}
+  if(a==='edit'){S.draft=JSON.parse(JSON.stringify(c));ui.viewCase=null;ui.step=0;save();render()}
+  if(a==='del'&&confirm('삭제할까요?')){S.cases=S.cases.filter(x=>x.id!==id);save();ui.viewCase=null;render()}
+  if(a==='copy'){const t=toMD(c);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>b.textContent='복사됨 ✓',()=>prompt('복사하세요',t))}
+  if(a==='export'){download('cyclemap.json',JSON.stringify({cases:S.cases,ledger:S.ledger},null,1))}
+  if(a==='mdall'){download('cyclemap.md',S.cases.map(toMD).join('\n\n---\n\n'))}
+  if(a==='import'){$('#imp').click()}
+});
+function toMD(c){
+  const L=[`# ${c.title}`,`*${c.level==='s'?'사회 순환':'개인 순환'}*`];
+  const add=(t,v)=>v&&String(v).trim()&&L.push(`**${t}**: ${v}`);
+  add('사실',c.fact);add('감각',c.sense);if((c.emotions||[]).length)L.push(`**감정**: ${c.emotions.join(', ')} (${c.intensity}/10)`);
+  add('떠오른 과거',c.memory);add('욕구',c.desire);
+  const it=(c.interps||[]).filter(x=>x);if(it.length)L.push('**해석들**\n'+it.map((x,i)=>`${i+1}. ${x}`).join('\n'));
+  add('생각',c.thought);add('판단',c.judgement);add('선택지',c.choice);add('행동',c.action);add('결과',c.result);add('경험',c.experience);
+  DESCENT.forEach(([k,q])=>add(q,c[k]));
+  if(c.node)L.push(`**개입 지점**: ${NODE[c.node].t} — ${c.experiment||''}`);
+  return L.join('\n\n');
+}
+function download(name,txt){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+/* ================= 보드 ================= */
+function renderBoard(){
+  $('#view').innerHTML=`<h2>아는 것 · 열린 질문</h2>
+  <p class="sub">지금 알고 있는 것과 아직 모르는 것을 섞지 않기 위한 보드. 확신도(●)를 스스로 매기고, 근거를 남기고, 항목을 옮겨보세요. 과학적 사실과 철학적 해석은 다른 칸에 둡니다.</p>
+  <div class="cols">${Object.entries(COL).map(([k,[t,cl]])=>`<div class="col ${cl}"><h3>${t}<span>${S.ledger.filter(x=>x.k===k).length}</span></h3>
+   ${S.ledger.filter(x=>x.k===k).map(x=>`<div class="item">${esc(x.t)}
+     <div class="meta"><button class="conf" data-conf="${x.id}" title="확신도 바꾸기" aria-label="확신도 ${x.c}/5">${'●'.repeat(x.c)}${'○'.repeat(5-x.c)}</button>
+     <button class="btn ghost sm" data-mv="${x.id}" data-d="-1" ${k==='known'?'disabled':''}>◀</button><button class="btn ghost sm" data-mv="${x.id}" data-d="1" ${k==='philo'?'disabled':''}>▶</button>
+     <button class="btn ghost sm" data-ldel="${x.id}">✕</button></div>
+     <input type="text" class="src" data-src="${x.id}" value="${esc(x.src)}" placeholder="근거·출처 메모" style="margin-top:6px;padding:4px 8px;font-size:12.5px"></div>`).join('')}
+   <div class="add"><input type="text" id="add_${k}" placeholder="새 항목"><button class="btn sm" data-ladd="${k}">추가</button></div></div>`).join('')}</div>`;
+}
+document.addEventListener('click',e=>{
+  if(ui.tab!=='board')return;const g=s=>e.target.closest(s);let b;
+  const ord=['known','open','philo'];
+  if(b=g('[data-conf]')){const x=S.ledger.find(i=>i.id===b.dataset.conf);x.c=x.c%5+1;save();renderBoard()}
+  else if(b=g('[data-mv]')){const x=S.ledger.find(i=>i.id===b.dataset.mv);x.k=ord[ord.indexOf(x.k)+ +b.dataset.d];save();renderBoard()}
+  else if(b=g('[data-ldel]')){S.ledger=S.ledger.filter(i=>i.id!==b.dataset.ldel);save();renderBoard()}
+  else if(b=g('[data-ladd]')){const v=$('#add_'+b.dataset.ladd).value.trim();if(v){S.ledger.push({id:uid(),k:b.dataset.ladd,t:v,c:b.dataset.ladd==='known'?3:1,src:''});save();renderBoard()}}
+});
+document.addEventListener('input',e=>{if(e.target.dataset.src){const x=S.ledger.find(i=>i.id===e.target.dataset.src);if(x){x.src=e.target.value;save()}}});
+
+/* ================= 기록·통찰 ================= */
+function renderLog(){
+  const cs=S.cases,H=heat();
+  const bias={};cs.forEach(c=>(c.biases||[]).forEach(k=>bias[k]=(bias[k]||0)+1));
+  const loops={reinforce:0,balance:0,unknown:0};cs.forEach(c=>c.loop&&loops[c.loop]++);
+  const avgInterp=cs.length?(cs.reduce((a,c)=>a+(c.interps||[]).filter(x=>x&&x.trim()).length,0)/cs.length).toFixed(1):'–';
+  const s2=cs.filter(c=>c.system==='s2').length,s1=cs.filter(c=>c.system==='s1').length;
+  const topNode=Object.entries(H.iv).sort((a,b)=>b[1]-a[1])[0];
+  const max=Math.max(1,...Object.values(bias));
+  $('#view').innerHTML=`<h2>기록 · 통찰</h2><p class="sub">쌓인 순환에서 나만의 반복 패턴을 봅니다. 모든 데이터는 이 브라우저에만 있습니다.</p>
+  <div class="stats"><div class="stat"><b>${cs.length}</b><span>기록한 순환</span></div>
+   <div class="stat"><b>${avgInterp}</b><span>사건당 평균 해석 수</span></div>
+   <div class="stat"><b>${s1||s2?Math.round(s2/(s1+s2)*100)+'%':'–'}</b><span>시스템 2로 검토한 비율</span></div>
+   <div class="stat"><b>${loops.reinforce}</b><span>스스로 커지는(강화) 고리</span></div></div>
+  ${cs.length?`<div class="grid2"><div class="card"><h3>자주 개입한 사고의 한계</h3>
+   ${BIASES.map(([k,t])=>`<div class="bar"><span class="l">${t}</span><i style="width:${(bias[k]||0)/max*100}%"></i><span>${bias[k]||0}</span></div>`).join('')}
+   ${topNode?`<p class="legend">가장 자주 개입 지점으로 고른 곳: <b>${NODE[topNode[0]].t}</b> (${topNode[1]}회). 이 지점이 지금 나의 가장 작은 지렛대일 수 있습니다.</p>`:''}</div>
+   <div class="card"><h3>내 순환 지도</h3>${mapSVG({overlay:true})}</div></div>`:'<div class="card empty">아직 기록이 없습니다. ‘순환 추적’에서 첫 순환을 돌려보세요.</div>'}
+  <div class="card" style="margin-top:16px"><h3>기록 목록</h3>
+   ${cs.map(c=>`<div class="case"><div><span class="badge-l ${c.level==='s'?'s':'p'}">${c.level==='s'?'사회':'개인'}</span> <b>${esc(c.title)}</b>
+     <div class="legend" style="margin:0">${new Date(c.at||0).toLocaleDateString('ko-KR')}${c.node?' · 개입: '+NODE[c.node].t:''}</div></div>
+     <button class="btn ghost sm" data-act="open" data-id="${c.id}">열기</button></div>`).join('')||'<div class="empty">비어 있음</div>'}
+   <div class="row"><div><button class="btn ghost sm" data-act="export">JSON 내보내기</button> <button class="btn ghost sm" data-act="mdall" ${cs.length?'':'disabled'}>마크다운 내보내기</button>
+   <button class="btn ghost sm" data-act="import">가져오기</button><input type="file" id="imp" accept=".json" hidden></div></div></div>`;
+  $('#imp').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);
+    if(Array.isArray(d.cases)){const ids=new Set(S.cases.map(c=>c.id));d.cases.forEach(c=>{if(c&&c.id&&!ids.has(c.id))S.cases.push(c)});if(Array.isArray(d.ledger)&&confirm('보드도 가져온 내용으로 바꿀까요?'))S.ledger=d.ledger;save();renderLog()}
+    else alert('형식이 맞지 않습니다')}catch(_){alert('읽을 수 없는 파일입니다')}};r.readAsText(f)};
+}
+
+/* ================= 렌더 / 테마 ================= */
+function render(){({map:renderMap,trace:renderTrace,board:renderBoard,log:renderLog})[ui.tab]()}
+function applyTheme(){const t=S.theme;if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
+$('#theme').onclick=()=>{const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;S.theme=dark?'light':'dark';applyTheme();save()};
+applyTheme();renderTabs();render();
+</script>
+</body>
+</html>
