@@ -125,6 +125,16 @@ details.part .bd{padding:0 0 16px;display:flex;flex-direction:column;gap:10px}
 @keyframes inhale{50%{transform:scale(1.35);opacity:.6}}
 @media(prefers-reduced-motion:reduce){.pause .ring{animation:none}}
 .entry{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.story{list-style:none;margin:0;padding:14px 16px;display:flex;flex-direction:column;gap:0;background:var(--soft);border-radius:12px;counter-reset:st}
+.story li{counter-increment:st;position:relative;padding:6px 0 6px 28px;font-family:var(--font-display);font-size:16px}
+.story li::before{content:"↓";position:absolute;left:4px;color:var(--accent);font-family:var(--font-body);font-weight:700}
+.story li:first-child::before{content:"●";font-size:11px;top:10px}
+.tl{list-style:none;margin:6px 0 0;padding:0 0 0 18px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:18px}
+.tl li{position:relative;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.tl li::before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.tl-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.tl-h b{font-family:var(--font-display);font-size:18px}
+.tl-n{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.tl-q{font-family:var(--font-display);font-size:16px}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -330,6 +340,16 @@ var EXPERIMENTS=[
 ];
 var STARTERS=['…는 개인의 문제가 아니라 구조의 문제일 수도 있다.','…는 하나의 원인이 아니라 여러 층위가 상호작용한 결과일 수 있다.','내가 당연하게 여긴 것은 …라는 전제였다.','…가 아니라 …도 가능하다.'];
 var ROOTS5=['감각수용','감각전달','지각','인지적 처리','반응과 피드백'];
+var STORY=['보는 것은 해석이다','우열이 얹히면 분별심, 편이 갈리면 분리의식','반복되어 습관·문화·제도가 된다','제도는 다시 사람의 생각을 만든다','어느 지점에서든 생각의 틈으로 열린 순환에 갈아탈 수 있다','연결이 기본값인 구조를 작은 실험으로 설계한다'];
+var FLOW=[
+ ['제1부 · 1~4장','인식의 뿌리','우리는 정말 세상을 있는 그대로 보고 있는가?','같은 비도 네 사람에게 네 개의 현실이다. 인식은 해석이고, 4개의 벽(효율·확증편향·손실 회피·동조)이 생각을 가둔다.','quick','잠깐! 진짜? 해 보기'],
+ ['제2부 · 5~9장','문명의 뿌리','왜 우리는 세상을 쪼개어 보게 되었는가?','분업은 문명을 키웠지만 부분만 최적화하는 합성의 오류를 낳았다. 연결은 원래의 질서이고, 연결에서 창발이 일어난다.','map:personal','순환 지도 보기'],
+ ['제3부 · 10~12장','사고의 순환과 병리','생각은 어떻게 제도가 되어 다시 나를 만드는가?','지름길 → 습관 → 규범 → 관행 → 제도의 사슬이 칸막이·각자도생·단기성과·경로의존성을 낳는다. 같은 느린 사고가 닫힌 순환과 열린 순환으로 갈린다.','map:closed','닫힌·열린 순환 보기'],
+ ['제4부 · 13~15장','통합의 기술','전체를 보고 어디를 건드릴까?','다름을 틀림이 아닌 조각으로 잇는 통합적 사고, 증상이 아닌 상류를 보는 업스트림, 작은 힘으로 큰 변화를 만드는 레버리지 포인트.','deep','깊게 디버깅하기'],
+ ['제5부 · 16~18장','연결 사회의 디자인','어떤 미래를 어떻게 설계할 것인가?','예측이 아닌 백캐스팅, 설득이 아닌 기본값(디폴트) 재설계, AI는 대체가 아닌 연결의 운영체제.','canvas','캔버스 작성하기'],
+ ['제6부 · 19~20장','실천 도구','오늘 당장 무엇을 해 볼까?','완벽한 계획 대신 30일 작은 실험, 그리고 생각과 반응 사이에 3초의 틈을 만드는 「잠깐! 진짜?」.','canvas','30일 실험 카드 쓰기'],
+ ['제7부 · 21장·에필로그','다섯 기둥','우리는 오늘 무엇을 연결할 용기를 낼 것인가?','사람·관계·순환·실험·설계의 다섯 기둥이 함께 서고, 분별하되 분리하지 않는 인간으로 살아간다.','canvas','선언문 쓰기']
+];
 var EXPAND=['마음 관리','관계·오해 해소','학교·토론 교육','조직 소통 문화','시민적 문해력'];
 
 /* 사고의 순환 지도 — 8단계 두 층위 + 12장의 두 순환 */
@@ -477,6 +497,9 @@ function vHome(){
  '<a href="#/map"><b>사고의 순환 지도</b><span>물질에서 마음, 사회까지의 순환과, 닫힌 순환·열린 순환을 눌러 보며 읽습니다.</span></a>'+
  '<a href="#/book"><b>책과 함께</b><span>장별 질문과 실험, 핵심 용어집. 밑줄 친 문장을 디버깅으로 가져갑니다.</span></a>'+
  '<a href="#/canvas"><b>미래 설계</b><span>5단계 캔버스, 30일 실험 카드, 미래 설계 선언문을 작성합니다.</span></a></div>'+
+ '<div class="sec" style="margin-top:26px"><span class="eyebrow">책 한 장으로 보기</span><h2>전체 흐름</h2>'+
+ '<ol class="story">'+STORY.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ol>'+
+ '<ol class="tl">'+FLOW.map(function(f,i){return '<li><div class="tl-h"><span class="tl-n">'+esc(f[0])+'</span><b>'+esc(f[1])+'</b></div><p class="tl-q">'+esc(f[2])+'</p><p class="hint">'+esc(f[3])+'</p><button class="btn ghost sm" data-fl="'+i+'">'+esc(f[5])+'</button></li>'}).join('')+'</ol></div>'+
  '<div class="card" style="margin-top:18px"><h3>이렇게 쓰세요</h3><ol class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>책을 읽다 마음이 걸리는 문장이나 사회문제를 하나 고릅니다.</li><li>지도에서 그 생각이 순환의 어느 지점에 있는지 확인합니다.</li><li>디버깅으로 “생각의 틈”을 만들고, 작은 선택까지 기록합니다.</li><li>‘내 기록’에서 확신이 어떻게 달라졌는지, 생각과 나 사이에 거리가 생겼는지 되돌아봅니다.</li></ol></div>'+
  '<div class="sec" style="margin-top:22px"><span class="label">이 작은 거리두기가 퍼져 가는 길 (책 20장)</span><div class="flow">'+EXPAND.map(function(x,i){return (i?'<span class="bar"></span>':'')+'<span class="n">'+(i+1)+' '+esc(x)+'</span>'}).join('')+'</div><p class="note">성과 기준은 생각이 얼마나 긍정적으로 바뀌었는가가 아니라, 생각과 나 사이에 건강한 거리를 둘 수 있게 되었는가입니다.</p></div>';
 }
@@ -746,8 +769,9 @@ function chGo(c){
 document.addEventListener('click',function(e){
  var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
  var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
- var el=e.target.closest('[data-issue],[data-pat],[data-go],[data-act],[data-node],[data-kind],[data-starter],[data-exp],[data-ex],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-mode]');
+ var el=e.target.closest('[data-issue],[data-pat],[data-go],[data-act],[data-node],[data-kind],[data-starter],[data-exp],[data-ex],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-mode],[data-fl]');
  if(!el)return;var d=el.dataset;
+ if(d.fl!==undefined){var fl=FLOW[+d.fl];chGo({go:fl[4],label:fl[0]});return}
  if(d.mode){if(S.mode!==d.mode){S.mode=d.mode;S.step=0;S.pause=false;save();render()}return}
  if(d.ex!==undefined){var t=$('#thoughtIn');if(t){t.value=d.ex;S.thought=d.ex;save();var g0=$('#go0');if(g0)g0.disabled=false}return}
  if(d.issue!==undefined){S.issue=d.issue;var it=$('#issueIn');if(it)it.value='';document.querySelectorAll('[data-issue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});var g=$('#go0');if(g)g.disabled=!(S.issue&&S.thought.trim().length>3);save();return}
