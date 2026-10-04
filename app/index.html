@@ -715,7 +715,6 @@ function vMap(){
   svg+='<g class="node'+(i===mapSel?' sel':'')+'" data-node="'+i+'" tabindex="0" role="button" aria-label="'+esc(nd.n)+'" aria-pressed="'+(i===mapSel)+'"><rect x="'+(p[0]-w/2).toFixed(1)+'" y="'+(p[1]-18).toFixed(1)+'" width="'+w+'" height="36" rx="10"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+5).toFixed(1)+'">'+esc(nd.n)+'</text></g>'});
  svg+='<text x="240" y="232" text-anchor="middle" font-family="var(--font-display)" font-size="19" font-weight="700" fill="var(--fg)">'+M.title+'</text><text x="240" y="256" text-anchor="middle" font-size="12.5" fill="var(--muted)">'+M.center+'</text></svg>';
  var nd=N[mapSel],refs=(nd.r||[]).map(function(i){return '<li>'+esc(REFS[i-1])+(BOOKREFS.indexOf(i)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('');
- var parts=PARTS.map(function(p,i){return '<details class="part"><summary><span class="n">'+String(i+1).padStart(2,'0')+'</span>'+esc(p[0])+'</summary><div class="bd"><p>'+esc(p[1])+'</p>'+(p[2].length?'<ul class="refs" style="margin:0;padding-left:18px">'+p[2].map(function(n){return '<li>'+esc(REFS[n-1])+(BOOKREFS.indexOf(n)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('')+'</ul>':'')+'</div></details>'}).join('');
  var tabs=MAPTABS.map(function(t){return '<button data-kind="'+t[0]+'" aria-pressed="'+(mapKind===t[0])+'">'+t[1]+'</button>'}).join('');
  var sw=mapKind==='closed'?'<button class="btn ghost sm" data-kind="open">열린 순환 보기</button>':mapKind==='open'?'<button class="btn ghost sm" data-kind="closed">닫힌 순환 보기</button>':'';
  return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">사유의 지도</div><h1>사고의 순환 지도</h1><p class="lead">물질에서 마음, 행동, 사회까지. 개인 층위와 사회 층위는 같은 구조입니다. 그리고 같은 느린 사고도 “내가 맞다”에서 출발하면 닫힌 순환, “내가 틀릴 수도 있다”에서 출발하면 열린 순환이 됩니다. 각 단계를 눌러 그 자리에서 던질 질문을 확인하세요.</p></header>'+
@@ -724,12 +723,15 @@ function vMap(){
  '<div class="detail" style="margin:18px 0"><div class="eyebrow">'+(mapSel+1)+' / '+N.length+(nd.ch?'  ·  책 '+esc(nd.ch.join(', ')):'')+'</div><h3>'+esc(nd.n)+'</h3><p>'+esc(nd.d)+'</p><div class="quote">잠깐! '+esc(nd.q)+'</div>'+(refs?'<ul class="refs" style="margin:0;padding-left:18px">'+refs+'</ul>':'')+
  '<div class="row"><button class="btn sm" data-act="mapDebug">이 질문으로 내 생각 검토하기</button></div></div>'+
  '<div class="insight"><div class="eyebrow">한 줄로 읽으면</div><h3 style="margin-top:6px">개인 층위와 사회 층위는 같은 그림이다.</h3><p style="margin-top:8px">작은 것들이 쌓이면 합과는 다른 ‘하나’가 나타나고, 그 ‘하나’는 다시 작은 것들의 다음 모습을 결정합니다. 요소가 입자·세포·뉴런이면 물질과 생명의 이야기, 한 사람의 생각과 행동이면 사회의 이야기입니다. 두 순환이 만나는 자리가 인간입니다.</p><div class="formula">'+SAME+'</div></div>'+
- '<h2 style="margin:34px 0 8px">깊이 읽기</h2><p class="hint" style="margin-bottom:12px">책 1장이 말하는 인식의 5단계 순환은 '+ROOTS5.join(' → ')+'입니다. 위 지도의 개인 층위는 이를 8단계로 풀어 쓴 것입니다.</p><div class="sec">'+parts+'</div>'+
+ '<div class="msum" style="margin-top:26px;gap:8px"><div class="eyebrow">더 읽어 보기</div><h3>배경과 근거가 궁금하다면</h3><p class="hint">물질에서 마음까지의 배경 설명, 과학적으로 알려진 것과 열린 질문, 참고문헌은 「책과 함께」의 ‘깊이 읽기’에 모아 두었습니다.</p><div class="row"><button class="btn sm" data-sc="dp">깊이 읽기로 가기</button><button class="btn ghost sm" data-sc="rf">참고문헌 보기</button></div></div>';
+}
+function deepRead(){
+ var parts=PARTS.map(function(p,i){return '<details class="part"><summary><span class="n">'+String(i+1).padStart(2,'0')+'</span>'+esc(p[0])+'</summary><div class="bd"><p>'+esc(p[1])+'</p>'+(p[2].length?'<ul class="refs" style="margin:0;padding-left:18px">'+p[2].map(function(n){return '<li>'+esc(REFS[n-1])+(BOOKREFS.indexOf(n)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('')+'</ul>':'')+'</div></details>'}).join('');
+ return '<h2 id="dp" style="margin:34px 0 8px">깊이 읽기</h2><p class="hint" style="margin-bottom:12px">책 1장이 말하는 인식의 5단계 순환은 '+ROOTS5.join(' → ')+'입니다. 위 지도의 개인 층위는 이를 8단계로 풀어 쓴 것입니다.</p><div class="sec">'+parts+'</div>'+
  '<div class="grid2" style="margin-top:22px"><div class="known"><h3>비교적 확실하게 알려진 것</h3><ul>'+KNOWN.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div><div class="open"><h3>아직 열린 질문</h3><ul>'+OPEN.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div></div>'+
  '<p class="hint" style="margin-top:12px">과학적 사실과 철학적 해석은 섞지 않습니다. 마지막 두 질문은 특히 구분해서 접근해야 하는 영역입니다. 그리고 이 구조는 “아래 단계가 위 단계를 일방적으로 만든다”가 아니라 “서로 다른 층위가 상호작용하며 하나의 복잡한 시스템을 이룬다”로 읽어야 합니다.</p>'+
- '<details class="part" style="margin-top:22px"><summary>전체 참고문헌 ('+REFS.length+')</summary><div class="bd"><ol class="refs" style="padding-left:20px;margin:0">'+REFS.map(function(r,i){return '<li>'+esc(r)+(BOOKREFS.indexOf(i+1)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('')+'</ol></div></details>';
+ '<details class="part" id="rf" style="margin-top:22px"><summary>전체 참고문헌 ('+REFS.length+')</summary><div class="bd"><ol class="refs" style="padding-left:20px;margin:0">'+REFS.map(function(r,i){return '<li>'+esc(r)+(BOOKREFS.indexOf(i+1)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('')+'</ol></div></details>';
 }
-
 /* ---------- 뷰: 책과 함께 ---------- */
 function vBook(){
  var groups=PARTS_BOOK.map(function(pn,pi){
@@ -745,13 +747,13 @@ function vBook(){
   '<div class="row"><button class="btn sm" data-act="chGo">'+goLabel+'</button></div></div>';
  }
  var gl=GLOSSARY.map(function(g){return '<details class="part"><summary>'+esc(g[0])+'</summary><div class="bd"><p>'+esc(g[1])+'</p></div></details>'}).join('');
- return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">책과 함께</div><h1>밑줄을 질문으로</h1><p class="lead">《'+esc(CONFIG.bookTitle)+'》'+(CONFIG.author?' · '+esc(CONFIG.author)+' 지음':'')+(CONFIG.publisher?' · '+esc(CONFIG.publisher):'')+'. 읽고 있는 장을 고르면 그 장의 질문과 실험이 나옵니다. 마음에 걸린 문장은 디버깅으로 이어 갑니다.</p></header>'+
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">책과 함께</div><h1>밑줄을 질문으로</h1><p class="lead">《'+esc(CONFIG.bookTitle)+'》'+(CONFIG.author?' · '+esc(CONFIG.author)+' 지음':'')+(CONFIG.publisher?' · '+esc(CONFIG.publisher):'')+'. 읽고 있는 장을 고르면 그 장의 질문과 실험이 나옵니다. 마음에 걸린 문장은 디버깅으로 이어 갑니다.</p><div class="row"><button class="btn ghost sm" data-sc="gl">용어집</button><button class="btn ghost sm" data-sc="dp">깊이 읽기</button><button class="btn ghost sm" data-sc="rf">참고문헌</button></div></header>'+
  '<div class="card">'+groups+det+
  '<div class="sec"><span class="label">장 또는 쪽수</span><input type="text" id="bkWhere" placeholder="예: 3장, p.84" value="'+esc(bk.w)+'"></div>'+
  '<div class="sec"><span class="label">마음에 걸린 문장 또는 내 생각</span><textarea id="bkQuote" placeholder="책의 문장이나, 읽고 떠오른 내 생각을 적어 주세요">'+esc(bk.q)+'</textarea></div>'+
  '<div class="sec"><span class="label">이 문장과 닿아 있는 사회문제 (선택)</span><div class="chips">'+ISSUES.map(function(x){return '<button class="chip" data-bkissue="'+esc(x)+'" aria-pressed="'+(bk.i===x)+'">'+esc(x)+'</button>'}).join('')+'</div><input type="text" id="bkIssue" placeholder="직접 입력" value="'+esc(bk.i)+'"></div>'+
  '<div class="row end"><span class="note">긴 인용은 피하고 한두 문장만 적어 주세요.</span><button class="btn" data-act="bookGo">디버깅으로 가져가기</button></div></div>'+
- '<h2 style="margin:30px 0 12px">핵심 용어집</h2><div class="sec">'+gl+'</div>'+
+ '<h2 id="gl" style="margin:30px 0 12px">핵심 용어집</h2><div class="sec">'+gl+'</div>'+deepRead()+
  '<div class="card" style="margin-top:22px"><h3>읽기 전후 질문</h3><ul class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>읽기 전 — 이 주제에 대해 나는 “원래” 어떻게 생각해 왔는가?</li><li>읽는 중 — 어느 문장에서 마음이 불편하거나 반가웠는가?</li><li>읽은 뒤 — 책 때문에 바뀐 것과 바뀌지 않은 것은 무엇인가?</li><li>함께 읽기 — 같은 문장을 다르게 읽은 사람은 누구인가?</li></ul></div>'+
  (CONFIG.purchaseUrl?'<p style="margin-top:16px"><a href="'+esc(CONFIG.purchaseUrl)+'" target="_blank" rel="noopener">도서 안내 보기</a></p>':'');
 }
@@ -849,7 +851,7 @@ function chGo(c){
 document.addEventListener('click',function(e){
  var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
  var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
- var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl]');
+ var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl],[data-sc]');
  if(!el)return;var d=el.dataset;
  /* 사고 디버깅 */
  if(d.dIssue!==undefined){D.issue=d.dIssue;D.s0='thought';save();render();window.scrollTo({top:0});var tt=$('#dThought');if(tt)tt.focus({preventScroll:true});return}
@@ -875,6 +877,7 @@ document.addEventListener('click',function(e){
   return;
  }
  /* 지도 · 책 · 기록 */
+ if(d.sc){var tid=d.sc;if(ROUTE!=='book')setRoute('book');var tg=document.getElementById(tid);if(tg){if(tg.tagName==='DETAILS')tg.open=true;tg.scrollIntoView({block:'start'})}return}
  if(d.fl!==undefined){var fl=FLOW[+d.fl];chGo({go:fl[4],label:fl[0]});return}
  if(d.node!==undefined){mapSel=+d.node;render();return}
  if(d.kind){mapKind=d.kind;mapSel=0;render();return}
