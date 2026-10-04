@@ -85,7 +85,7 @@ textarea{min-height:84px}
 .entry a:hover{border-color:var(--accent)}.entry b{font-family:var(--font-display);font-size:18px}.entry span{font-size:14px;color:var(--muted)}
 /* map */
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
-.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;padding:9px 18px;cursor:pointer;min-height:40px}
+.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;flex:1 1 auto;padding:9px 14px;cursor:pointer;min-height:40px}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
 .mapbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
 .mapbox svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
@@ -109,6 +109,22 @@ details.part .bd{padding:0 0 16px;display:flex;flex-direction:column;gap:10px}
 .rec pre{white-space:pre-wrap;font:inherit;font-size:14px;margin:8px 0 0;color:var(--muted)}
 .cf{position:sticky;top:56px;z-index:4;margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .cf[hidden]{display:none}
+
+.chip{text-align:left;border-radius:14px;line-height:1.5}
+.chip-ch{font-size:12px;color:var(--muted);margin-left:4px}
+.chip[aria-pressed="true"] .chip-ch{color:inherit;opacity:.8}
+.qchip{width:100%;border-radius:12px}
+.seg{flex-wrap:wrap;border-radius:18px}
+.gauge{display:flex;flex-direction:column;gap:6px}
+.gauge .grow{display:flex;align-items:center;gap:14px}
+.gauge input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:32px}
+.gauge output{min-width:3.6em;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.pause{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding-block:24px}
+.pause .big{font-family:var(--font-display);font-weight:700;font-size:clamp(46px,16vw,96px);line-height:1.15;color:var(--pause)}
+.pause .ring{width:96px;height:96px;border-radius:50%;border:3px solid var(--pause);background:var(--pause-soft);animation:inhale 4s ease-in-out infinite}
+@keyframes inhale{50%{transform:scale(1.35);opacity:.6}}
+@media(prefers-reduced-motion:reduce){.pause .ring{animation:none}}
+.entry{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -121,10 +137,12 @@ footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direc
   <a class="tab" href="#/debug" data-r="debug">사고 디버깅</a>
   <a class="tab" href="#/map" data-r="map">순환 지도</a>
   <a class="tab" href="#/book" data-r="book">책과 함께</a>
+  <a class="tab" href="#/canvas" data-r="canvas">미래 설계</a>
   <a class="tab" href="#/notes" data-r="notes">내 기록</a>
 </div></nav>
 <div class="wrap"><div id="cf" class="err cf" role="alert" hidden></div><main id="view"></main>
 <footer>
+  <div>《연결할 용기》 채기석 지음 · 퍼플. 이 앱은 책의 내용을 직접 해 보도록 돕는 동행 도구입니다.</div>
   <div>입력한 글은 이 기기의 브라우저 안에만 저장되며 서버로 전송되지 않습니다. (AI 보조를 켠 경우에만 해당 단계의 글이 AI에 전달됩니다.)</div>
   <div>이 앱은 진단이나 치료 도구가 아니라 생각을 바라보는 연습 도구입니다. 마음이 많이 힘들 때는 가까운 사람이나 전문가의 도움을 받으세요.</div>
 </footer></div>
@@ -137,31 +155,164 @@ footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direc
    ========================================================= */
 var CONFIG={
   bookTitle:'연결할 용기',
-  author:'',            // 저자명
-  publisher:'',         // 출판사
+  subtitle:'뿌리에서 미래로 — AI가 비춘 인간, 우리가 다시 설계하는 세계',
+  author:'채기석',
+  publisher:'퍼플',
   purchaseUrl:'',       // 도서 안내/구매 링크
-  chapters:[            // 목차 연동: {title, question, issue, link}  (비어 있으면 자유 입력 모드)
-    // {title:'1장 …', question:'이 장을 읽고 떠오른 질문', issue:'저출생', link:''}
-  ],
   aiEndpoint:''         // (선택) 자체 서버 프록시 URL. POST {prompt} → JSON. 비어 있으면 Claude 화면 안에서만 AI가 켜집니다.
 };
 
-/* ---------- 콘텐츠 데이터 ---------- */
+/* ---------- 책 구조: 《연결할 용기》 ---------- */
+var PARTS_BOOK=['프롤로그','제1부 인식의 뿌리','제2부 문명의 뿌리를 다시 묻다','제3부 사고의 순환과 사회적 병리','제4부 통합의 기술','제5부 백캐스팅과 연결 사회의 디자인','제6부 실천 도구 & AI 사고 보조 앱','제7부 & 에필로그'];
+/* go: quick | deep | canvas | map:<kind> */
+var CHAPTERS=[
+ {id:'P',part:0,label:'프롤로그',title:'우리는 정말 세상을 있는 그대로 보고 있는가?',quote:'세상을 바꾸는 것은 새로운 답이 아니라 새로운 질문이다.',
+  root:'AI는 정답이 아니라, 내가 얼마나 좁은 질문만 던지며 살아왔는지를 비추는 거울이었다. 분별력이 분별심이 되고 분리의식이 되는 찰나를 알아차리는 것이 이 책의 출발점이다.',
+  qs:['오늘 하루 당연하다고 생각했던 것 다섯 가지는 무엇인가요? 각각 왜 당연하다고 믿나요?','그 생각은 내 경험에서 왔나요, 사회가 가르쳐 준 것인가요?','나는 지금 사실을 보고 있나요, 나만의 해석을 보고 있나요?'],
+  lab:'오늘 당연하다고 생각한 것 다섯 가지를 적고, 각각 “왜 나는 이것을 당연하다고 믿는가?”를 묻는다.',go:'quick'},
+ {id:'1',part:1,label:'1장',title:'우리가 보고 있는 것은 현실일까, 해석일까?',quote:'우리는 세상을 있는 그대로 보는 것이 아니라, 우리가 이해할 수 있는 방식으로 바라본다.',
+  root:'세상을 바꾸기 전에 먼저 이해할 것은 세상을 바라보는 나의 사고 메커니즘이다. 인식은 감각수용→감각전달→지각→인지적 처리→반응과 피드백으로 도는 순환이다.',
+  qs:['최근 의견이 크게 부딪힌 일에서, 나는 상대가 “틀렸다”고 생각했나요, “다른 렌즈로 보고 있다”고 생각했나요?','매일 접하는 뉴스에서 나는 사실을 보나요, 믿고 싶은 해석만 모으나요?','나는 문제의 진짜 뿌리를 보고 있나요, 결과와 증상만 보고 있나요?'],
+  lab:'오늘 시각 차이로 불편했던 상황 하나를 떠올려, 나는 상대를 이해하려 했는지 내 프레임으로 이기려 했는지 솔직히 적어 본다.',go:'map:personal',issue:'갈등과 혐오'},
+ {id:'2',part:1,label:'2장',title:'인간의 사고는 왜 쉽게 변하지 않는가 (4개의 벽)',quote:'사람은 새로운 생각을 거부하는 존재가 아니다. 자신의 세계가 무너지는 것을 두려워하는 존재이다.',
+  root:'인지적 효율성, 확증편향, 손실 회피, 사회적 동조라는 네 개의 벽은 습관에서 문화, 제도로 이어진다. 변화는 뇌의 작동을 인정하고 좋은 선택이 기본값이 되게 설계하는 데서 시작된다.',
+  qs:['“원래 다 이렇게 해”라며 의심 없이 따르는 관행은 무엇인가요?','내 의견과 반대되는 정보나 사람을 만났을 때 귀담아들었나요, 무시했나요?','우리 조직에서 더 좋은 선택이 저절로 이루어지게 바꿀 수 있는 기본값은 무엇인가요?'],
+  lab:'고민 하나를 골라 “왜 그런 일이 생기는가?”를 연속해서 다섯 번 물어 본다.',go:'quick'},
+ {id:'3',part:1,label:'3장',title:'개념은 어떻게 현실을 가리는가',quote:'사람은 사물을 이해하기 위해 이름을 붙인다. 그러나 이름은 이해를 돕는 동시에 본질을 가리는 틀이 되기도 한다.',
+  root:'이름은 이해의 시작일 뿐 본질이 아니다. 문제를 어떻게 이름 붙이느냐가 우리가 상상할 수 있는 해법의 범위를 먼저 정한다. 예: ‘저출산’이라 부르면 출산장려금, ‘삶의 불안정성’이라 부르면 전혀 다른 해법이 보인다.',
+  qs:['오늘 누군가를 판단할 때 고유한 결을 보았나요, 직업·나이·이념이라는 이름표로 지레짐작했나요?','우리 조직이나 가정에서 문제 이름을 너무 단순하게 붙여 상류를 놓치고 있는 것은 무엇인가요?','‘학생’, ‘직원’, ‘어르신’이라는 단어 너머의 가능성을 살리려면 어떤 질문이 필요할까요?'],
+  lab:'오늘 나/우리/그들/경쟁/협력/원래/절대 같은 말을 얼마나 자주 쓰는지 관찰하고, 연결의 언어인지 분리의 언어인지 물어 본다.',go:'deep',issue:'저출생'},
+ {id:'4',part:1,label:'4장',title:'분절된 사고는 어떻게 문명이 되었는가',quote:'분리는 인류를 성장시켰다. 그러나 연결은 인류를 지속가능하게 만든다.',
+  root:'분업과 전문화는 문명을 키웠지만 부분만 최적화하고 전체는 병드는 ‘합성의 오류’를 낳았다. 쪼개진 조각을 잇는 ‘연결 설계자’가 미래의 경쟁력이다.',
+  qs:['각자의 역할만 다하다가 전체 목적을 놓친 경험이 있나요?','단편적인 부분만 고치려다 다른 부작용을 만든 사례는 무엇인가요?','서로 다른 두 분야나 사람을 연결해 새로운 가치를 만들 수 있는 아이디어가 주변에 있나요?'],
+  lab:'성공/실패/능력/가난/교육/공동체를 적고 각 단어 옆에 “반드시 그럴까?”를 달아 본다.',go:'deep'},
+ {id:'5',part:2,label:'5장',title:'연결은 새로운 발견이 아니라 원래 존재하던 질서였다',quote:'우리가 잃어버린 것은 연결이 아니라, 연결을 바라보는 시선이다.',
+  root:'연결은 새로 발명된 기술이 아니라 본래의 질서다. 단순한 디지털 ‘접속’을 넘어 신뢰와 협력이 흐르는 관계의 ‘온도’를 올리는 것이 과제다.',
+  qs:['나는 사람들과 통로만 열린 ‘접속’의 관계인가요, 신뢰가 오가는 ‘연결’의 관계인가요?','단편적인 시각에 갇혀 본래의 연결성을 놓치고 있는 문제는 무엇인가요?','서로 만나지 못해 잠들어 있는 두 자원이나 사람을 잇는다면 무엇이 태어날까요?'],
+  lab:'내 주변에서 서로 만나지 못한 두 사람이나 자원을 하나 찾아 이어 줄 방법을 적어 본다.',go:'canvas'},
+ {id:'6',part:2,label:'6장',title:'보이지 않는 연결이 세상을 움직인다',quote:'우리는 눈앞의 사건을 보지만, 세상은 보이지 않는 관계에 의해 움직인다.',
+  root:'사건은 보이지만 세상을 움직이는 관계는 보이지 않는다. 촘촘한 연결망이 회복탄력성의 비밀이며, 증상만 고치는 시대를 넘어 보이지 않는 관계를 살펴야 한다.',
+  qs:['최근 스트레스의 눈앞 사건 뒤에 숨어 있는 보이지 않는 원인(관계)은 무엇인가요?','우리 조직이나 지역이 작은 충격에도 흔들리는 것은 어떤 완충 연결망이 부족해서일까요?','증상 대신 환경과 관계를 돌볼 방법은 무엇인가요?'],
+  lab:'',go:'deep'},
+ {id:'7',part:2,label:'7장',title:'시스템은 사건을 만들고, 사건은 다시 시스템을 강화한다 (Upstream)',quote:'우리는 불이 난 곳으로 달려간다. 그러나 불이 왜 반복해서 나는지는 좀처럼 묻지 않는다.',
+  root:'사건은 강 하류에서 터지지만 미래는 강 상류에서 설계된다. 사람을 탓하기보다 사람이 합리적으로 행동하게 만드는 구조와 기본값을 본다.',
+  qs:['매일 바쁘게 물을 퍼내고 있는 ‘하류의 증상’은 무엇인가요?','그 문제가 반복되는 ‘상류’의 무너진 구조나 규칙은 무엇일까요?','문제 발생 자체를 막을 기본값이나 규칙 개혁은 무엇일까요?'],
+  lab:'',go:'deep'},
+ {id:'8',part:2,label:'8장',title:'시계는 고쳐도 되고, 숲은 함께 살아야 한다',quote:'시계는 부품의 합이지만, 숲은 관계의 합이다.',
+  root:'기계는 부품을 갈면 되지만 살아 있는 시스템은 관계망 전체를 돌봐야 산다. 외부 통제는 에너지를 고갈시키고, 신뢰가 만드는 자기조직화가 생명력을 만든다.',
+  qs:['내 일터는 사람을 생명체로 대하나요, 교체 가능한 부품으로 대하나요?','문제가 터졌을 때 부품 하나만 바꾸려다 관계와 환경을 놓친 적이 있나요?','외부 지시 없이도 좋은 질서가 생기려면 어떤 신뢰와 자율성이 필요할까요?'],
+  lab:'',go:'deep'},
+ {id:'9',part:2,label:'9장',title:'전체는 부분의 합보다 크다 (창발과 프레스턴 모델)',quote:'한 사람은 세상을 바꾸기 어렵다. 그러나 연결된 사람들은 새로운 세상을 만든다.',
+  root:'창발은 없는 자원을 새로 만드는 것이 아니라 이미 곁에 있던 자원 사이의 연결 고리를 다시 놓는 일에서 시작된다.',
+  qs:['내 일터나 공동체는 스펙과 경쟁을 부추기나요, 서로 다른 사람이 만나 가능성을 창발시키나요?','연결되지 않은 채 잠들어 있는 자원이나 사람은 누구인가요?','새 예산 없이 기존 연결 고리를 바꿔 활력을 만들 방안은 무엇인가요?'],
+  lab:'',go:'canvas',issue:'지역소멸'},
+ {id:'10',part:3,label:'10장',title:'사고는 어떻게 사회의 시스템이 되는가 (재귀 구조)',quote:'인간은 사회를 만들지만, 자신이 만든 사회에 의해 다시 만들어진다.',
+  root:'인지적 지름길 → 반복 행동 → 개인 습관 → 집단 규범 → 조직 관행 → 공식 제도화의 6단계로 사고가 시스템이 되고, 시스템은 다시 사고를 만든다. 자동화 자체는 못 벗어나도 성찰의 선순환이 되게 기본값을 설계할 수 있다.',
+  qs:['“원래 우리 조직은 그래”라는 행동 중 처음에는 누군가의 편의에서 시작된 것은 무엇인가요?','우리 사회의 법과 제도가 내 사고를 어떤 방향으로 자라게 한다고 느끼나요?','나쁜 관성을 깨고 성찰과 협력이 저절로 일어나게 할 최소한의 장치는 무엇일까요?'],
+  lab:'',go:'map:social'},
+ {id:'11',part:3,label:'11장',title:'사고의 순환이 만들어내는 4대 사회적 병리',quote:'사회적 병리는 개별 정책의 실수가 아니다. 개인의 합리성이 집단의 비합리성으로 전환되는 사고 순환의 결과다.',
+  root:'칸막이 행정, 각자도생, 단기성과주의, 경로의존성은 서로 다른 문제가 아니라 같은 순환이 낳은 공통의 병리다. 사람을 비난하기보다 의사결정의 기본값과 구조를 재설계해야 한다.',
+  qs:['‘부서별 최적화’ 때문에 전체가 손해 본 칸막이 경험은 무엇인가요?','단기 성과지표를 채우느라 장기 자산을 잃은 적이 있나요?','불편한 줄 알면서도 QWERTY 자판처럼 고수하는 오랜 습관은 무엇인가요?'],
+  lab:'',go:'deep',issue:'갈등과 혐오'},
+ {id:'12',part:3,label:'12장',title:'System 2의 두 갈래 길: 폐쇄 순환과 개방 순환',quote:'느린 사고(System 2)는 항상 정직한 판사가 아니다. 때로는 내 신념을 우겨주는 변호사가 되고, 때로는 나를 고치는 성찰의 스위치가 된다.',
+  root:'같은 느린 사고도 “내가 맞다”는 전제에서는 합리화의 변호사가 되고, “내가 틀릴 수도 있다”는 전제에서는 성찰의 스위치가 된다. 성찰 다짐만으로는 편향이 줄지 않으니 반대 증거 검토 같은 절차를 구조에 넣어야 한다.',
+  qs:['최근 판단에서 “내가 맞다”는 증거만 찾았나요, “틀릴 수도 있다”며 반대 의견을 살폈나요?','우리 조직의 회의에는 반대 증거를 검토하게 하는 장치가 있나요?','AI에게 내 믿음을 강요하는 질문을 하나요, 내 맹점을 찾아 달라는 질문을 하나요?'],
+  lab:'',go:'map:closed'},
+ {id:'13',part:4,label:'13장',title:'통합적 사고: 코끼리와 다섯 장님',quote:'장님들의 대답은 저마다 참이었다. 문제는 그 다름을 틀림으로 바꾼 분별심과, 전체를 보지 못한 분절된 시야였다.',
+  root:'통합적 사고는 모든 것을 아는 것이 아니라 쪼개진 부분들 사이의 관계를 읽는 시선이다. 서로 다른 지혜를 이어 전체 그림을 그리는 통합 설계자가 필요하다.',
+  qs:['“내 분야가 아니야”라며 담을 쌓았지만 사실은 내 일과 연결된 것은 무엇인가요?','나와 다른 전문성의 말을 오답으로 배척했나요, 코끼리의 다른 면을 보여 주는 조각으로 받아들였나요?','우리 지역이나 조직의 복잡한 문제 뒤에서 서로 연결되는 서로 다른 세 분야는 무엇인가요?'],
+  lab:'',go:'deep'},
+ {id:'14',part:4,label:'14장',title:'업스트림 사고와 구조적 설계',quote:'강에 빠진 사람을 건져내는 것도 소중한 용기다. 그러나 더 위대한 지혜는 왜 사람들이 계속 강에 빠지는지를 묻는 것이다.',
+  root:'증상을 퍼내는 사람은 평생 소모되지만 상류에서 질문하는 사람은 문제가 반복되지 않는 구조를 디자인한다. 구호보다 강한 것은 시스템의 보이지 않는 규칙과 인센티브다.',
+  qs:['매일 처리하는 일 중 당장의 증상만 가라앉히는 ‘하류의 처방’은 무엇인가요?','그 문제가 반복되는 ‘상류’의 구조나 규칙은 무엇일까요?','비난이나 노력 강요 대신 사람들이 저절로 협력하게 만드는 환경 구조는 무엇일까요?'],
+  lab:'',go:'deep'},
+ {id:'15',part:4,label:'15장',title:'레버리지 포인트 (작은 변화가 세상을 바꾸는 지점)',quote:'세상을 바꾸는 것은 거대한 힘이 아니라, 올바른 지점을 찾는 지혜이다.',
+  root:'성과는 노력의 총량이 아니라 레버리지의 정확성이 결정한다. 규칙, 기본값, 목적을 바꾸는 것이 힘이 세고, 가장 깊은 레버리지는 나 자신의 패러다임과 관점의 전환이다.',
+  qs:['가장 많은 에너지와 예산을 쓰는 곳이 바닥의 물을 퍼내는 하류는 아닌가요?','예산이나 수치를 조금 조절하는 ‘약한 개입’에 머물고 있지 않나요?','가장 작은 힘으로 선순환을 일깨울 나의 ‘수도꼭지’는 어디에 있을까요?'],
+  lab:'',go:'canvas'},
+ {id:'16',part:5,label:'16장',title:'예측에서 백캐스팅(Backcasting)으로',quote:'미래는 기다리는 사람의 것이 아니라, 원하는 미래를 먼저 정의하고 거꾸로 오늘을 설계하는 사람의 것이다.',
+  root:'현재의 제약과 과거 추세에 매인 예측은 경로의존성을 강화한다. 바라는 미래를 먼저 정의하고 거슬러 올라와 오늘 할 일을 정하는 백캐스팅이 변화의 동력이다.',
+  qs:['내 목표는 ‘현재 제약에서 가능한 예측’에서 시작하나요, ‘정말 원하는 미래 비전’에서 시작하나요?','새로운 미래를 그리지 못하게 막는 대표적인 ‘현재의 제약’은 무엇인가요?','10년 뒤 바람직한 모습을 위해 오늘 시작할 가장 작은 변화는 무엇인가요?'],
+  lab:'',go:'canvas'},
+ {id:'17',part:5,label:'17장',title:'디폴트(기본값) 변경과 레버리지 정책 (Opt-in vs Opt-out)',quote:'사람들의 마음을 억지로 바꾸려 애쓰지 마라. 좋은 선택이 저절로 이루어지도록 환경의 기본값을 바꿔라.',
+  root:'마음을 설득하는 호소는 가장 약한 개입이다. 좋은 선택이 저절로 이루어지게 기본값을 바꾸는 것이 가장 강력하다. 단, 기본값만으로 모든 것이 풀리지는 않으며 스스로 생각하는 일과 함께 굴러야 하는 두 바퀴다.',
+  qs:['내 회사·학교·가정에서 아무 생각 없이 두면 작동하는 ‘현재의 기본값’은 무엇인가요? (침묵, 경쟁, 소비, 개별 처리…)','마음을 설득하는 대신 좋은 행동이 선택되도록 바꿀 서식이나 절차의 기본값은 무엇일까요?','내가 원하는 삶이 자동으로 실행되도록 환경의 기본값을 바꿀 작은 부분은 무엇인가요?'],
+  lab:'',go:'canvas'},
+ {id:'18',part:5,label:'18장',title:'AI는 연결 사회의 운영체제(OS)다',quote:'AI는 문명의 두뇌가 아니라, 문명이 서로 대화하고 연결되도록 돕는 신경망이다.',
+  root:'AI는 인간을 대체하는 도구가 아니라 사람과 자원의 관계 온도를 높이는 운영체제다. 운영체제는 목적이 없으므로 어떤 가치를 우선해 연결할지는 인간의 철학과 질문에 달려 있다.',
+  qs:['AI를 내 일을 대신해 주는 도구로만 쓰나요, 타인과 자원을 이어 주는 연결자로 보나요?','서로 연결되지 못해 가치가 묻힌 두 집단이나 자원은 무엇이며, AI가 어떻게 이어 줄 수 있을까요?','AI가 발달할수록 인간만이 발휘할 신뢰·공감·목적 설정은 어떻게 다듬어질까요?'],
+  lab:'',go:'quick',issue:'AI 대전환과 일자리·정체성 상실'},
+ {id:'19',part:6,label:'19장',title:'미래 설계 캔버스 및 작은 실험 (30일 프로토타이핑)',quote:'미래는 완벽한 계획서 위에서 태어나지 않는다. 작은 실험을 반복하며 시스템을 진화시키는 사람들의 손에서 태어난다.',
+  root:'미래는 완벽한 계획서가 아니라 빠른 학습 속도를 가진 사람들이 만든다. 실패는 배움을 얻지 못한 채 멈춘 상태이고, 성찰과 피드백을 남긴 실패는 시스템을 진화시키는 데이터다.',
+  qs:['너무 완벽한 계획만 세우다 시작하지 못하고 미룬 일은 무엇인가요?','이번 달 안에 작은 비용과 에너지로 해볼 첫 번째 시제품 실험은 무엇인가요?','최근의 시행착오 중 다음 진화를 위한 귀중한 데이터로 바꿀 배움은 무엇인가요?'],
+  lab:'30일 미래 실험 카드를 작성한다: 해결하고 싶은 문제, 30일의 작은 실험, 관찰 지표, 실패의 데이터화.',go:'canvas'},
+ {id:'20',part:6,label:'20장',title:'AI 사고 관찰·보조 서비스 「잠깐! 진짜?」 기획 및 가이드',quote:'사고 전환이란 생각을 다른 생각으로 바꾸는 것이 아니다. 생각과 반응 사이에 아주 짧은 ‘생각의 틈’을 만드는 것이다.',
+  root:'생각을 억지로 바꾸라고 강요하지 않고 내가 하는 생각을 잠시 멈추어 바라본다. 성과 기준은 생각이 긍정적으로 바뀌었는가가 아니라 생각과 나 사이에 건강한 거리를 둘 수 있게 되었는가이다.',
+  qs:['고민이나 화가 날 때 그것을 객관적 사실로 믿나요, 내 마음이 빚어낸 하나의 해석으로 바라보나요?','“생각을 바꾸라”는 지적을 받았을 때와 “잠깐, 진짜 꼭 그럴까?”를 스스로 물었을 때 내 마음의 반응은 어떻게 다른가요?','자동 반응이 튀어나오기 전 3초의 틈을 만드는 나만의 멈춤 신호는 무엇일까요?'],
+  lab:'자동 생각 하나를 적고 손가락으로 짚은 채 “잠깐! 진짜?”를 천천히 세 번 말한 뒤 “정말 100% 꼭 그럴까? 1%라도 다른 가능성은 없을까?”를 달아 본다.',go:'quick'},
+ {id:'21',part:7,label:'21장',title:'미래 문명을 떠받치는 5가지 기둥 (사람, 관계, 순환, 실험, 설계)',quote:'튼튼한 미래는 하나의 거대한 기둥으로 서지 않는다. 다섯 기둥이 서로를 받쳐줄 때 비로소 완성된다.',
+  root:'사람, 관계, 순환, 실험, 설계는 순서대로 세우는 단계가 아니라 동시에 존재해야 하는 생태계다. 그 아래에서 AI가 디지털 신경망으로 흐른다.',
+  qs:[],lab:'에필로그의 ‘미래 설계 선언문’ 다섯 문장을 나만의 언어로 완성한다.',go:'canvas'},
+ {id:'E',part:7,label:'에필로그',title:'끝이 아니라 새로운 시작 (분별하되 분리하지 않는 인간)',quote:'우리는 오늘, 무엇을 연결할 용기를 낼 것인가?',
+  root:'분별력은 소중히 다듬되 편을 가르는 분별심과 분리의식을 넘어, 분별하되 분리하지 않는 지혜를 갖는다. 오늘 건네는 “내가 틀릴 수도 있나?”라는 한마디, 3초의 생각의 틈, 30일 실험 하나가 백캐스팅의 첫걸음이다.',
+  qs:[],lab:'',go:'canvas'}
+];
+var GLOSSARY=[
+ ['분별력 · 분별심 · 분리의식','분별력은 차이를 알아보는 중립적 지혜, 분별심은 거기에 “내가 맞고 너는 틀렸다”는 우열을 얹는 마음, 분리의식은 그것이 굳어 “저 부류와는 함께할 수 없다”며 벽을 세우는 상태입니다.'],
+ ['생각의 틈 (Thought Gap)','자동으로 떠오른 생각과 반응 사이에 만드는 3~5초의 멈춤. 생각을 억지로 바꾸지 않고 제3자의 시선으로 바라보게 하는 메타인지의 스위치입니다.'],
+ ['빠른 대충이 · 신중한 완벽이','System 1(직관적·자동적·에너지 절약)과 System 2(의식적·논리적·에너지 소모)를 가리키는 책의 표현입니다.'],
+ ['내 편 전담 변호사','System 2가 정직한 판사로 일하지 않고, System 1이 내린 결론을 정당화할 논리와 증거만 모으는 확증편향의 상태입니다.'],
+ ['합성의 오류','부서나 개인 차원에서는 합리적인 선택들이 모여 전체에서는 사각지대와 비합리적 결과를 만드는 역설. 칸막이 행정의 본질입니다.'],
+ ['업스트림 사고','강 하류의 증상만 퍼내는 대신 상류로 올라가 문제가 반복되는 구조와 원인을 찾아 재설계하는 사고방식입니다.'],
+ ['레버리지 포인트','큰 힘을 쏟지 않고도 시스템 전체의 선순환을 깨울 수 있는 결정적인 변화의 지점입니다.'],
+ ['디폴트 재설계','마음을 설득하는 대신, 내버려 두어도 협력과 선순환이 일어나도록 환경의 기본값을 바꾸는 일입니다.'],
+ ['창발','개체들의 촘촘한 상호작용으로 개별 요소에는 없던 새로운 질서와 가치가 피어나는 현상. 전체는 부분의 합보다 큽니다.'],
+ ['관계의 온도','단순한 접속을 넘어 존재 인지 → 관심 → 신뢰 → 협력 → 공동 가치 창출로 깊어지는 관계의 깊이와 온기입니다.'],
+ ['백캐스팅','과거 추세에 매인 예측 대신, 원하는 미래를 먼저 정의하고 거슬러 올라와 오늘 할 일을 정하는 역산의 설계법입니다.'],
+ ['연결의 운영체제 (Connection OS)','AI를 일을 빼앗는 정복자가 아니라, 사람과 자원이 부딪히지 않고 가치를 주고받도록 조율하는 신경망 플랫폼으로 보는 관점입니다.'],
+ ['연결 설계자 (Connection Designer)','자기 칸막이 안의 지식에 머무르지 않고, 쪼개진 전문성과 자원을 이어 새로운 선순환을 만드는 인재상입니다.']
+];
+var PILLARS=[['사람','모든 것의 목적이자 출발점'],['관계','소유에서 존재의 연결로'],['순환','일회성 소모에서 생태적 재투자로'],['실험','완벽주의를 넘어 빠르게 배우는 시스템'],['설계','파라미터 조정을 넘어 레버리지 포인트 개혁']];
+var DECL=['[사람] 나는 사람의 존엄성을 중심에 두는 (   )을(를) 만들겠습니다.','[관계] 나는 단절되어 있던 (   )와(과) (   ) 사이의 온기 있는 다리를 놓겠습니다.','[순환] 나는 자원과 신뢰가 한 번 쓰이고 버려지지 않고 순환하는 (   ) 구조를 설계하겠습니다.','[실험] 나는 이번 달 안에 (   )라는 가벼운 30일 실험을 시작해 보겠습니다.','[설계] 나는 AI를 (   )을(를) 위한 지혜로운 운영체제로 활용하겠습니다.'];
+var CANVAS=[
+ ['백캐스팅 미래 비전','현재의 제약을 떠나, 10년 뒤 우리가 만들고 싶은 바람직한 미래 상태를 선명하게 적어 보세요.'],
+ ['핵심 가치','그 미래로 가는 길에서 절대 포기할 수 없는 가치는 무엇인가요? (예: 사람 중심, 신뢰, 지속가능성, 공존)'],
+ ['연결 자원','내 삶·조직·지역 안에 이미 있지만 서로 단절된 채 잠들어 있는 사람, 정보, 공간, 기술은 무엇인가요?'],
+ ['레버리지 포인트','디폴트 변경이나 규칙 재설계처럼, 최소의 개입으로 최대의 순환을 부를 스위치는 어디에 있을까요?'],
+ ['첫 번째 실행 (30일 프로토타입)','30일 안에 시작해 배울 수 있는 가장 작은 실험 하나를 정해 보세요.']
+];
+var CARD=[
+ ['목표 고민','내가 해결하고 싶은 문제'],
+ ['30일의 작은 실험','거대한 계획 대신 30일 안에 해볼 가장 가벼운 행동 하나 (예: 매주 1회 다른 부서 사람과 커피 마시며 이야기 나누기)'],
+ ['관찰 지표','이 실험으로 확인하고 싶은 반응이나 변화'],
+ ['실패의 데이터화','기대한 결과가 나오지 않더라도 얻게 될 핵심적인 배움']
+];
+
+/* ---------- 디버깅 콘텐츠 ---------- */
 var ISSUES=['저출생','초고령사회와 노인의 빈곤·고립','청년 일자리와 불평등','지역소멸','AI 대전환과 일자리·정체성 상실','교육 경쟁','갈등과 혐오','기후위기'];
-var STEPS=['문제 고르기','문제 정의','의식구조','다섯 질문','재해석','작은 실험'];
+var DSTEPS=['문제 고르기','문제 정의','의식구조','다섯 질문','재해석','작은 실험'];
+var QSTEPS=['생각 꺼내기','잠깐!','핵심 질문','생각의 틈','나의 작은 선택'];
+var EXAMPLES=['팀장이 회의에서 또 내 의견을 무시했다.','나는 시간이 없어서 운동을 못 한다.','사람은 쉽게 변하지 않는다.','나는 원래 이런 사람이다.','다들 그렇게 생각한다.'];
+/* src: book = 《연결할 용기》가 짚은 틀 */
 var PATTERNS=[
- {id:'blame',name:'개인 책임론',auto:'결국 그 사람이 노력하지 않아서 생긴 일이다.',premise:'결과는 개인의 선택과 노력으로 대부분 설명된다.',hidden:'개인이 선택하기 전에 이미 놓여 있던 조건과 제도.'},
- {id:'gen',name:'세대 갈등 프레임',auto:'요즘 세대는, 혹은 기성세대는 원래 그렇다.',premise:'같은 나이대는 같은 생각과 이해관계를 가진다.',hidden:'세대 안의 차이와 세대를 가로지르는 공통의 구조.'},
- {id:'comp',name:'경쟁·효율 중심 사고',auto:'경쟁하지 않으면 도태된다. 효율이 곧 합리다.',premise:'희소한 자리를 두고 겨루는 것이 기본 상태다.',hidden:'협력으로 늘어나는 것, 효율로 측정되지 않는 가치.'},
- {id:'growth',name:'성장 지상주의',auto:'성장하면 대부분의 문제는 풀린다.',premise:'더 큰 규모와 속도가 곧 더 나은 상태다.',hidden:'성장의 분배, 성장 없이도 가능한 안정과 충분함.'},
- {id:'use',name:'쓸모와 생산성의 잣대',auto:'쓸모 있어야 존재할 자격이 있다.',premise:'사람의 가치는 생산하는 것으로 잰다.',hidden:'돌봄, 존재 자체, 관계가 만드는 가치.'},
- {id:'job',name:'일자리 = 정체성',auto:'일이 없으면 나는 누구인가.',premise:'직업이 곧 나를 설명하는 거의 유일한 이름이다.',hidden:'일 바깥의 역할, 관계, 공동체 안의 자리.'},
- {id:'scarce',name:'희소성의 가정',auto:'누군가 얻으면 누군가는 잃는다.',premise:'세상의 파이는 고정되어 있다.',hidden:'서로 연결될 때 새로 생기는 몫.'},
- {id:'wethey',name:'우리와 그들의 구분',auto:'저들은 우리와 다르고 이해할 수 없다.',premise:'집단의 경계는 분명하고 고정되어 있다.',hidden:'경계를 넘는 경험, 한 사람 안의 여러 소속.'}
+ {id:'sep',src:'book',ch:'1·3·13장',name:'분리의식',auto:'저 사람들은 원래 그렇다. 우리와는 다르다.',premise:'다름은 곧 틀림이고, 집단의 경계는 고정되어 있다.',hidden:'같은 사건을 서로 다른 렌즈로 보고 있을 가능성, 그 사람의 사정.'},
+ {id:'name',src:'book',ch:'3장',name:'이름표와 문제 이름의 덫',auto:'이 문제는 결국 ○○ 문제다.',premise:'문제의 이름이 곧 문제의 본질이다.',hidden:'이름 너머의 얽힘과 관계, 이름이 가려 버린 다른 해법.'},
+ {id:'down',src:'book',ch:'7·14장',name:'하류의 처방',auto:'일단 눈앞의 증상부터 처리하면 된다.',premise:'사건이 터진 곳이 문제의 원인이 있는 곳이다.',hidden:'문제가 반복되게 만드는 상류의 구조, 규칙, 기본값.'},
+ {id:'silo',src:'book',ch:'4·11장',name:'칸막이 사고',auto:'그건 내 분야(내 부서)의 일이 아니다.',premise:'각자의 몫만 잘하면 전체도 잘 된다.',hidden:'부분의 합리성이 모여 만드는 전체의 비합리, 사각지대.'},
+ {id:'short',src:'book',ch:'11장',name:'단기성과·각자도생',auto:'당장 성과가 나와야 하고, 각자 알아서 살아남아야 한다.',premise:'눈앞의 지표와 개인의 생존이 가장 합리적인 기준이다.',hidden:'장기적으로 쌓이는 자산, 서로 기대는 안전망.'},
+ {id:'path',src:'book',ch:'10·11장',name:'경로의존 (“원래 그렇게 해”)',auto:'원래 다 이렇게 해 왔다.',premise:'지금의 방식에는 그럴 만한 이유가 있다.',hidden:'처음의 이유는 사라지고 습관만 남은 것(QWERTY 자판처럼).'},
+ {id:'lawyer',src:'book',ch:'2·12장',name:'내 편 전담 변호사',auto:'내가 맞다는 근거를 더 찾아보자.',premise:'이미 내린 결론이 옳다.',hidden:'반대 증거, “내가 틀릴 수도 있다”는 가능성.'},
+ {id:'blame',src:'soc',ch:'',name:'개인 책임론',auto:'결국 그 사람이 노력하지 않아서 생긴 일이다.',premise:'결과는 개인의 선택과 노력으로 대부분 설명된다.',hidden:'개인이 선택하기 전에 이미 놓여 있던 조건과 제도.'},
+ {id:'gen',src:'soc',ch:'',name:'세대 갈등 프레임',auto:'요즘 세대는, 혹은 기성세대는 원래 그렇다.',premise:'같은 나이대는 같은 생각과 이해관계를 가진다.',hidden:'세대 안의 차이와 세대를 가로지르는 공통의 구조.'},
+ {id:'comp',src:'soc',ch:'',name:'경쟁·효율 중심 사고',auto:'경쟁하지 않으면 도태된다. 효율이 곧 합리다.',premise:'희소한 자리를 두고 겨루는 것이 기본 상태다.',hidden:'협력으로 늘어나는 것, 효율로 측정되지 않는 가치.'},
+ {id:'growth',src:'soc',ch:'',name:'성장 지상주의',auto:'성장하면 대부분의 문제는 풀린다.',premise:'더 큰 규모와 속도가 곧 더 나은 상태다.',hidden:'성장의 분배, 성장 없이도 가능한 안정과 충분함.'},
+ {id:'use',src:'soc',ch:'',name:'쓸모와 생산성의 잣대',auto:'쓸모 있어야 존재할 자격이 있다.',premise:'사람의 가치는 생산하는 것으로 잰다.',hidden:'돌봄, 존재 자체, 관계가 만드는 가치.'},
+ {id:'job',src:'soc',ch:'',name:'일자리 = 정체성',auto:'일이 없으면 나는 누구인가.',premise:'직업이 곧 나를 설명하는 거의 유일한 이름이다.',hidden:'일 바깥의 역할, 관계, 공동체 안의 자리.'},
+ {id:'scarce',src:'soc',ch:'',name:'희소성의 가정',auto:'누군가 얻으면 누군가는 잃는다.',premise:'세상의 파이는 고정되어 있다.',hidden:'서로 연결될 때 새로 생기는 몫.'}
 ];
 var QUESTIONS={
- q1:{name:'잠깐! 진짜?',sub:'사실 확인 · 확인된 것과 내 해석을 나눕니다',ask:'이 생각 중 직접 확인한 사실은 무엇이고, 내가 덧붙인 해석은 무엇인가요?'},
- q2:{name:'꼭 그래야 해?',sub:'전제 확인 · 당연하다고 여기는 것을 찾습니다',ask:'이 생각이 맞으려면 무엇이 당연히 참이어야 하나요? 그것은 언제나 참인가요?'},
+ q1:{name:'잠깐! 진짜?',sub:'사실 확인 · 확인된 것과 내 해석을 나눕니다',ask:'그렇게 느낀 구체적인 사실(행동)은 무엇이었나요? 내가 덧붙인 해석은 무엇인가요?'},
+ q2:{name:'꼭 그래야 해?',sub:'전제 확인 · 당연하다고 여기는 것을 찾습니다',ask:'내 생각이 100% 진실이어야만 할까요? 이 생각이 맞으려면 무엇이 당연히 참이어야 하나요?'},
  q3:{name:'왜 그렇지?',sub:'사고의 뿌리 · 사건에서 신념까지 거슬러 올라갑니다',ask:'이 생각은 어떤 경험, 두려움, 습관, 주변의 기준에서 왔을까요?'},
  q4:{name:'다르게 보면?',sub:'관점 확장 · 가장 옳은 관점이 아니라 “하나뿐”이라는 믿음을 내려놓습니다',ask:'아래 관점에서는 이 문제가 어떻게 보일까요? 비워 두어도 됩니다.'},
  q5:{name:'그렇다면?',sub:'선택과 행동',ask:'그렇다면 나는 무엇을 선택해 보겠습니까?'}
@@ -169,59 +320,82 @@ var QUESTIONS={
 var CHAIN=['사건','생각','근거','전제','경험','신념'];
 var VIEWS=['나','상대방','제3자','공동체','5년 후의 나','AI(맹점 찾기)'];
 var EXPERIMENTS=[
- '내 생각을 “사실 한 줄 / 해석 한 줄”로 나누어 적어 본다.',
- '이 문제에서 나와 다른 입장의 사람에게 10분만 질문하며 들어 본다.',
- '내 생각과 반대되는 근거를 하나만 찾아 읽어 본다.',
- '오늘 뉴스나 대화에서 “원래 그렇다”는 말을 세 번 찾아 메모한다.',
- '이 문제와 닿아 있는 이웃·동료에게 안부와 함께 질문 하나를 건넨다.'
+ ['오늘 당연하다고 생각한 것 다섯 가지를 적고 각각 “왜 당연하다고 믿는가?”를 묻는다.','프롤로그'],
+ ['불편했던 시각 차이 하나를 골라, 상대를 이해하려 했는지 이기려 했는지 적어 본다.','1장'],
+ ['고민 하나에 “왜?”를 다섯 번 연속으로 물어본다.','2장'],
+ ['오늘 나/우리/그들/원래/절대 같은 말을 몇 번 썼는지 세어 본다.','3장'],
+ ['성공·실패·교육 같은 단어 옆에 “반드시 그럴까?”를 달아 본다.','4장'],
+ ['자동 생각 하나를 손가락으로 짚고 “잠깐! 진짜?”를 천천히 세 번 말해 본다.','20장'],
+ ['동료나 가족에게 “내가 틀릴 수도 있나?”라고 한 번 물어본다.','에필로그']
 ];
 var STARTERS=['…는 개인의 문제가 아니라 구조의 문제일 수도 있다.','…는 하나의 원인이 아니라 여러 층위가 상호작용한 결과일 수 있다.','내가 당연하게 여긴 것은 …라는 전제였다.','…가 아니라 …도 가능하다.'];
+var ROOTS5=['감각수용','감각전달','지각','인지적 처리','반응과 피드백'];
+var EXPAND=['마음 관리','관계·오해 해소','학교·토론 교육','조직 소통 문화','시민적 문해력'];
 
-/* 사고의 순환 지도 — 개인 층위와 사회 층위는 같은 8단계 구조 */
+/* 사고의 순환 지도 — 8단계 두 층위 + 12장의 두 순환 */
 var MAP={
  personal:{title:'개인 층위',center:'한 사람 안의 순환',nodes:[
-  {n:'외부 자극',d:'세상에서 일어나는 사건. 사실은 아직 의미가 붙기 전의 상태입니다.',q:'지금 일어난 일을, 해석 없이 한 줄로 쓰면?'},
-  {n:'감각',d:'빛·소리·접촉 같은 입력이 신경계로 들어옵니다. 뇌는 이 입력을 바탕으로 세계의 모델을 만듭니다.',q:'내가 실제로 보고 들은 것은 무엇인가?',r:[8,9]},
-  {n:'기억·감정·욕구',d:'감각은 과거의 기억, 그때의 감정, 지금의 욕구와 함께 처리됩니다. 현재를 경험하면서 과거를 함께 경험하고 있을 수 있습니다.',q:'이 반응에는 어떤 과거가 섞여 있을까?',r:[10,12]},
-  {n:'해석',d:'사실과 생각 사이의 다리. 같은 사건도 어떻게 해석하느냐에 따라 전혀 다른 경험이 됩니다.',q:'다른 해석은 몇 가지나 가능한가?',r:[13,14],gap:true},
-  {n:'생각',d:'해석이 말과 이미지가 된 것. 빠르고 자동적인 시스템 1이 대부분을 만듭니다.',q:'이 생각은 내가 선택한 것인가, 저절로 켜진 것인가?',r:[16,17]},
-  {n:'판단·선택',d:'확증편향, 손실회피, 동조 같은 구조적 한계가 개입하는 지점입니다.',q:'나는 결론부터 정하고 근거를 찾고 있지 않은가?',r:[18,19]},
-  {n:'행동',d:'눈에 보이는 결과. 그 아래에는 보이지 않는 흐름이 있습니다.',q:'이 행동을 반복하면 내 삶은 어디로 가는가?'},
-  {n:'경험·결과',d:'행동의 결과가 뇌와 마음을 바꾸고, 새로운 생각의 재료가 됩니다. 자기실현적 예언이 만들어지는 자리입니다.',q:'이 경험은 내 생각을 확인했는가, 아니면 내가 그렇게 읽은 것인가?',r:[15]}
+  {n:'외부 자극',d:'세상에서 일어나는 사건. 사실은 아직 의미가 붙기 전의 상태입니다.',q:'지금 일어난 일을, 해석 없이 한 줄로 쓰면?',ch:['1장']},
+  {n:'감각',d:'빛·소리·접촉 같은 입력이 신경계로 들어옵니다(책 1장의 감각수용·감각전달). 뇌는 이 입력을 바탕으로 세계의 모델을 만듭니다.',q:'내가 실제로 보고 들은 것은 무엇인가?',r:[8,9],ch:['1장']},
+  {n:'기억·감정·욕구',d:'감각은 과거의 기억, 그때의 감정, 지금의 욕구와 함께 처리됩니다(지각). 현재를 경험하면서 과거를 함께 경험하고 있을 수 있습니다.',q:'이 반응에는 어떤 과거가 섞여 있을까?',r:[10,12],ch:['1장']},
+  {n:'해석',d:'사실과 생각 사이의 다리. 같은 비도 아이에게는 놀이, 농부에게는 안도, 신랑에게는 걱정입니다. 여기가 “생각의 틈”이 열리는 자리입니다.',q:'다른 해석은 몇 가지나 가능한가?',r:[13,14],gap:true,ch:['1장','20장']},
+  {n:'생각',d:'해석이 말과 이미지가 된 것. 빠르고 자동적인 시스템 1이 대부분을 만듭니다.',q:'이 생각은 내가 선택한 것인가, 저절로 켜진 것인가?',r:[16,17],ch:['1장','2장']},
+  {n:'판단·선택',d:'확증편향, 손실회피, 동조 같은 구조적 한계(네 개의 벽)가 개입하는 지점입니다(인지적 처리).',q:'나는 결론부터 정하고 근거를 찾고 있지 않은가?',r:[18,19],ch:['2장','12장']},
+  {n:'행동',d:'눈에 보이는 결과. 그 아래에는 보이지 않는 흐름이 있습니다.',q:'이 행동을 반복하면 내 삶은 어디로 가는가?',ch:['6장']},
+  {n:'경험·결과',d:'행동의 결과가 뇌와 마음을 바꾸고 새로운 생각의 재료가 됩니다(반응과 피드백). 자기실현적 예언이 만들어지는 자리입니다.',q:'이 경험은 내 생각을 확인했는가, 아니면 내가 그렇게 읽은 것인가?',r:[15],ch:['1장']}
  ]},
  social:{title:'사회 층위',center:'사람과 시스템의 순환',nodes:[
-  {n:'개인의 생각',d:'한 사람의 생각과 판단이 출발점입니다.',q:'내가 당연하다고 여기는 생각은 어디서 왔는가?',r:[20]},
-  {n:'반복·습관',d:'같은 행동이 반복되면 습관이 됩니다.',q:'우리는 어떤 행동을 아무 의심 없이 반복하고 있는가?',r:[21]},
-  {n:'집단의 행동',d:'많은 사람의 반복된 행동이 모여 집단의 행동이 됩니다. 창발의 시작입니다.',q:'개인의 합과 다르게 나타나는 것은 무엇인가?',r:[3]},
-  {n:'문화·규범',d:'집단의 행동이 “원래 그런 것”이라는 기준으로 굳어집니다.',q:'이 규범은 누구에게 유리하고 누구에게 불리한가?',gap:true,r:[21]},
-  {n:'조직·제도',d:'규범이 조직의 관행과 제도가 됩니다.',q:'이 제도를 유지시키는 사람들의 사고방식은 무엇인가?',r:[22]},
-  {n:'사회 시스템',d:'제도들이 얽힌 전체. 요소의 합과는 다른 성질을 가지며 다시 요소를 바꿉니다.',q:'이 시스템의 목적은 실제로 무엇인가?',r:[4]},
-  {n:'환경',d:'시스템은 개인이 놓이는 환경이 됩니다.',q:'이 환경에서 어떤 선택지가 보이지 않게 되는가?',r:[20]},
-  {n:'새로운 경험',d:'환경 속 경험이 다시 개인의 마음과 생각을 만듭니다.',q:'다른 경험을 만들 수 있는 가장 작은 변화는?'}
+  {n:'개인의 생각',d:'한 사람의 인지적 지름길이 출발점입니다. 사람은 사회를 만들지만 자신이 만든 사회에 의해 다시 만들어집니다.',q:'내가 당연하다고 여기는 생각은 어디서 왔는가?',r:[20],ch:['10장']},
+  {n:'반복·습관',d:'같은 상황에서 같은 판단을 반복하면 의식적 검토 없이 실행되는 습관이 됩니다.',q:'우리는 어떤 행동을 아무 의심 없이 반복하고 있는가?',r:[21],ch:['10장']},
+  {n:'집단의 행동',d:'비슷한 지름길을 공유하는 사람들의 반복이 모여 집단의 행동이 됩니다. 창발의 시작입니다.',q:'개인의 합과 다르게 나타나는 것은 무엇인가?',r:[3],ch:['9장','10장']},
+  {n:'문화·규범',d:'“원래 다 이렇게 하는 거야”라는 비공식적 상식이 됩니다. 나는 이렇게 한다가 우리도 이렇게 한다가 됩니다.',q:'이 규범은 누구에게 유리하고 누구에게 불리한가?',gap:true,r:[21],ch:['10장']},
+  {n:'조직·제도',d:'규범이 조직의 일하는 방식, 평가 기준이 되고 법·매뉴얼·행정 절차로 공식화됩니다.',q:'이 제도를 유지시키는 사람들의 사고방식은 무엇인가?',r:[22,29],ch:['4장','10장']},
+  {n:'사회 시스템',d:'제도들이 얽힌 전체. 요소의 합과는 다른 성질을 가지며 다시 요소를 바꿉니다. 칸막이, 각자도생, 단기성과, 경로의존성이 여기서 굳어집니다.',q:'이 시스템의 목적은 실제로 무엇인가?',r:[4,29],ch:['11장']},
+  {n:'환경',d:'시스템은 개인이 놓이는 환경이 됩니다. 기본값(디폴트)이 행동을 정합니다.',q:'이 환경에서 어떤 선택지가 보이지 않게 되는가?',r:[20,26],ch:['17장']},
+  {n:'새로운 경험',d:'환경 속 경험이 다시 개인의 마음과 생각을 만듭니다.',q:'다른 경험을 만들 수 있는 가장 작은 변화는?',ch:['19장']}
+ ]},
+ closed:{title:'닫힌 순환',center:'“내가 맞다”에서 출발',note:'같은 느린 사고(System 2)도 “내가 맞다”는 전제에서는 이렇게 돕니다. 각 단계가 앞 단계의 편향을 검증 없이 키웁니다. “내가 틀릴 수도 있다”는 전제로 바꾸면 열린 순환으로 갈아탈 수 있습니다.',nodes:[
+  {n:'합리화',d:'확증편향. 기존 신념에 맞는 정보만 능동적으로 모읍니다. System 2가 정직한 판사가 아니라 “내 편 전담 변호사”가 됩니다.',q:'나는 지금 어떤 결론의 변호사로 일하고 있는가?',r:[18],ch:['2장','12장']},
+  {n:'편향 강화',d:'동기적 추론. 모은 정보로 이전의 결론을 완벽히 정당화합니다.',q:'이 근거는 내가 찾은 것인가, 결론이 불러온 것인가?',r:[27],ch:['12장']},
+  {n:'고착',d:'인지적 경직성. 사고의 틀이 굳어 반대 증거와 새 정보에 대한 저항이 커집니다.',q:'어떤 증거가 나타나면 내 생각이 바뀔 수 있는가?',ch:['12장']},
+  {n:'집단사고',d:'비판적 검토보다 동조와 합의가 우선합니다. 혼자 남는 것을 위험으로 느끼는 오래된 본능입니다.',q:'모두 찬성할 때 나는 침묵하고 있지 않은가?',ch:['2장','12장']},
+  {n:'오류의 사회화',d:'개인의 고집과 오류가 집단의 “흔들리지 않는 상식”으로 포장됩니다.',q:'우리가 상식이라 부르는 것 중 검증된 것은 무엇인가?',ch:['12장']},
+  {n:'공식 제도화',d:'편향된 상식이 법, 규정, 행정 절차로 문서화되어 다시 사람의 생각을 만듭니다.',q:'이 규정은 처음에 어떤 이유로 만들어졌는가?',ch:['10장','12장']}
+ ]},
+ open:{title:'열린 순환',center:'“내가 틀릴 수도 있다”에서 출발',note:'같은 느린 사고가 성찰의 스위치로 돕니다. 단, 성찰하겠다는 마음가짐만으로는 편향이 줄지 않습니다. 반대 증거를 반드시 검토하게 하는 절차와 좋은 기본값이 함께 있어야 합니다.',nodes:[
+  {n:'성찰(메타인지)',d:'자신의 판단과 신념이 틀릴 수 있다는 가능성을 전제로 사고 과정을 다시 봅니다. 「잠깐! 진짜?」가 여는 “생각의 틈”입니다.',q:'내가 틀릴 수도 있다면 어디가 틀렸을까?',gap:true,r:[27],ch:['12장','20장']},
+  {n:'편향 약화',d:'반대되는 정보와 다양한 관점을 능동적으로 들여다봅니다.',q:'내 생각에 반대되는 가장 좋은 근거는 무엇인가?',ch:['12장']},
+  {n:'관점 전환',d:'갇혀 있던 시야의 울타리를 넓혀 대상의 본래 맥락을 봅니다. 코끼리의 다른 면을 만져 보는 일입니다.',q:'그 사람의 입장에서는 이 일이 어떻게 보일까?',ch:['13장']},
+  {n:'새로운 학습',d:'기존의 틀을 깨고 새로운 지식과 현실의 관계망을 익힙니다.',q:'이 일에서 내가 몰랐던 관계는 무엇인가?',ch:['12장']},
+  {n:'새로운 경험·시도',d:'바뀐 관점으로 새로운 선택과 작은 실험을 실행합니다.',q:'30일 안에 해볼 가장 작은 실험은 무엇인가?',ch:['19장']},
+  {n:'새 패턴 내면화',d:'더 나은 사고와 행동 양식이 새로운 선순환의 습관이 됩니다.',q:'이 습관이 기본값이 되려면 무엇이 필요한가?',ch:['10장','17장']}
  ]}
 };
+var MAPTABS=[['personal','개인 층위'],['social','사회 층위'],['closed','닫힌 순환'],['open','열린 순환']];
 var SAME='요소가 쌓인다 → 질적으로 다른 전체가 나타난다 → 그 전체가 다시 요소를 바꾼다 → 반복된다';
 
-var REFS=['Frank Wilczek, The Lightness of Being (Basic Books, 2008).','Brian Greene, The Fabric of the Cosmos (Knopf, 2004).','P. W. Anderson, “More Is Different,” Science 177(4047), 1972: 393–396.','Donella H. Meadows, Thinking in Systems: A Primer (Chelsea Green, 2008).','Bruce Alberts et al., Molecular Biology of the Cell, 6th ed. (Garland Science, 2014).','Eric R. Kandel et al., Principles of Neural Science, 6th ed. (McGraw-Hill, 2021).','Antonio Damasio, Descartes’ Error (Putnam, 1994).','Anil Seth, Being You (Dutton, 2021).','Chris Frith, Making Up the Mind (Blackwell, 2007).','Lisa Feldman Barrett, How Emotions Are Made (Houghton Mifflin Harcourt, 2017).','Richard Lazarus, Emotion and Adaptation (Oxford UP, 1991).','Joseph LeDoux, The Emotional Brain (Simon & Schuster, 1996).','Aaron T. Beck, Cognitive Therapy and the Emotional Disorders (International Universities Press, 1976).','Albert Ellis & Robert A. Harper, A Guide to Rational Living (Wilshire, 1961) — ABC 모델.','Robert K. Merton, “The Self-Fulfilling Prophecy,” The Antioch Review 8(2), 1948: 193–210.','Daniel Kahneman, Thinking, Fast and Slow (FSG, 2011).','Keith E. Stanovich & Richard F. West, “Individual Differences in Reasoning,” Behavioral and Brain Sciences 23(5), 2000: 645–665.','Raymond S. Nickerson, “Confirmation Bias,” Review of General Psychology 2(2), 1998: 175–220.','Daniel Kahneman & Amos Tversky, “Prospect Theory,” Econometrica 47(2), 1979: 263–291.','Pierre Bourdieu, Outline of a Theory of Practice (Cambridge UP, 1977).','Peter L. Berger & Thomas Luckmann, The Social Construction of Reality (Doubleday, 1966).','Anthony Giddens, The Constitution of Society (Polity, 1984).','David J. Chalmers, “Facing Up to the Problem of Consciousness,” Journal of Consciousness Studies 2(3), 1995: 200–219.','Benjamin Libet et al., “Time of Conscious Intention to Act in Relation to Onset of Cerebral Activity,” Brain 106(3), 1983: 623–642.','William James, The Principles of Psychology (Henry Holt, 1890).'];
+var REFS=['Frank Wilczek, The Lightness of Being (Basic Books, 2008).','Brian Greene, The Fabric of the Cosmos (Knopf, 2004).','P. W. Anderson, “More Is Different,” Science 177(4047), 1972: 393–396.','Donella H. Meadows, Thinking in Systems: A Primer (Chelsea Green, 2008).','Bruce Alberts et al., Molecular Biology of the Cell, 6th ed. (Garland Science, 2014).','Eric R. Kandel et al., Principles of Neural Science, 6th ed. (McGraw-Hill, 2021).','Antonio Damasio, Descartes’ Error (Putnam, 1994).','Anil Seth, Being You (Dutton, 2021).','Chris Frith, Making Up the Mind (Blackwell, 2007).','Lisa Feldman Barrett, How Emotions Are Made (Houghton Mifflin Harcourt, 2017).','Richard Lazarus, Emotion and Adaptation (Oxford UP, 1991).','Joseph LeDoux, The Emotional Brain (Simon & Schuster, 1996).','Aaron T. Beck, Cognitive Therapy and the Emotional Disorders (International Universities Press, 1976).','Albert Ellis & Robert A. Harper, A Guide to Rational Living (Wilshire, 1961) — ABC 모델.','Robert K. Merton, “The Self-Fulfilling Prophecy,” The Antioch Review 8(2), 1948: 193–210.','Daniel Kahneman, Thinking, Fast and Slow (FSG, 2011).','Keith E. Stanovich & Richard F. West, “Individual Differences in Reasoning,” Behavioral and Brain Sciences 23(5), 2000: 645–665.','Raymond S. Nickerson, “Confirmation Bias,” Review of General Psychology 2(2), 1998: 175–220.','Daniel Kahneman & Amos Tversky, “Prospect Theory,” Econometrica 47(2), 1979: 263–291.','Pierre Bourdieu, Outline of a Theory of Practice (Cambridge UP, 1977).','Peter L. Berger & Thomas Luckmann, The Social Construction of Reality (Doubleday, 1966).','Anthony Giddens, The Constitution of Society (Polity, 1984).','David J. Chalmers, “Facing Up to the Problem of Consciousness,” Journal of Consciousness Studies 2(3), 1995: 200–219.','Benjamin Libet et al., “Time of Conscious Intention to Act in Relation to Onset of Cerebral Activity,” Brain 106(3), 1983: 623–642.','William James, The Principles of Psychology (Henry Holt, 1890).',
+ 'Eric J. Johnson & Daniel Goldstein, “Do Defaults Save Lives?” Science 302(5649), 2003: 1338–1339.','Pat Croskerry et al., “Cognitive debiasing 1 & 2,” BMJ Quality & Safety, 2013.','Florin Dolcos, Alexandru D. Iordan & Sanda Dolcos, “Neural correlates of emotion–cognition interactions,” Journal of Cognitive Psychology (책에는 2011/2025로 표기).','Niklas Luhmann, Social Systems (Stanford UP, 1995).','Donella Meadows, Leverage Points: Places to Intervene in a System (The Sustainability Institute, 1999).','John W. Kingdon, Agendas, Alternatives, and Public Policies (Little, Brown, 1984).','CLES & Preston City Council, How We Built Community Wealth in Preston: Achievements and Lessons (2019).','T. C. Rose et al., “Understanding the differential effects on employment of a community wealth building programme in England,” Journal of Epidemiology & Community Health (2025).'];
+var BOOKREFS=[16,18,20,22,26,27,28,29,30,31,32,33];
 /* 지도의 깊이 읽기: [제목, 본문, 참고문헌 번호] */
 var PARTS=[
  ['물질이란 무엇인가','물질을 계속 작게 나누면 분자, 원자, 기본입자에 이르고, 현대 물리학은 입자보다 근본적인 것으로 양자장을 세웁니다. 물질은 단단한 덩어리가 아니라 요소와 상호작용으로 이루어진 구조입니다.',[1,2]],
  ['부분의 합이 아닌 것 — 창발','수소와 산소는 물과 전혀 다른 성질을 가졌지만 특정 방식으로 결합하면 물이 됩니다. 전체는 구성요소의 합과 다른 성질을 가질 수 있고, 이것이 창발입니다. 개인의 생각이 모여 문화와 제도가 되는 과정도 같은 논리를 따릅니다.',[3,4]],
  ['물질에서 생명으로','세포는 에너지와 물질을 교환하고 환경을 감지하며 자기 상태를 유지합니다. 생명의 기원은 아직 완전히 해결되지 않았지만, 인간의 몸과 생명 현상이 물질적·생물학적 과정 위에 있다는 것은 현대 생물학의 기본 전제입니다.',[5]],
  ['생명에서 신경계로','세포 → 신경세포 → 신경망 → 뇌. 뉴런은 정보를 전달하는 데 특화된 세포로, 이 지점부터 물질의 세계는 조금씩 정보의 세계로 넘어갑니다.',[6]],
- ['전기적 작용과 화학적 작용','신경세포 안에서는 전기적 신호가, 신경세포 사이에서는 화학적 신호(신경전달물질)가 핵심입니다. 그러나 생각을 특정 화학물질 하나로 환원해서는 안 됩니다. 신경회로, 신체 상태, 기억, 환경이 함께 작동합니다.',[6,7]],
+ ['전기적 작용과 화학적 작용','신경세포 안에서는 전기적 신호가, 신경세포 사이에서는 화학적 신호(신경전달물질)가 핵심입니다. 그러나 생각을 특정 화학물질 하나로 환원해서는 안 됩니다. 신경회로, 신체 상태, 기억, 환경이 함께 작동합니다.',[6,7,28]],
  ['보이지 않는 흐름','화내는 행동 아래에는 감각, 뇌의 처리, 기억, 감정, 판단으로 이어지는 흐름이 있을 수 있습니다. 사회현상의 표면만 보고 대응하는 것과 아래의 흐름까지 보는 것은 전혀 다른 개입을 만듭니다.',[]],
  ['현실은 그대로 주어지는가','눈에 들어오는 것은 빛과 시각 정보이고, 뇌의 처리를 거쳐 “컵이 있다”고 경험합니다. 외부에 사건이 있는 것과 내가 그것을 경험하는 것은 같지 않을 수 있습니다.',[8,9]],
  ['같은 현실, 다른 경험','같은 비가 농부에게는 반가움, 행사 준비자에게는 걱정, 다른 이에게는 낭만입니다. 감각에 기억·감정·욕구·기대·가치관이 함께 작용하기 때문입니다.',[10,11]],
  ['기억은 현재에 개입한다','개에게 크게 물린 사람에게 현재의 개는 “현재의 개 + 과거의 기억 + 그때의 감정”입니다. 우리는 현재를 경험하면서 과거를 함께 경험합니다.',[12]],
- ['감정과 생각은 분리되지 않는다','두려움은 위험에 대한 생각을 늘리고, 반복된 생각은 두려움을 키웁니다. 마음 ↔ 감정 ↔ 생각은 뇌와 신체의 변화와 함께 움직입니다.',[7]],
+ ['감정과 생각은 분리되지 않는다','두려움은 위험에 대한 생각을 늘리고, 반복된 생각은 두려움을 키웁니다. 마음 ↔ 감정 ↔ 생각은 뇌와 신체의 변화와 함께 움직입니다.',[7,28]],
  ['해석이라는 다리','외부 자극 → 감각 → 기억·감정·욕구와의 연결 → 해석 → 생각. 인사를 받지 못한 사실은 하나지만, “무시했나?”와 “못 봤겠지”는 해석의 차이입니다.',[13,14]],
  ['생각·판단·행동의 순환','생각 → 판단 → 선택 → 행동 → 결과 → 새로운 경험 → (다시) 생각. 직선이 아니라 순환입니다.',[]],
  ['생각이 현실을 만드는 방식','“말을 못한다”는 생각이 발표 회피를 낳고, 경험 부족이 불안을 키워 “역시 나는 못해”를 강화합니다. 생각이 행동을 만들고 행동의 결과가 다시 생각을 강화합니다.',[15]],
  ['빠른 사고와 느린 사고','뇌는 에너지를 아끼려 익숙한 상황에서 빠르고 자동적인 시스템 1을 씁니다. “잠깐, 정말 그런가?” 하고 멈추는 것이 시스템 2입니다. 일상의 판단 대부분은 시스템 1이 합니다.',[16,17]],
  ['사고의 구조적 한계','확증편향, 손실회피, 습관, 동조가 개입합니다. 생각 → 근거 선택 → 확신 강화 → 더 강한 생각의 순환이 만들어집니다.',[18,19]],
  ['그 생각은 정말 나의 것인가','내 생각에는 경험, 기억, 감정, 신체 상태와 함께 가족·교육·문화·미디어·제도가 영향을 미쳤을 수 있습니다. “나는 원래 이래”의 “원래”는 어디서 만들어졌을까요.',[20]],
- ['개인의 사고와 사회의 순환','개인의 사고·행동이 반복되어 습관, 집단의 행동, 문화·규범, 제도, 사회 시스템이 되고, 시스템은 다시 환경과 경험으로 개인에게 돌아옵니다. 사회는 인간과 시스템이 서로를 만들어내는 순환 구조입니다.',[21,22]],
+ ['개인의 사고와 사회의 순환','개인의 사고·행동이 반복되어 습관, 집단의 행동, 문화·규범, 제도, 사회 시스템이 되고, 시스템은 다시 환경과 경험으로 개인에게 돌아옵니다. 사회는 인간과 시스템이 서로를 만들어내는 순환 구조입니다.',[21,22,29]],
  ['질문을 바꾸는 것','① 무슨 일이 일어나고 있는가 ② 왜 반복되는가 ③ 어떤 행동이 반복되는가 ④ 그 행동을 만드는 생각은 ⑤ 그 생각을 만든 경험·감정·기억은 ⑥ 그 경험을 만든 환경과 제도는 ⑦ 그 제도를 유지시키는 사고방식은. 질문을 내려가면 표면의 문제에서 구조의 문제로 이동합니다.',[]],
  ['지금까지의 큰 그림','개인 층위와 사회 층위는 사실 같은 그림입니다. 요소가 쌓이면 질적으로 다른 전체가 나타나고, 그 전체가 다시 요소를 바꿉니다. 두 순환이 만나는 자리가 인간입니다.',[]]
 ];
@@ -236,16 +410,17 @@ var store={
  get:function(){try{var v=localStorage.getItem(KEY);return v?JSON.parse(v):null}catch(e){return mem.d||null}},
  set:function(d){mem.d=d;try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
 };
-function blank(){return {step:0,issue:'',thought:'',source:'',picked:[],customPat:'',f:{}}}
-var DB=store.get()||{draft:blank(),records:[]};
-if(!DB.draft)DB.draft=blank(); if(!DB.records)DB.records=[];
-var S=DB.draft; if(!S.f)S.f={}; if(!S.picked)S.picked=[];
+function blank(){return {mode:'quick',step:0,pause:false,issue:'',thought:'',source:'',picked:[],customPat:'',f:{}}}
+var DB=store.get()||{};
+if(!DB.draft)DB.draft=blank(); if(!DB.records)DB.records=[]; if(!DB.canvas)DB.canvas={};
+var S=DB.draft; if(!S.f)S.f={}; if(!S.picked)S.picked=[]; if(!S.mode)S.mode='quick';
 function save(){DB.draft=S;store.set(DB)}
-var busy=false, errMsg='', mapKind='personal', mapSel=0;
+var busy=false, errMsg='', mapKind='personal', mapSel=0, curCh=-1, bk={q:'',w:'',i:''};
+function steps(){return S.mode==='quick'?QSTEPS:DSTEPS}
 
 /* ---------- AI (선택) ---------- */
 var aiSample=null,aiChecked=false;
-var RULES='당신은 「잠깐! 진짜?」 앱의 사고 파트너입니다. 정답이나 훈계를 주지 않고 사용자가 자기 생각을 바라보도록 돕습니다. 긍정적으로 생각하라고 강요하지 않으며 사실·해석·가능성을 구분합니다. 차분하고 따뜻한 한국어, 짧고 구체적인 문장을 씁니다. 확신 없는 통계 수치와 연도는 쓰지 않고 “대체로” 같은 표현을 씁니다. 특정 정당이나 진영의 편을 들지 않습니다. 반드시 JSON만 출력합니다.';
+var RULES='당신은 「잠깐! 진짜?」 앱의 사고 파트너입니다. 정답이나 훈계를 주지 않고, 사용자가 자기 생각을 잠시 멈추어 바라보도록 거울 같은 질문을 건넵니다. 순서는 공감 → 사실 확인 → 자동 생각 확인 → 질문 → 대안적 가능성 탐색 → 사용자의 선택입니다. 생각이 틀렸다고 비난하지 않고, 무조건 긍정적으로 생각하라고 강요하지 않습니다. 질문의 전제에 “내가 틀릴 수도 있다”는 열린 가능성을 자연스럽게 담습니다. 사실, 해석, 가능성을 구분하고, 차이를 알아보는 분별력과 우열을 매기는 분별심, 편을 가르는 분리의식을 혼동하지 않습니다. 차분하고 따뜻한 한국어, 짧고 구체적인 문장을 씁니다. 확신 없는 통계 수치와 연도는 쓰지 않고 “대체로” 같은 표현을 씁니다. 특정 정당이나 진영의 편을 들지 않습니다. 반드시 JSON만 출력합니다.';
 async function aiAvailable(){
  if(CONFIG.aiEndpoint)return true;
  if(aiChecked)return !!aiSample; aiChecked=true;
@@ -260,13 +435,16 @@ async function ask(prompt){
  if(!(await aiAvailable()))throw {code:'unavailable'};
  return await aiSample.json(RULES+'\n\n'+prompt,{cache:false,modelTier:'default'});
 }
-function ctx(){return '사회문제: '+S.issue+'\n사용자의 자동적인 생각: '+S.thought}
+function ctx(){return (S.issue?'사회문제: '+S.issue+'\n':'')+'사용자의 자동적인 생각: '+S.thought}
 async function runAI(kind){
  busy=true;errMsg='';render();
  try{
   if(kind==='define'){
    var d=await ask(ctx()+'\n\n이 사회문제를 정의해 주세요. JSON으로만: {"definition":"2~3문장","facts":["확인 가능한 사실 3개"],"causes":["구조적 원인 3개"],"stakeholders":["이해관계자: 걸린 것 (4개)"]}');
    S.f.def=d.definition||'';S.f.facts=(d.facts||[]).join('\n');S.f.causes=(d.causes||[]).join('\n');S.f.stake=(d.stakeholders||[]).join('\n');
+  }else if(kind==='mirror'){
+   var m=await ask(ctx()+'\n\n이 생각을 대상으로, 먼저 한 문장으로 공감하고, 정답을 주지 말고 사용자의 상황에 맞는 거울 같은 질문 2개만 건네 주세요. 하나는 구체적인 사실(행동)을 되묻고, 하나는 다른 가능성을 열어 줍니다. JSON으로만: {"empathy":"공감 한 문장","questions":["질문1","질문2"]}');
+   S.f.mirrorE=m.empathy||'';S.f.mirrorQ=(m.questions||[]).join('\n');
   }else if(kind==='reframe'){
    var f=S.f,r=await ask(ctx()+'\n사용자 답변:\n- 사실/해석: '+(f.q1fact||'')+' / '+(f.q1interp||'')+'\n- 숨은 전제: '+(f.q2||'')+'\n- 생각의 뿌리: '+(f.q3||'')+'\n- 선택: '+(f.q5||'')+'\n의식구조: '+(f.before||'')+'\n\n사용자 자신의 답을 최대한 살려 다시 해석해 주세요. 비어 있는 부분은 억지로 채우지 마세요. JSON으로만: {"after":"새로 열어 볼 해석 한 문장","personal":["개인의 선택지 3개"],"community":["공동체의 선택지 3개"],"keepAsking":"계속 품고 갈 질문 한 개"}');
    S.f.after=r.after||'';S.f.personal=(r.personal||[]).join('\n');S.f.community=(r.community||[]).join('\n');S.f.keep=r.keepAsking||'';
@@ -275,28 +453,84 @@ async function runAI(kind){
  busy=false;save();render();
 }
 
-/* ---------- 뷰: 홈 ---------- */
-function vHome(){
- var book=CONFIG.bookTitle?'《'+esc(CONFIG.bookTitle)+'》':'도서';
- return '<header class="sec" style="gap:14px;margin-bottom:22px"><div class="eyebrow">'+book+' 동행 앱</div><h1>잠깐! 진짜?</h1>'+
- '<p class="quote">생각을 바꾸기 전에, 생각을 바라보는 능력이 필요하다.</p>'+
- '<p class="lead">책에서 만난 질문을 내 삶과 우리 사회의 문제로 가져와 연습하는 곳입니다. 정답을 주지 않고, 사실·해석·가능성을 나누고, 작은 실험 하나로 끝납니다.</p>'+flowStrip()+'</header>'+
- '<div class="entry"><a href="#/debug"><b>사고 디버깅</b><span>6단계로 내 자동생각을 살펴봅니다. 약 15~20분.</span></a>'+
- '<a href="#/map"><b>사고의 순환 지도</b><span>물질에서 마음, 사회까지 이어지는 순환을 눌러 보며 읽습니다.</span></a>'+
- '<a href="#/book"><b>책과 함께</b><span>밑줄 친 문장을 질문으로 바꿔 디버깅으로 가져갑니다.</span></a></div>'+
- '<div class="card" style="margin-top:18px"><h3>이렇게 쓰세요</h3><ol class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>책을 읽다 마음이 걸리는 문장이나 사회문제를 하나 고릅니다.</li><li>지도에서 그 생각이 순환의 어느 지점에 있는지 확인합니다.</li><li>디버깅으로 “잠깐!”의 틈을 만들고, 재해석과 작은 실험까지 기록합니다.</li><li>‘내 기록’에서 내 생각이 어떻게 달라졌는지 되돌아봅니다.</li></ol></div>';
-}
-function flowStrip(){return '<div class="flow" aria-label="생각의 흐름"><span class="n">사건</span><span class="bar"></span><span class="n">자동생각</span><span class="gap">잠깐! 생각의 틈</span><span class="n on">질문</span><span class="bar"></span><span class="n on">검토</span><span class="bar"></span><span class="n on">다른 가능성</span><span class="bar"></span><span class="n on">선택</span><span class="bar"></span><span class="n">행동</span></div>'}
-
-/* ---------- 뷰: 디버깅 ---------- */
-function ta(k,ph,h){return '<textarea data-f="'+k+'" placeholder="'+esc(ph||'')+'"'+(h?' style="min-height:'+h+'px"':'')+'>'+esc(S.f[k]||'')+'</textarea>'}
+/* ---------- 공통 조각 ---------- */
+function ta(k,ph,h){return '<textarea data-f="'+k+'" id="f_'+k+'" placeholder="'+esc(ph||'')+'"'+(h?' style="min-height:'+h+'px"':'')+'>'+esc(S.f[k]||'')+'</textarea>'}
 function nav(back,label,act,dis){return '<div class="row end">'+(back?'<button class="btn ghost" data-act="back">이전</button>':'<span></span>')+(label?'<button class="btn" data-act="'+act+'"'+(dis?' disabled':'')+'>'+label+'</button>':'')+'</div>'}
 function errBox(){return errMsg?'<div class="err" role="alert">'+esc(errMsg)+'</div>':''}
 function aiBtn(kind,label){return '<button class="btn ghost sm" data-act="ai-'+kind+'" data-ai>✦ '+label+'</button>'}
+function gauge(key,label,hint,max,unit){
+ var v=S.f[key],has=v!=null&&v!=='';
+ return '<div class="gauge"><label for="g_'+key+'" class="label">'+label+'</label>'+(hint?'<span class="hint">'+hint+'</span>':'')+
+ '<div class="grow"><input type="range" id="g_'+key+'" data-f="'+key+'" data-unit="'+unit+'" min="'+(max===5?1:0)+'" max="'+max+'" step="'+(max===5?1:5)+'" value="'+(has?esc(v):(max===5?3:50))+'"><output id="o_'+key+'">'+(has?esc(v)+unit:'—')+'</output></div></div>';
+}
+function modeSeg(){
+ return '<div class="seg" role="group" aria-label="진행 방식"><button data-mode="quick" aria-pressed="'+(S.mode==='quick')+'">빠르게 · 5단계 (약 5분)</button><button data-mode="deep" aria-pressed="'+(S.mode==='deep')+'">깊게 · 6단계 (15~20분)</button></div>';
+}
+
+/* ---------- 뷰: 홈 ---------- */
+function flowStrip(){return '<div class="flow" aria-label="생각의 흐름"><span class="n">사건</span><span class="bar"></span><span class="n">자동생각</span><span class="gap">잠깐! 생각의 틈</span><span class="n on">질문</span><span class="bar"></span><span class="n on">검토</span><span class="bar"></span><span class="n on">다른 가능성</span><span class="bar"></span><span class="n on">선택</span><span class="bar"></span><span class="n">행동</span></div>'}
+function vHome(){
+ return '<header class="sec" style="gap:14px;margin-bottom:22px"><div class="eyebrow">《'+esc(CONFIG.bookTitle)+'》 동행 앱</div><h1>잠깐! 진짜?</h1>'+
+ '<p class="quote">생각을 바꾸기 전에, 생각을 바라보는 능력이 필요하다.</p>'+
+ '<p class="lead">책에서 만난 질문을 내 삶과 우리 사회의 문제로 가져와 연습하는 곳입니다. 생각을 억지로 바꾸라고 하지 않습니다. 생각과 반응 사이에 3초의 틈을 만들고, 사실·해석·가능성을 나누고, 작은 선택 하나로 마칩니다.</p>'+flowStrip()+'</header>'+
+ '<div class="entry"><a href="#/debug"><b>사고 디버깅</b><span>책 20장의 5단계로 자동 생각에 “잠깐! 진짜?”를 묻습니다. 더 깊게 가는 6단계도 있습니다.</span></a>'+
+ '<a href="#/map"><b>사고의 순환 지도</b><span>물질에서 마음, 사회까지의 순환과, 닫힌 순환·열린 순환을 눌러 보며 읽습니다.</span></a>'+
+ '<a href="#/book"><b>책과 함께</b><span>장별 질문과 실험, 핵심 용어집. 밑줄 친 문장을 디버깅으로 가져갑니다.</span></a>'+
+ '<a href="#/canvas"><b>미래 설계</b><span>5단계 캔버스, 30일 실험 카드, 미래 설계 선언문을 작성합니다.</span></a></div>'+
+ '<div class="card" style="margin-top:18px"><h3>이렇게 쓰세요</h3><ol class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>책을 읽다 마음이 걸리는 문장이나 사회문제를 하나 고릅니다.</li><li>지도에서 그 생각이 순환의 어느 지점에 있는지 확인합니다.</li><li>디버깅으로 “생각의 틈”을 만들고, 작은 선택까지 기록합니다.</li><li>‘내 기록’에서 확신이 어떻게 달라졌는지, 생각과 나 사이에 거리가 생겼는지 되돌아봅니다.</li></ol></div>'+
+ '<div class="sec" style="margin-top:22px"><span class="label">이 작은 거리두기가 퍼져 가는 길 (책 20장)</span><div class="flow">'+EXPAND.map(function(x,i){return (i?'<span class="bar"></span>':'')+'<span class="n">'+(i+1)+' '+esc(x)+'</span>'}).join('')+'</div><p class="note">성과 기준은 생각이 얼마나 긍정적으로 바뀌었는가가 아니라, 생각과 나 사이에 건강한 거리를 둘 수 있게 되었는가입니다.</p></div>';
+}
+
+/* ---------- 뷰: 디버깅 ---------- */
+function vPause(){
+ return '<div class="pause" role="status"><div class="ring" aria-hidden="true"></div><div class="big">잠깐!<br>진짜?</div>'+
+ '<div class="quote" style="max-width:34ch">“'+esc(S.thought)+'”</div>'+
+ '<p class="lead" style="text-align:center">판단도 정답도 없습니다. 숨을 한 번 천천히 쉬고, 방금 쓴 생각을 바라보세요.</p>'+
+ '<button class="btn" id="pauseGo" data-act="pauseGo" disabled>숨을 쉬는 중…</button></div>';
+}
 function vDebug(){
- var head='<div class="steps" role="group" aria-label="진행 단계">'+STEPS.map(function(n,i){return '<button class="'+(i===S.step?'cur':i<S.step?'done':'')+'" data-go="'+i+'" aria-label="'+(i+1)+'단계 '+n+'"></button>'}).join('')+'</div><div class="note" style="margin-bottom:14px">'+(S.step+1)+' / '+STEPS.length+'  '+STEPS[S.step]+'</div>';
+ var st=steps();
+ var head='<div class="row end" style="margin-bottom:12px">'+modeSeg()+'</div>'+
+  '<div class="steps" style="grid-template-columns:repeat('+st.length+',1fr)" role="group" aria-label="진행 단계">'+st.map(function(n,i){return '<button class="'+(i===S.step?'cur':i<S.step?'done':'')+'" data-go="'+i+'" aria-label="'+(i+1)+'단계 '+n+'"></button>'}).join('')+'</div><div class="note" style="margin-bottom:14px">'+(S.step+1)+' / '+st.length+'  '+st[S.step]+'</div>';
  if(busy)return head+'<div class="card"><div class="loading">AI가 초안을 정리하는 중입니다…</div></div>';
- return head+[s0,s1,s2,s3,s4,s5][S.step]();
+ if(isPause())return vPause();
+ var vs=S.mode==='quick'?[q0,vPause,q2,q3,q4]:[s0,s1,s2,s3,s4,s5];
+ return head+vs[S.step]();
+}
+function isPause(){return S.pause||(S.mode==='quick'&&S.step===1)}
+function q0(){
+ var ok=S.thought.trim().length>3;
+ var ex=EXAMPLES.map(function(x){return '<button class="chip" data-ex="'+esc(x)+'">'+esc(x)+'</button>'}).join('');
+ return '<div class="card"><div class="sec"><div class="eyebrow">STEP 1</div><h2>머릿속을 사로잡은 생각을 꺼내 보세요</h2><p class="lead">최근 자꾸 떠오르는 자동 생각이나 답답한 상황을 있는 그대로 적어 주세요. 맞는지 틀린지 따지지 않아도 됩니다.</p>'+
+ '<textarea id="thoughtIn" placeholder="예: 팀장이 회의에서 또 내 의견을 무시했다.">'+esc(S.thought)+'</textarea><span class="hint">떠오르지 않으면 이런 문장으로 시작해 보세요.</span><div class="chips">'+ex+'</div></div>'+
+ gauge('belief0','지금 이 생각이 얼마나 사실처럼 느껴지나요?','대략으로 괜찮습니다. 슬라이더를 움직여 골라 주세요.',100,'%')+
+ '<div class="sec"><label class="label" for="issueIn">이 생각이 닿아 있는 사회문제가 있다면 (선택)</label><input type="text" id="issueIn" placeholder="예: 저출생, 칸막이 행정, 세대 갈등" value="'+esc(S.issue)+'"></div>'+
+ '<div class="row end"><span class="note">입력은 이 기기에만 저장됩니다.</span><button class="btn" data-act="next" id="go0"'+(ok?'':' disabled')+'>잠깐!</button></div></div>';
+}
+function q2(){
+ return '<div class="card"><div class="sec"><div class="eyebrow">STEP 3</div><h2>핵심 질문</h2><div class="quote">“'+esc(S.thought)+'”</div>'+
+ '<p class="lead">'+(S.f.mirrorE?esc(S.f.mirrorE):'그런 생각이 들 만한 이유가 있었을 거예요. 정답을 찾기보다 몇 가지만 가볍게 되물어 볼게요.')+'</p></div>'+
+ '<div class="q"><div class="qhead"><span class="tag">사실</span><h3>잠깐! 진짜?</h3></div><p>그렇게 느낀 구체적인 사실(행동)은 무엇이었나요?</p>'+ta('q1fact','내가 직접 보고 들은 것은…')+'</div>'+
+ '<div class="q"><div class="qhead"><span class="tag">전제</span><h3>꼭 그래야 해?</h3></div><p>내 생각이 100% 진실이어야만 할까요?</p>'+ta('q2','나는 이것을 당연하게 생각하고 있었다')+'</div>'+
+ '<div class="q"><div class="qhead"><span class="tag">관점</span><h3>다르게 보면?</h3></div><p>그 사람의 입장이나 상황에 다른 가능성은 없었을까요?</p>'+ta('q4a','다른 입장에서는…')+'</div>'+
+ (S.f.mirrorQ?'<div class="box"><b>AI의 거울 질문 (답하지 않아도 됩니다)</b>'+esc(S.f.mirrorQ).replace(/\n/g,'<br>')+'</div>':'')+
+ '<div class="row">'+aiBtn('mirror','내 상황에 맞는 거울 질문 받기')+'</div>'+errBox()+
+ '<div class="row end"><button class="btn ghost" data-act="back">이전</button><button class="btn" data-act="next">생각의 틈 보기</button></div></div>';
+}
+function q3(){
+ var b0=S.f.belief0,b1=S.f.belief1,shift=(b0!=null&&b0!==''&&b1!=null&&b1!=='')?'<p class="note">처음 '+esc(b0)+'% → 지금 '+esc(b1)+'%. 숫자가 내려가야 성공은 아닙니다. 틈이 열렸는지가 중요합니다.</p>':'';
+ return '<div class="card"><div class="sec"><div class="eyebrow">STEP 4</div><h2>생각의 틈</h2><p class="lead">질문을 거치며 내 자동 생각과 사실 사이에 공간이 생겼나요? 정말 100% 꼭 그럴까요? 1%라도 다른 가능성은 없을까요?</p></div>'+
+ '<div class="sec"><span class="label">다르게 볼 수 있는 가능성</span><span class="hint">예: “팀장이 급한 보고 때문에 휴대폰을 보느라 내 말을 못 들었을 수도 있겠네.”</span>'+ta('gap','다른 가능성은…',96)+'</div>'+
+ gauge('belief1','지금은 이 생각이 얼마나 사실처럼 느껴지나요?','',100,'%')+shift+
+ '<div class="row end"><button class="btn ghost" data-act="back">이전</button><button class="btn" data-act="next">작은 선택으로</button></div></div>';
+}
+function q4(){
+ return '<div class="card"><div class="sec"><div class="eyebrow">STEP 5</div><h2>나의 작은 선택</h2><p class="lead">다르게 본 가능성을 바탕으로, 오늘 당장 할 수 있는 가장 작은 행동 하나를 스스로 골라 적어 보세요.</p></div>'+
+ '<div class="sec">'+ta('action','예: 회의가 끝나고 팀장님께 내 의견이 전달되었는지 한 줄로 물어본다',80)+'</div>'+
+ '<div class="sec"><span class="label">나만의 3초 멈춤 신호 (선택)</span><span class="hint">자동 반응이 튀어나오기 전에 틈을 만들 신호. 예: 숨 한 번 내쉬기, 손가락으로 문장 짚기</span>'+ta('signal','',60)+'</div>'+
+ gauge('dist','지금 이 생각과 나 사이에 거리가 느껴지나요?','1은 생각 그 자체, 5는 한 걸음 떨어져 바라보는 느낌',5,' / 5')+
+ '<div class="final">내가 지금 생각하고 있는 것이<br>정말 내가 선택한 생각인가?<small>멈추고 · 질문하고 · 구분하고 · 바라보고 · 확장하고 · 선택하고 · 행동한다</small></div>'+
+ '<div class="row end"><button class="btn ghost" data-act="back">이전</button><span class="row"><button class="btn ghost" data-act="toDeep">더 깊이 살펴보기</button><button class="btn" data-act="saveRec">내 기록에 저장</button></span></div></div>';
 }
 function s0(){
  var chips=ISSUES.map(function(x){return '<button class="chip" aria-pressed="'+(S.issue===x)+'" data-issue="'+esc(x)+'">'+esc(x)+'</button>'}).join('');
@@ -305,28 +539,33 @@ function s0(){
  '<label class="hint" for="issueIn">직접 입력</label><input type="text" id="issueIn" placeholder="예: 돌봄의 공백, 비정규직, 주거 불안" value="'+(ISSUES.indexOf(S.issue)<0?esc(S.issue):'')+'"></div>'+
  '<div class="sec"><h3>이 문제에 대해 평소 드는 생각은요?</h3><p class="hint">한두 문장이면 충분합니다. 맞는지 틀린지 따지지 않고 떠오르는 대로 적어 주세요.</p>'+
  '<textarea id="thoughtIn" placeholder="예: 저출생은 결국 요즘 젊은 사람들이 이기적이어서 생기는 일이다.">'+esc(S.thought)+'</textarea>'+
- (S.source?'<p class="note">책에서 가져온 문장: “'+esc(S.source)+'”</p>':'')+'</div>'+
- '<div class="row end"><span class="note">입력은 이 기기에만 저장됩니다.</span><button class="btn" data-act="next" id="go0"'+(ok?'':' disabled')+'>문제 정의하기</button></div></div>';
+ (S.source?'<p class="note">가져온 곳: '+esc(S.source)+'</p>':'')+'</div>'+
+ gauge('belief0','지금 이 생각이 얼마나 사실처럼 느껴지나요?','대략으로 괜찮습니다.',100,'%')+
+ '<div class="row end"><span class="note">입력은 이 기기에만 저장됩니다.</span><button class="btn" data-act="next" id="go0"'+(ok?'':' disabled')+'>잠깐!</button></div></div>';
 }
 function s1(){
- return '<div class="card"><div class="sec"><div class="eyebrow">먼저 문제부터</div><h2>'+esc(S.issue)+'</h2><p class="lead">생각을 검토하기 전에, 문제의 지형을 내 말로 정리합니다. 모르는 칸은 비워 두세요.</p></div>'+
+ return '<div class="card"><div class="sec"><div class="eyebrow">먼저 문제부터</div><h2>'+esc(S.issue)+'</h2><p class="lead">생각을 검토하기 전에, 문제의 지형을 내 말로 정리합니다. 문제의 이름이 우리가 떠올릴 수 있는 해법을 정한다는 점(책 3장)을 떠올려 보세요. 모르는 칸은 비워 두세요.</p></div>'+
  '<div class="sec"><span class="label">이 문제를 한두 문장으로 정의하면</span>'+ta('def','무슨 일이 누구에게 어떻게 일어나고 있는가')+'</div>'+
  '<div class="grid2"><div class="sec"><span class="label">확인 가능한 사실</span>'+ta('facts','출처를 댈 수 있는 것만')+'</div><div class="sec"><span class="label">구조적 원인 후보</span>'+ta('causes','개인이 아니라 제도·환경 쪽에서 본다면')+'</div></div>'+
  '<div class="sec"><span class="label">이해관계자 — 누가, 무엇이 걸려 있나</span>'+ta('stake','예: 청년 — 주거와 일자리 / 지자체 — 재정')+'</div>'+
+ '<div class="sec"><span class="label">이 문제를 다시 이름 붙인다면 (선택)</span>'+ta('rename','예: 저출산 → 집과 돌봄과 일자리가 모두 불안정한 삶',60)+'</div>'+
  '<div class="row">'+aiBtn('define','AI 초안 받기')+'<span class="note">AI의 글은 가설입니다. 고쳐 쓰는 것이 목적입니다.</span></div>'+errBox()+nav(true,'의식구조 살펴보기','next')+'</div>';
 }
+function patCard(p){return '<button class="pat" aria-pressed="'+(S.picked.indexOf(p.id)>=0)+'" data-pat="'+p.id+'"><span class="nm">'+esc(p.name)+(p.ch?' <span class="tag">책 '+esc(p.ch)+'</span>':'')+'</span><span>“'+esc(p.auto)+'”</span><span class="sm">숨은 전제: '+esc(p.premise)+'</span><span class="sm">잘 보이지 않게 되는 것: '+esc(p.hidden)+'</span></button>'}
 function s2(){
- var cards=PATTERNS.map(function(p,i){return '<button class="pat" aria-pressed="'+(S.picked.indexOf(p.id)>=0)+'" data-pat="'+p.id+'"><span class="nm">'+esc(p.name)+'</span><span>“'+esc(p.auto)+'”</span><span class="sm">숨은 전제: '+esc(p.premise)+'</span><span class="sm">잘 보이지 않게 되는 것: '+esc(p.hidden)+'</span></button>'}).join('');
+ var book=PATTERNS.filter(function(p){return p.src==='book'}).map(patCard).join(''),soc=PATTERNS.filter(function(p){return p.src!=='book'}).map(patCard).join('');
  return '<div class="card"><div class="sec"><h2>우리에게 자동으로 켜지는 생각</h2><p class="lead">'+esc(S.issue)+'을(를) 마주할 때 사회와 우리 안에서 저절로 작동하는 의식구조입니다. 내 생각과 닿는 것을 모두 눌러 보세요.</p></div>'+
- '<div class="sec"><span class="label">내가 쓴 자동적인 생각</span><div class="box">“'+esc(S.thought)+'”</div></div><div class="grid2">'+cards+'</div>'+
+ '<div class="sec"><span class="label">내가 쓴 자동적인 생각</span><div class="box">“'+esc(S.thought)+'”</div></div>'+
+ '<div class="sec"><span class="label">《연결할 용기》가 짚은 틀</span><div class="grid2">'+book+'</div></div>'+
+ '<div class="sec"><span class="label">사회문제에서 자주 켜지는 틀</span><div class="grid2">'+soc+'</div></div>'+
  '<div class="sec"><span class="label">여기에 없는 틀이 있다면</span><input type="text" id="customPat" value="'+esc(S.customPat)+'" placeholder="내가 쓰는 말로 적어 주세요"></div>'+
- '<p class="hint">내 생각은 이 중 어디에 가장 가까운가요? 닮은 정도가 아니라 “내 안에서도 켜지는가”를 살펴보세요.</p>'+nav(true,'잠깐! 진짜? 시작','next')+'</div>';
+ '<p class="hint">내 생각은 이 중 어디에 가장 가까운가요? 같은 사건도 서로 다른 렌즈로 보고 있을 수 있다는 점에서, 닮은 정도가 아니라 “내 안에서도 켜지는가”를 살펴보세요.</p>'+nav(true,'잠깐! 진짜? 시작','next')+'</div>';
 }
 function s3(){
  var Q=QUESTIONS,h=function(k,i){return '<div class="qhead"><span class="tag">'+i+'</span><h3>'+Q[k].name+'</h3></div><div class="hint">'+Q[k].sub+'</div><p>'+Q[k].ask+'</p>'};
  var chain='<div class="grid3">'+CHAIN.map(function(c,i){return '<label class="box"><b>'+c+'</b><input type="text" data-f="ch'+i+'" value="'+esc(S.f['ch'+i]||'')+'" style="padding:6px 8px;font-size:15px"></label>'}).join('')+'</div>';
  var views=VIEWS.map(function(v,i){return '<div class="sec"><span class="label">'+v+'</span>'+ta('v'+i,'',60)+'</div>'}).join('');
- return '<div class="card"><div class="sec"><div class="eyebrow">잠깐!</div><h2>이 생각을 대상으로 놓고 봅니다</h2><div class="quote">“'+esc(S.thought)+'”</div><p class="hint">비워 두고 넘어가도 됩니다. 한 칸이라도 적어 보면 틈이 생깁니다.</p></div>'+
+ return '<div class="card"><div class="sec"><div class="eyebrow">잠깐!</div><h2>이 생각을 대상으로 놓고 봅니다</h2><div class="quote">“'+esc(S.thought)+'”</div><p class="hint">비워 두고 넘어가도 됩니다. 한 칸이라도 적어 보면 틈이 생깁니다. 이 질문들은 정답을 가리는 시험이 아니라 나를 비추는 거울입니다.</p></div>'+
  '<div class="q">'+h('q1',1)+'<div class="grid3"><div class="sec"><span class="label">확인한 사실</span>'+ta('q1fact','직접 확인한 것')+'</div><div class="sec"><span class="label">내 해석</span>'+ta('q1interp','내가 덧붙인 의미')+'</div><div class="sec"><span class="label">다른 가능성</span>'+ta('q1poss','다르게 볼 여지')+'</div></div></div>'+
  '<div class="q">'+h('q2',2)+ta('q2','나는 이것을 당연하게 생각하고 있었다')+'</div>'+
  '<div class="q">'+h('q3',3)+chain+ta('q3','이 생각은 이런 경험이나 두려움, 습관, 주변의 기준에서 왔다')+'</div>'+
@@ -336,18 +575,23 @@ function s3(){
 function s4(){
  if(S.f.before==null){S.f.before=S.picked.map(function(id){var p=PATTERNS.filter(function(x){return x.id===id})[0];return p?p.name+': '+p.premise:''}).filter(Boolean).concat(S.customPat?[S.customPat]:[]).join('\n')||S.thought}
  var st=STARTERS.map(function(x){return '<button class="chip" data-starter="'+esc(x)+'">'+esc(x)+'</button>'}).join('');
- return '<div class="card"><div class="sec"><div class="eyebrow">다시 해석하기</div><h2>닫혀 있던 가능성이 열리는 자리</h2><p class="lead">내가 앞에서 적은 답을 바탕으로, 기존의 틀 옆에 새로운 해석을 하나 놓아 봅니다. 맞는 해석을 찾는 것이 아니라 선택지를 늘리는 일입니다.</p></div>'+
+ return '<div class="card"><div class="sec"><div class="eyebrow">다시 해석하기</div><h2>닫혀 있던 가능성이 열리는 자리</h2><p class="lead">내가 앞에서 적은 답을 바탕으로, 기존의 틀 옆에 새로운 해석을 하나 놓아 봅니다. 맞는 해석을 찾는 것이 아니라 선택지를 늘리는 일입니다. “내가 틀릴 수도 있다”는 전제에서 출발하면 열린 순환(책 12장)이 됩니다.</p></div>'+
  '<div class="ba"><div class="sec"><span class="label">자동으로 작동하던 틀</span>'+ta('before','',100)+'</div><div class="sec"><span class="label">새로 열어 볼 해석</span>'+ta('after','',100)+'<div class="chips">'+st+'</div></div></div>'+
- '<div class="grid2"><div class="sec"><span class="label">개인이 할 수 있는 선택</span>'+ta('personal','')+'</div><div class="sec"><span class="label">공동체·사회가 할 수 있는 선택</span>'+ta('community','')+'</div></div>'+
+ '<div class="grid2"><div class="sec"><span class="label">개인이 할 수 있는 선택</span>'+ta('personal','')+'</div><div class="sec"><span class="label">공동체·사회가 할 수 있는 선택 (기본값을 바꾼다면?)</span>'+ta('community','')+'</div></div>'+
  '<div class="sec"><span class="label">계속 품고 갈 질문</span>'+ta('keep','',60)+'</div>'+
  '<div class="row">'+aiBtn('reframe','AI와 함께 다듬기')+'</div>'+errBox()+nav(true,'작은 실험 정하기','next')+'</div>';
 }
 function s5(){
- var ex=EXPERIMENTS.map(function(x){return '<button class="chip" data-exp="'+esc(x)+'">'+esc(x)+'</button>'}).join('');
- return '<div class="card"><div class="sec"><div class="eyebrow">행동 → 경험 → 다시 생각</div><h2>오늘 해볼 작은 실험</h2><p class="hint">하루 안에, 10분 안팎으로 할 수 있는 것 하나만 고르거나 직접 적어 주세요.</p><div class="chips">'+ex+'</div>'+ta('action','내가 해볼 작은 행동 한 가지',70)+'</div>'+
+ var ex=EXPERIMENTS.map(function(x){return '<button class="chip" data-exp="'+esc(x[0])+'">'+esc(x[0])+' <span class="chip-ch">'+esc(x[1])+'</span></button>'}).join('');
+ return '<div class="card"><div class="sec"><div class="eyebrow">행동 → 경험 → 다시 생각</div><h2>오늘 해볼 작은 실험</h2><p class="hint">하루 안에, 10분 안팎으로 할 수 있는 것 하나만 고르거나 직접 적어 주세요. 아래는 책의 ‘관점 전환 실험실’에서 가져왔습니다.</p><div class="chips">'+ex+'</div>'+ta('action','내가 해볼 작은 행동 한 가지',70)+'</div>'+
  '<div class="sec"><span class="label">예상</span><span class="hint">이 행동을 하면 어떤 일이 일어날 것 같나요?</span>'+ta('pred','')+'</div>'+
  '<div class="sec"><span class="label">실제 경험</span><span class="hint">실험을 마친 뒤 적어 주세요. 나중에 ‘내 기록’에서 이어 쓸 수 있습니다.</span>'+ta('real','')+'</div>'+
  '<div class="sec"><span class="label">새로운 발견</span>'+ta('found','')+'</div>'+
+ '<details class="part"><summary>30일 미래 실험 카드로 키우기 (책 19장)</summary><div class="bd">'+
+ '<div class="sec"><span class="label">관찰 지표</span><span class="hint">이 실험으로 확인하고 싶은 반응이나 변화</span>'+ta('obs','',60)+'</div>'+
+ '<div class="sec"><span class="label">실패의 데이터화</span><span class="hint">기대한 결과가 나오지 않아도 얻게 될 배움. 실패는 배움을 얻지 못한 채 멈춘 상태입니다.</span>'+ta('failLearn','',60)+'</div></div></details>'+
+ gauge('belief1','지금은 처음의 생각이 얼마나 사실처럼 느껴지나요?','',100,'%')+
+ gauge('dist','지금 이 생각과 나 사이에 거리가 느껴지나요?','1은 생각 그 자체, 5는 한 걸음 떨어져 바라보는 느낌',5,' / 5')+
  '<div class="final">내가 지금 생각하고 있는 것이<br>정말 내가 선택한 생각인가?<small>멈추고 · 질문하고 · 구분하고 · 바라보고 · 확장하고 · 선택하고 · 행동한다</small></div>'+
  '<div class="row end"><button class="btn ghost" data-act="back">이전</button><span class="row"><button class="btn ghost" data-act="restart">새로 시작</button><button class="btn" data-act="saveRec">내 기록에 저장</button></span></div></div>';
 }
@@ -355,119 +599,191 @@ function s5(){
 /* ---------- 뷰: 순환 지도 ---------- */
 function vMap(){
  var M=MAP[mapKind],N=M.nodes,cx=240,cy=240,R=165,pts=N.map(function(_,i){var a=-Math.PI/2+i*2*Math.PI/N.length;return [cx+R*Math.cos(a),cy+R*Math.sin(a)]});
- var svg='<svg viewBox="0 0 480 480" role="group" aria-label="'+M.title+'의 8단계 순환"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker><marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--pause)"/></marker></defs>';
+ var svg='<svg viewBox="0 0 480 480" role="group" aria-label="'+M.title+'의 '+N.length+'단계 순환"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker><marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--pause)"/></marker></defs>';
  N.forEach(function(nd,i){
   var a=pts[i],b=pts[(i+1)%N.length],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.sqrt(dx*dx+dy*dy),ux=dx/L,uy=dy/L,k=N[(i+1)%N.length].gap;
-  var s=[a[0]+ux*44,a[1]+uy*20],e=[b[0]-ux*44,b[1]-uy*20];
+  var s=[a[0]+ux*46,a[1]+uy*22],e=[b[0]-ux*46,b[1]-uy*22];
   svg+='<line x1="'+s[0].toFixed(1)+'" y1="'+s[1].toFixed(1)+'" x2="'+e[0].toFixed(1)+'" y2="'+e[1].toFixed(1)+'" stroke="'+(k?'var(--pause)':'var(--muted)')+'" stroke-width="'+(k?2.2:1.2)+'" marker-end="url(#'+(k?'arg':'ar')+')"'+(k?' stroke-dasharray="4 3"':'')+'/>';
-  if(k){svg+='<text x="'+((s[0]+e[0])/2+(i<4?18:-18)).toFixed(1)+'" y="'+((s[1]+e[1])/2).toFixed(1)+'" font-size="12" font-weight="700" fill="var(--pause)" text-anchor="middle">잠깐!</text>'}
+  if(k){var mx=(s[0]+e[0])/2,my=(s[1]+e[1])/2,ox=mx-cx,oy=my-cy,ol=Math.sqrt(ox*ox+oy*oy)||1;svg+='<text x="'+(mx+ox/ol*20).toFixed(1)+'" y="'+(my+oy/ol*20+4).toFixed(1)+'" font-size="13" font-weight="700" fill="var(--pause)" text-anchor="middle">잠깐!</text>'}
  });
- N.forEach(function(nd,i){var p=pts[i],w=Math.max(96,nd.n.length*17+24);
+ N.forEach(function(nd,i){var p=pts[i],w=Math.max(96,nd.n.length*16+26);
   svg+='<g class="node'+(i===mapSel?' sel':'')+'" data-node="'+i+'" tabindex="0" role="button" aria-label="'+esc(nd.n)+'" aria-pressed="'+(i===mapSel)+'"><rect x="'+(p[0]-w/2).toFixed(1)+'" y="'+(p[1]-18).toFixed(1)+'" width="'+w+'" height="36" rx="10"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+5).toFixed(1)+'">'+esc(nd.n)+'</text></g>'});
- svg+='<text x="240" y="236" text-anchor="middle" font-family="var(--font-display)" font-size="19" font-weight="700" fill="var(--fg)">'+M.title+'</text><text x="240" y="258" text-anchor="middle" font-size="12.5" fill="var(--muted)">'+M.center+'</text></svg>';
- var nd=N[mapSel],refs=(nd.r||[]).map(function(i){return '<li>'+esc(REFS[i-1])+'</li>'}).join('');
- var parts=PARTS.map(function(p,i){return '<details class="part"><summary><span class="n">'+String(i+1).padStart(2,'0')+'</span>'+esc(p[0])+'</summary><div class="bd"><p>'+esc(p[1])+'</p>'+(p[2].length?'<ul class="refs" style="margin:0;padding-left:18px">'+p[2].map(function(n){return '<li>'+esc(REFS[n-1])+'</li>'}).join('')+'</ul>':'')+'</div></details>'}).join('');
- return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">사유의 지도</div><h1>사고의 순환 지도</h1><p class="lead">물질에서 마음, 행동, 사회까지. 위 그림과 아래 그림은 같은 구조입니다. 각 단계를 눌러 그 자리에서 던질 질문을 확인하세요.</p></header>'+
- '<div class="row" style="margin-bottom:12px"><div class="seg" role="group" aria-label="층위 선택"><button data-kind="personal" aria-pressed="'+(mapKind==='personal')+'">개인 층위</button><button data-kind="social" aria-pressed="'+(mapKind==='social')+'">사회 층위</button></div></div>'+
- '<div class="mapbox">'+svg+'</div>'+
- '<div class="detail" style="margin:18px 0"><div class="eyebrow">'+(mapSel+1)+' / '+N.length+'</div><h3>'+esc(nd.n)+'</h3><p>'+esc(nd.d)+'</p><div class="quote">잠깐! '+esc(nd.q)+'</div>'+(refs?'<ul class="refs" style="margin:0;padding-left:18px">'+refs+'</ul>':'')+
+ svg+='<text x="240" y="232" text-anchor="middle" font-family="var(--font-display)" font-size="19" font-weight="700" fill="var(--fg)">'+M.title+'</text><text x="240" y="256" text-anchor="middle" font-size="12.5" fill="var(--muted)">'+M.center+'</text></svg>';
+ var nd=N[mapSel],refs=(nd.r||[]).map(function(i){return '<li>'+esc(REFS[i-1])+(BOOKREFS.indexOf(i)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('');
+ var parts=PARTS.map(function(p,i){return '<details class="part"><summary><span class="n">'+String(i+1).padStart(2,'0')+'</span>'+esc(p[0])+'</summary><div class="bd"><p>'+esc(p[1])+'</p>'+(p[2].length?'<ul class="refs" style="margin:0;padding-left:18px">'+p[2].map(function(n){return '<li>'+esc(REFS[n-1])+(BOOKREFS.indexOf(n)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('')+'</ul>':'')+'</div></details>'}).join('');
+ var tabs=MAPTABS.map(function(t){return '<button data-kind="'+t[0]+'" aria-pressed="'+(mapKind===t[0])+'">'+t[1]+'</button>'}).join('');
+ var sw=mapKind==='closed'?'<button class="btn ghost sm" data-kind="open">열린 순환 보기</button>':mapKind==='open'?'<button class="btn ghost sm" data-kind="closed">닫힌 순환 보기</button>':'';
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">사유의 지도</div><h1>사고의 순환 지도</h1><p class="lead">물질에서 마음, 행동, 사회까지. 개인 층위와 사회 층위는 같은 구조입니다. 그리고 같은 느린 사고도 “내가 맞다”에서 출발하면 닫힌 순환, “내가 틀릴 수도 있다”에서 출발하면 열린 순환이 됩니다. 각 단계를 눌러 그 자리에서 던질 질문을 확인하세요.</p></header>'+
+ '<div class="row" style="margin-bottom:12px"><div class="seg" role="group" aria-label="지도 선택">'+tabs+'</div></div>'+
+ '<div class="mapbox">'+svg+'</div>'+(M.note?'<p class="hint" style="margin-top:10px">'+esc(M.note)+'</p>':'')+(sw?'<div class="row" style="margin-top:8px">'+sw+'</div>':'')+
+ '<div class="detail" style="margin:18px 0"><div class="eyebrow">'+(mapSel+1)+' / '+N.length+(nd.ch?'  ·  책 '+esc(nd.ch.join(', ')):'')+'</div><h3>'+esc(nd.n)+'</h3><p>'+esc(nd.d)+'</p><div class="quote">잠깐! '+esc(nd.q)+'</div>'+(refs?'<ul class="refs" style="margin:0;padding-left:18px">'+refs+'</ul>':'')+
  '<div class="row"><button class="btn sm" data-act="mapDebug">이 질문으로 내 생각 검토하기</button></div></div>'+
  '<div class="insight"><div class="eyebrow">한 줄로 읽으면</div><h3 style="margin-top:6px">개인 층위와 사회 층위는 같은 그림이다.</h3><p style="margin-top:8px">작은 것들이 쌓이면 합과는 다른 ‘하나’가 나타나고, 그 ‘하나’는 다시 작은 것들의 다음 모습을 결정합니다. 요소가 입자·세포·뉴런이면 물질과 생명의 이야기, 한 사람의 생각과 행동이면 사회의 이야기입니다. 두 순환이 만나는 자리가 인간입니다.</p><div class="formula">'+SAME+'</div></div>'+
- '<h2 style="margin:34px 0 12px">깊이 읽기</h2><div class="sec">'+parts+'</div>'+
+ '<h2 style="margin:34px 0 8px">깊이 읽기</h2><p class="hint" style="margin-bottom:12px">책 1장이 말하는 인식의 5단계 순환은 '+ROOTS5.join(' → ')+'입니다. 위 지도의 개인 층위는 이를 8단계로 풀어 쓴 것입니다.</p><div class="sec">'+parts+'</div>'+
  '<div class="grid2" style="margin-top:22px"><div class="known"><h3>비교적 확실하게 알려진 것</h3><ul>'+KNOWN.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div><div class="open"><h3>아직 열린 질문</h3><ul>'+OPEN.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div></div>'+
  '<p class="hint" style="margin-top:12px">과학적 사실과 철학적 해석은 섞지 않습니다. 마지막 두 질문은 특히 구분해서 접근해야 하는 영역입니다. 그리고 이 구조는 “아래 단계가 위 단계를 일방적으로 만든다”가 아니라 “서로 다른 층위가 상호작용하며 하나의 복잡한 시스템을 이룬다”로 읽어야 합니다.</p>'+
- '<details class="part" style="margin-top:22px"><summary>전체 참고문헌 ('+REFS.length+')</summary><div class="bd"><ol class="refs" style="padding-left:20px;margin:0">'+REFS.map(function(r){return '<li>'+esc(r)+'</li>'}).join('')+'</ol></div></details>';
+ '<details class="part" style="margin-top:22px"><summary>전체 참고문헌 ('+REFS.length+')</summary><div class="bd"><ol class="refs" style="padding-left:20px;margin:0">'+REFS.map(function(r,i){return '<li>'+esc(r)+(BOOKREFS.indexOf(i+1)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('')+'</ol></div></details>';
 }
 
 /* ---------- 뷰: 책과 함께 ---------- */
 function vBook(){
- var title=CONFIG.bookTitle?'《'+esc(CONFIG.bookTitle)+'》':'도서';
- var chs=CONFIG.chapters.length?'<div class="sec"><span class="label">장 선택</span><div class="chips">'+CONFIG.chapters.map(function(c,i){return '<button class="chip" data-ch="'+i+'">'+esc(c.title)+'</button>'}).join('')+'</div></div>':'';
- return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">책과 함께</div><h1>밑줄을 질문으로</h1><p class="lead">'+title+'을 읽다가 마음에 걸린 문장을 적어 보세요. 그 문장이 내 안에서 어떤 생각을 켜는지 디버깅으로 이어 갑니다.</p></header>'+
- '<div class="card">'+chs+'<div class="sec"><span class="label">장 또는 쪽수 (선택)</span><input type="text" id="bkWhere" placeholder="예: 3장, p.84"></div>'+
- '<div class="sec"><span class="label">마음에 걸린 문장</span><textarea id="bkQuote" placeholder="책의 문장이나, 읽고 떠오른 내 생각을 적어 주세요"></textarea></div>'+
- '<div class="sec"><span class="label">이 문장과 닿아 있는 사회문제</span><div class="chips">'+ISSUES.map(function(x){return '<button class="chip" data-bkissue="'+esc(x)+'" aria-pressed="false">'+esc(x)+'</button>'}).join('')+'</div><input type="text" id="bkIssue" placeholder="직접 입력"></div>'+
- '<div class="row end"><span class="note">저작권을 위해 긴 인용은 피하고 한두 문장만 적어 주세요.</span><button class="btn" data-act="bookGo">디버깅으로 가져가기</button></div></div>'+
- '<div class="card" style="margin-top:18px"><h3>읽기 전후 질문</h3><ul class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>읽기 전 — 이 주제에 대해 나는 “원래” 어떻게 생각해 왔는가?</li><li>읽는 중 — 어느 문장에서 마음이 불편하거나 반가웠는가?</li><li>읽은 뒤 — 책 때문에 바뀐 것과 바뀌지 않은 것은 무엇인가?</li><li>함께 읽기 — 같은 문장을 다르게 읽은 사람은 누구인가?</li></ul></div>'+
- (CONFIG.purchaseUrl?'<p style="margin-top:16px"><a href="'+esc(CONFIG.purchaseUrl)+'" target="_blank" rel="noopener">'+title+' 안내 보기</a></p>':'');
+ var groups=PARTS_BOOK.map(function(pn,pi){
+  var cs=CHAPTERS.map(function(c,i){return [c,i]}).filter(function(x){return x[0].part===pi});
+  return '<div class="sec"><span class="label">'+esc(pn)+'</span><div class="chips">'+cs.map(function(x){return '<button class="chip" aria-pressed="'+(curCh===x[1])+'" data-ch="'+x[1]+'">'+esc(x[0].label)+'</button>'}).join('')+'</div></div>';
+ }).join('');
+ var c=curCh>=0?CHAPTERS[curCh]:null,det='';
+ if(c){
+  var go=c.go||'quick',goLabel={quick:'빠른 디버깅 열기',deep:'깊은 디버깅 열기',canvas:'미래 설계 열기'}[go]||'지도에서 보기';
+  det='<div class="detail" style="margin:16px 0"><div class="eyebrow">'+esc(PARTS_BOOK[c.part])+' · '+esc(c.label)+'</div><h3>'+esc(c.title)+'</h3><div class="quote">“'+esc(c.quote)+'”</div><p><b>뿌리 노트</b> '+esc(c.root)+'</p>'+
+  (c.qs.length?'<div class="sec"><span class="label">생각해 볼 질문 — 눌러서 아래 칸으로 가져가기</span>'+c.qs.map(function(q,i){return '<button class="chip qchip" data-bq="'+i+'">'+esc(q)+'</button>'}).join('')+'</div>':'')+
+  (c.lab?'<p class="hint"><b>관점 전환 실험실</b> '+esc(c.lab)+'</p>':'')+
+  '<div class="row"><button class="btn sm" data-act="chGo">'+goLabel+'</button></div></div>';
+ }
+ var gl=GLOSSARY.map(function(g){return '<details class="part"><summary>'+esc(g[0])+'</summary><div class="bd"><p>'+esc(g[1])+'</p></div></details>'}).join('');
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">책과 함께</div><h1>밑줄을 질문으로</h1><p class="lead">《'+esc(CONFIG.bookTitle)+'》'+(CONFIG.author?' · '+esc(CONFIG.author)+' 지음':'')+(CONFIG.publisher?' · '+esc(CONFIG.publisher):'')+'. 읽고 있는 장을 고르면 그 장의 질문과 실험이 나옵니다. 마음에 걸린 문장은 디버깅으로 이어 갑니다.</p></header>'+
+ '<div class="card">'+groups+det+
+ '<div class="sec"><span class="label">장 또는 쪽수</span><input type="text" id="bkWhere" placeholder="예: 3장, p.84" value="'+esc(bk.w)+'"></div>'+
+ '<div class="sec"><span class="label">마음에 걸린 문장 또는 내 생각</span><textarea id="bkQuote" placeholder="책의 문장이나, 읽고 떠오른 내 생각을 적어 주세요">'+esc(bk.q)+'</textarea></div>'+
+ '<div class="sec"><span class="label">이 문장과 닿아 있는 사회문제 (선택)</span><div class="chips">'+ISSUES.map(function(x){return '<button class="chip" data-bkissue="'+esc(x)+'" aria-pressed="'+(bk.i===x)+'">'+esc(x)+'</button>'}).join('')+'</div><input type="text" id="bkIssue" placeholder="직접 입력" value="'+esc(bk.i)+'"></div>'+
+ '<div class="row end"><span class="note">긴 인용은 피하고 한두 문장만 적어 주세요.</span><button class="btn" data-act="bookGo">디버깅으로 가져가기</button></div></div>'+
+ '<h2 style="margin:30px 0 12px">핵심 용어집</h2><div class="sec">'+gl+'</div>'+
+ '<div class="card" style="margin-top:22px"><h3>읽기 전후 질문</h3><ul class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>읽기 전 — 이 주제에 대해 나는 “원래” 어떻게 생각해 왔는가?</li><li>읽는 중 — 어느 문장에서 마음이 불편하거나 반가웠는가?</li><li>읽은 뒤 — 책 때문에 바뀐 것과 바뀌지 않은 것은 무엇인가?</li><li>함께 읽기 — 같은 문장을 다르게 읽은 사람은 누구인가?</li></ul></div>'+
+ (CONFIG.purchaseUrl?'<p style="margin-top:16px"><a href="'+esc(CONFIG.purchaseUrl)+'" target="_blank" rel="noopener">도서 안내 보기</a></p>':'');
+}
+
+/* ---------- 뷰: 미래 설계 ---------- */
+function cv(k,ph,h){return '<textarea data-cv="'+k+'" id="cv_'+k+'" placeholder="'+esc(ph||'')+'"'+(h?' style="min-height:'+h+'px"':'')+'>'+esc(DB.canvas[k]||'')+'</textarea>'}
+function canvasText(){var c=DB.canvas;return ['[미래 설계 캔버스]'].concat(CANVAS.map(function(x,i){return (i+1)+'. '+x[0]+': '+(c['c'+i]||'')})).concat(['','[30일 미래 실험 카드]']).concat(CARD.map(function(x,i){return x[0]+': '+(c['e'+i]||'')})).concat(['','[미래 설계 선언문]']).concat(DECL.map(function(x,i){return x+'\n→ '+(c['d'+i]||'')})).join('\n')}
+function vCanvas(){
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">미래 설계</div><h1>완벽한 계획보다 작은 실험</h1><p class="lead">책 19장의 5단계 캔버스와 30일 미래 실험 카드, 에필로그의 선언문입니다. 미래는 서류함 속의 완벽한 계획서가 아니라 작은 시제품을 반복하며 배우는 사람들의 손에서 태어납니다. 비워 둔 칸이 있어도 괜찮습니다. 내용은 이 기기에 자동 저장됩니다.</p></header>'+
+ '<div class="card"><h2>5단계 미래 설계 캔버스</h2>'+CANVAS.map(function(x,i){return '<div class="sec"><span class="label">STEP '+(i+1)+'. '+esc(x[0])+'</span><span class="hint">'+esc(x[1])+'</span>'+cv('c'+i,'',72)+'</div>'}).join('')+'</div>'+
+ '<div class="card" style="margin-top:18px"><h2>30일 미래 실험 카드</h2><p class="hint">실패란 목표를 이루지 못한 상태가 아니라, 배움을 얻지 못한 채 멈춰 선 상태입니다.</p>'+CARD.map(function(x,i){return '<div class="sec"><span class="label">'+(i+1)+'. '+esc(x[0])+'</span><span class="hint">'+esc(x[1])+'</span>'+cv('e'+i,'',64)+'</div>'}).join('')+'</div>'+
+ '<div class="card" style="margin-top:18px"><h2>미래 문명을 떠받치는 다섯 기둥</h2><div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">'+PILLARS.map(function(p){return '<div class="box"><b>'+esc(p[0])+'</b>'+esc(p[1])+'</div>'}).join('')+'</div><p class="hint">다섯 기둥은 순서대로 세우는 단계가 아니라 동시에 존재해야 하는 생태계입니다. 아래 선언문의 괄호를 나만의 말로 채워 보세요.</p>'+
+ DECL.map(function(x,i){return '<div class="sec"><span class="label">'+esc(x)+'</span>'+cv('d'+i,'괄호 안에 들어갈 내 말',56)+'</div>'}).join('')+
+ '<div class="row"><button class="btn ghost" data-act="copyCanvas">전체 복사</button><button class="btn ghost" data-act="saveCanvas">파일로 저장</button><span class="note" id="cvMsg" role="status"></span></div></div>';
 }
 
 /* ---------- 뷰: 내 기록 ---------- */
-function recText(r){var f=r.f||{};return ['[잠깐! 진짜?] 나의 사고 디버깅 기록 ('+r.date+')','사회문제: '+r.issue,'처음 생각: '+r.thought,r.source?'책에서 가져온 문장: '+r.source:'','자동으로 작동하던 틀: '+(f.before||''),'새로 열어 본 해석: '+(f.after||''),'나의 선택: '+(f.q5||''),'계속 품고 갈 질문: '+(f.keep||''),'작은 실험: '+(f.action||''),'예상: '+(f.pred||''),'실제 경험: '+(f.real||''),'새로운 발견: '+(f.found||'')].filter(Boolean).join('\n')}
+function recText(r){
+ var f=r.f||{},b0=f.belief0,b1=f.belief1,has=function(v){return v!=null&&v!==''};
+ return ['[잠깐! 진짜?] 나의 사고 디버깅 기록 ('+r.date+')',r.issue?'사회문제: '+r.issue:'','처음 생각: '+r.thought,r.source?'가져온 곳: '+r.source:'',has(b0)?'처음 확신도: '+b0+'%':'',
+  f.q1fact?'확인한 사실: '+f.q1fact:'',f.q1interp?'내 해석: '+f.q1interp:'',f.q2?'꼭 그래야 해?: '+f.q2:'',f.q4a?'다르게 보면: '+f.q4a:'',f.gap?'생각의 틈(다른 가능성): '+f.gap:'',
+  f.before?'자동으로 작동하던 틀: '+f.before:'',f.after?'새로 열어 본 해석: '+f.after:'',f.q5?'나의 선택: '+f.q5:'',f.keep?'계속 품고 갈 질문: '+f.keep:'',
+  f.action?'작은 선택/실험: '+f.action:'',f.signal?'3초 멈춤 신호: '+f.signal:'',f.pred?'예상: '+f.pred:'',f.real?'실제 경험: '+f.real:'',f.found?'새로운 발견: '+f.found:'',f.obs?'관찰 지표: '+f.obs:'',f.failLearn?'실패의 데이터화: '+f.failLearn:'',
+  has(b1)?'지금 확신도: '+b1+'%':'',has(f.dist)?'생각과 나 사이의 거리: '+f.dist+' / 5':''].filter(Boolean).join('\n');
+}
 function vNotes(){
  var rs=DB.records.slice().reverse();
- var list=rs.length?rs.map(function(r){return '<div class="rec"><div class="row end"><b>'+esc(r.issue)+'</b><span class="note">'+esc(r.date)+'</span></div><div class="hint">“'+esc(r.thought)+'”</div><details><summary class="hint" style="cursor:pointer">전체 보기</summary><pre>'+esc(recText(r))+'</pre></details><div class="row"><button class="btn ghost sm" data-copy="'+r.id+'">복사</button><button class="btn ghost sm" data-resume="'+r.id+'">이어 쓰기</button><button class="btn ghost sm" data-del="'+r.id+'">삭제</button></div></div>'}).join(''):'<p class="lead">아직 저장한 기록이 없습니다. 디버깅을 마치면 여기에 모입니다.</p>';
- return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">내 기록</div><h1>생각이 달라진 자리</h1><p class="lead">이 기기의 브라우저에만 저장됩니다. 브라우저 데이터를 지우면 사라지니 중요한 기록은 내려받아 보관하세요.</p></header>'+
+ var list=rs.length?rs.map(function(r){var f=r.f||{},sh=(f.belief0!=null&&f.belief0!==''&&f.belief1!=null&&f.belief1!=='')?'<span class="tag">확신 '+esc(f.belief0)+'% → '+esc(f.belief1)+'%</span>':'',ds=(f.dist!=null&&f.dist!=='')?'<span class="tag">거리 '+esc(f.dist)+' / 5</span>':'';
+  return '<div class="rec"><div class="row end"><b>'+esc(r.issue||'자유 주제')+'</b><span class="note">'+esc(r.date)+'</span></div><div class="hint">“'+esc(r.thought)+'”</div>'+((sh||ds)?'<div class="row">'+sh+ds+'</div>':'')+'<details><summary class="hint" style="cursor:pointer">전체 보기</summary><pre>'+esc(recText(r))+'</pre></details><div class="row"><button class="btn ghost sm" data-copy="'+r.id+'">복사</button><button class="btn ghost sm" data-resume="'+r.id+'">이어 쓰기</button><button class="btn ghost sm" data-del="'+r.id+'">삭제</button></div></div>'}).join(''):'<p class="lead">아직 저장한 기록이 없습니다. 디버깅을 마치면 여기에 모입니다.</p>';
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">내 기록</div><h1>생각이 달라진 자리</h1><p class="lead">이 기기의 브라우저에만 저장됩니다. 확신도가 내려가지 않아도 괜찮습니다. 생각과 나 사이에 틈이 생겼는지를 살펴보세요. 브라우저 데이터를 지우면 사라지니 중요한 기록은 내려받아 보관하세요.</p></header>'+
  '<div class="row" style="margin-bottom:14px"><button class="btn ghost sm" data-act="exportJson"'+(rs.length?'':' disabled')+'>JSON 내려받기</button><button class="btn ghost sm" data-act="exportTxt"'+(rs.length?'':' disabled')+'>텍스트 내려받기</button><button class="btn ghost sm" data-act="importJson">불러오기</button><input type="file" id="imp" accept="application/json" hidden></div>'+
  '<div class="sec">'+list+'</div><div class="note" id="notesMsg" style="margin-top:12px" role="status"></div>';
 }
 
 /* ---------- 라우팅 / 렌더 ---------- */
-var ROUTES=['home','debug','map','book','notes'],ROUTE='home';
+var ROUTES=['home','debug','map','book','canvas','notes'],ROUTE='home';
 try{var h0=(location.hash||'').replace('#/','').replace('#','');if(ROUTES.indexOf(h0)>=0)ROUTE=h0}catch(e){}
 function route(){return ROUTE}
 function setRoute(r){ROUTE=r;errMsg='';render();window.scrollTo({top:0})}
+var pt=null;
+function startPause(){
+ clearInterval(pt);var b=$('#pauseGo');if(!b)return;var n=4;b.disabled=true;b.textContent='숨을 쉬는 중… '+n;
+ pt=setInterval(function(){n--;var x=$('#pauseGo');if(!x){clearInterval(pt);return}if(n<=0){clearInterval(pt);x.disabled=false;x.textContent='계속하기';x.focus()}else x.textContent='숨을 쉬는 중… '+n},1000);
+}
 function render(){
  var r=route();
  document.querySelectorAll('.top a.tab').forEach(function(a){if(a.dataset.r===r)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
  var c0=$('#cf');if(c0){c0.hidden=true;pend=null}
- $('#view').innerHTML={home:vHome,debug:vDebug,map:vMap,book:vBook,notes:vNotes}[r]();
- if(r==='debug')aiAvailable().then(function(ok){if(!ok)document.querySelectorAll('[data-ai]').forEach(function(b){b.hidden=true})});
+ clearInterval(pt);
+ $('#view').innerHTML={home:vHome,debug:vDebug,map:vMap,book:vBook,canvas:vCanvas,notes:vNotes}[r]();
+ if(r==='debug'){
+  if(isPause()&&!busy)startPause();
+  aiAvailable().then(function(ok){if(!ok)document.querySelectorAll('[data-ai]').forEach(function(b){b.hidden=true})});
+ }
 }
-function go(n){S.step=n;errMsg='';save();render();window.scrollTo({top:0})}
+function go(n){S.step=n;S.pause=false;errMsg='';save();render();window.scrollTo({top:0})}
 async function dl(name,text,type){
- try{var d=await claude.use('downloads');if(d){await d.save({filename:name,data:text});return}}catch(e){if(e&&e.code==='declined')return}
- try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}catch(e){}
- var m=$('#notesMsg');if(m)m.innerHTML='내려받기를 사용할 수 없어 아래에 내용을 표시합니다. 전체 선택해 복사하세요.<textarea readonly style="min-height:140px;margin-top:8px">'+esc(text)+'</textarea>'
+ try{var d=await claude.use('downloads');if(d){await d.save({filename:name,data:text});return true}}catch(e){if(e&&e.code==='declined')return false}
+ try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);return true}catch(e){}
+ return false;
 }
+function showText(el,t){if(el)el.innerHTML='내려받기를 사용할 수 없어 아래에 내용을 표시합니다. 전체 선택해 복사하세요.<textarea readonly style="min-height:140px;margin-top:8px">'+esc(t)+'</textarea>'}
 var pend=null;
 function ask2(msg,fn){pend=fn;var c=$('#cf');c.hidden=false;c.innerHTML=esc(msg)+' <button class="btn sm" data-cf="y">확인</button> <button class="btn ghost sm" data-cf="n">취소</button>';c.scrollIntoView({block:'nearest'})}
 function say(m){var e=$('#notesMsg');if(e)e.textContent=m}
-function copy(t,after){(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){after('복사했습니다.')}).catch(function(){var m=$('#notesMsg');if(m)m.innerHTML='복사하지 못했습니다. 아래 내용을 선택해 복사하세요.<textarea readonly style="min-height:120px;margin-top:8px">'+esc(t)+'</textarea>'})}
+function copy(t,after,box){(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){after('복사했습니다.')}).catch(function(){var m=box||$('#notesMsg');if(m)m.innerHTML='복사하지 못했습니다. 아래 내용을 선택해 복사하세요.<textarea readonly style="min-height:120px;margin-top:8px">'+esc(t)+'</textarea>'})}
 function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
+/* ---------- 이벤트 ---------- */
 document.addEventListener('input',function(e){
  var t=e.target;
- if(t.id==='thoughtIn'){S.thought=t.value;save();var g=$('#go0');if(g)g.disabled=!(S.issue.trim()&&S.thought.trim().length>3)}
- else if(t.id==='issueIn'){S.issue=t.value.trim();document.querySelectorAll('[data-issue]').forEach(function(b){b.setAttribute('aria-pressed','false')});save();var g2=$('#go0');if(g2)g2.disabled=!(S.issue&&S.thought.trim().length>3)}
+ if(t.id==='thoughtIn'){S.thought=t.value;save();var g=$('#go0');if(g)g.disabled=!(S.mode==='quick'?S.thought.trim().length>3:(S.issue.trim()&&S.thought.trim().length>3))}
+ else if(t.id==='issueIn'){S.issue=t.value.trim();document.querySelectorAll('[data-issue]').forEach(function(b){b.setAttribute('aria-pressed','false')});save();var g2=$('#go0');if(g2)g2.disabled=!(S.mode==='quick'?S.thought.trim().length>3:(S.issue&&S.thought.trim().length>3))}
  else if(t.id==='customPat'){S.customPat=t.value;save()}
- else if(t.dataset&&t.dataset.f){S.f[t.dataset.f]=t.value;save()}
+ else if(t.id==='bkWhere'){bk.w=t.value}
+ else if(t.id==='bkQuote'){bk.q=t.value}
+ else if(t.id==='bkIssue'){bk.i=t.value;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed','false')})}
+ else if(t.dataset&&t.dataset.cv){DB.canvas[t.dataset.cv]=t.value;save()}
+ else if(t.dataset&&t.dataset.f){
+  S.f[t.dataset.f]=t.value;save();
+  if(t.type==='range'){var o=$('#o_'+t.dataset.f);if(o)o.textContent=t.value+(t.dataset.unit||'')}
+ }
 });
 document.addEventListener('change',function(e){
  if(e.target.id!=='imp')return;
  var f=e.target.files[0];if(!f)return;var rd=new FileReader();
- rd.onload=function(){try{var d=JSON.parse(rd.result);if(!Array.isArray(d))throw 0;var have={};DB.records.forEach(function(r){have[r.id]=1});var n=0;d.forEach(function(r){if(r&&r.id&&r.issue&&!have[r.id]){DB.records.push({id:String(r.id),date:String(r.date||''),issue:String(r.issue),thought:String(r.thought||''),source:String(r.source||''),f:(r.f&&typeof r.f==='object')?r.f:{}});n++}});save();render();say(n+'개의 기록을 불러왔습니다.')}catch(x){say('파일을 읽지 못했습니다. 이 앱에서 내려받은 JSON인지 확인해 주세요.')}};
+ rd.onload=function(){try{var d=JSON.parse(rd.result);if(!Array.isArray(d))throw 0;var have={};DB.records.forEach(function(r){have[r.id]=1});var n=0;d.forEach(function(r){if(r&&r.id&&(r.thought||r.issue)&&!have[r.id]){DB.records.push({id:String(r.id),date:String(r.date||''),issue:String(r.issue||''),thought:String(r.thought||''),source:String(r.source||''),mode:r.mode||'',f:(r.f&&typeof r.f==='object')?r.f:{}});n++}});save();render();say(n+'개의 기록을 불러왔습니다.')}catch(x){say('파일을 읽지 못했습니다. 이 앱에서 내려받은 JSON인지 확인해 주세요.')}};
  rd.readAsText(f);
 });
 document.addEventListener('keydown',function(e){var n=e.target.closest&&e.target.closest('[data-node]');if(n&&(e.key==='Enter'||e.key===' ')){e.preventDefault();mapSel=+n.dataset.node;render()}});
+function chGo(c){
+ var g=c.go||'quick';
+ if(g==='quick'||g==='deep'){S=DB.draft=blank();S.mode=g;if(c.issue&&g==='deep')S.issue=c.issue;S.source='《'+CONFIG.bookTitle+'》 '+c.label;save();setRoute('debug')}
+ else if(g==='canvas')setRoute('canvas');
+ else if(g.indexOf('map:')===0){mapKind=g.slice(4);mapSel=0;setRoute('map')}
+}
 document.addEventListener('click',function(e){
  var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
  var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
- var el=e.target.closest('[data-issue],[data-pat],[data-go],[data-act],[data-node],[data-kind],[data-starter],[data-exp],[data-copy],[data-del],[data-resume],[data-ch],[data-bkissue]');
+ var el=e.target.closest('[data-issue],[data-pat],[data-go],[data-act],[data-node],[data-kind],[data-starter],[data-exp],[data-ex],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-mode]');
  if(!el)return;var d=el.dataset;
+ if(d.mode){if(S.mode!==d.mode){S.mode=d.mode;S.step=0;S.pause=false;save();render()}return}
+ if(d.ex!==undefined){var t=$('#thoughtIn');if(t){t.value=d.ex;S.thought=d.ex;save();var g0=$('#go0');if(g0)g0.disabled=false}return}
  if(d.issue!==undefined){S.issue=d.issue;var it=$('#issueIn');if(it)it.value='';document.querySelectorAll('[data-issue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});var g=$('#go0');if(g)g.disabled=!(S.issue&&S.thought.trim().length>3);save();return}
  if(d.pat){var k=S.picked.indexOf(d.pat);if(k>=0)S.picked.splice(k,1);else S.picked.push(d.pat);S.f.before=null;el.setAttribute('aria-pressed',String(k<0));save();return}
- if(d.go!==undefined){go(+d.go);return}
+ if(d.go!==undefined){var tg=+d.go;if(tg>0&&S.step===0&&!(S.thought.trim().length>3&&(S.mode==='quick'||S.issue.trim())))return;go(tg);return}
  if(d.node!==undefined){mapSel=+d.node;render();return}
  if(d.kind){mapKind=d.kind;mapSel=0;render();return}
  if(d.starter){var a=$('[data-f="after"]');if(a){a.value=(a.value?a.value+'\n':'')+d.starter;S.f.after=a.value;save();a.focus()}return}
  if(d.exp){var x=$('[data-f="action"]');if(x){x.value=d.exp;S.f.action=d.exp;save()}return}
  if(d.copy){var r=DB.records.filter(function(r){return r.id===d.copy})[0];if(r)copy(recText(r),say);return}
  if(d.del){ask2('이 기록을 삭제할까요? 되돌릴 수 없습니다.',function(){DB.records=DB.records.filter(function(r){return r.id!==d.del});save();render()});return}
- if(d.resume){var rr=DB.records.filter(function(r){return r.id===d.resume})[0];if(rr){S=DB.draft=Object.assign(blank(),{step:5,issue:rr.issue,thought:rr.thought,source:rr.source||'',f:Object.assign({},rr.f)});save();setRoute('debug')}return}
- if(d.ch!==undefined){var c=CONFIG.chapters[+d.ch];$('#bkWhere').value=c.title;if(c.question)$('#bkQuote').placeholder=c.question;if(c.issue)$('#bkIssue').value=c.issue;return}
- if(d.bkissue){$('#bkIssue').value=d.bkissue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});return}
+ if(d.resume){var rr=DB.records.filter(function(r){return r.id===d.resume})[0];if(rr){var m=rr.mode||(rr.f&&(rr.f.pred||rr.f.before)?'deep':'quick');S=DB.draft=Object.assign(blank(),{mode:m,step:m==='quick'?4:5,issue:rr.issue,thought:rr.thought,source:rr.source||'',f:Object.assign({},rr.f)});save();setRoute('debug')}return}
+ if(d.ch!==undefined){curCh=+d.ch;var c=CHAPTERS[curCh];if(!bk.w)bk.w='';bk.w=c.label==='프롤로그'||c.label==='에필로그'?c.label:c.label;render();return}
+ if(d.bq!==undefined){var q=CHAPTERS[curCh].qs[+d.bq];bk.q=q;var qt=$('#bkQuote');if(qt){qt.value=q;qt.focus()}var c2=CHAPTERS[curCh];if(c2.issue&&!bk.i){bk.i=c2.issue;var bi=$('#bkIssue');if(bi)bi.value=c2.issue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.bkissue===c2.issue))})}return}
+ if(d.bkissue){bk.i=d.bkissue;var bi2=$('#bkIssue');if(bi2)bi2.value=d.bkissue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});return}
  var act=d.act;
- if(act==='back')go(Math.max(0,S.step-1));
- else if(act==='next'){var n=Math.min(STEPS.length-1,S.step+1);if(n===5&&S.step===4&&!S.f.after){ask2('새로운 해석을 비워 둔 채로 넘어갈까요?',function(){go(5)});return}go(n)}
+ if(act==='back'){go(S.mode==='quick'&&S.step===2?0:Math.max(0,S.step-1))}
+ else if(act==='next'){
+  if(S.step===0&&S.mode==='deep'&&!S.pause){S.pause=true;save();render();window.scrollTo({top:0});return}
+  var n=Math.min(steps().length-1,S.step+1);
+  if(S.mode==='deep'&&n===5&&S.step===4&&!S.f.after){ask2('새로운 해석을 비워 둔 채로 넘어갈까요?',function(){go(5)});return}
+  go(n)}
+ else if(act==='pauseGo'){if(S.mode==='quick')go(2);else{S.pause=false;go(1)}}
+ else if(act==='toDeep'){S.mode='deep';save();go(0)}
  else if(act==='ai-define')runAI('define');
+ else if(act==='ai-mirror')runAI('mirror');
  else if(act==='ai-reframe')runAI('reframe');
- else if(act==='restart'){ask2('지금까지 쓴 내용을 지우고 새로 시작할까요? (저장한 기록은 유지됩니다)',function(){S=DB.draft=blank();save();render();window.scrollTo({top:0})})}
- else if(act==='saveRec'){DB.records.push({id:Date.now().toString(36),date:today(),issue:S.issue,thought:S.thought,source:S.source,f:Object.assign({},S.f)});S=DB.draft=blank();save();setRoute('notes')}
- else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];S.issue=S.issue||'';S.source=nd.n+' — 잠깐! '+nd.q;save();setRoute('debug');go(0)}
- else if(act==='bookGo'){var q=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q){$('#bkQuote').focus();return}S=DB.draft=blank();S.thought=q;S.issue=iss;S.source=(w?w+' · ':'')+(CONFIG.bookTitle?'《'+CONFIG.bookTitle+'》':'책');save();setRoute('debug')}
- else if(act==='exportJson')dl('잠깐진짜_기록_'+today()+'.json',JSON.stringify(DB.records,null,2),'application/json');
- else if(act==='exportTxt')dl('잠깐진짜_기록_'+today()+'.txt',DB.records.map(recText).join('\n\n----------------\n\n'),'text/plain');
+ else if(act==='restart'){ask2('지금까지 쓴 내용을 지우고 새로 시작할까요? (저장한 기록은 유지됩니다)',function(){var m=S.mode;S=DB.draft=blank();S.mode=m;save();render();window.scrollTo({top:0})})}
+ else if(act==='saveRec'){DB.records.push({id:Date.now().toString(36),date:today(),issue:S.issue,thought:S.thought,source:S.source,mode:S.mode,f:Object.assign({},S.f)});var m2=S.mode;S=DB.draft=blank();S.mode=m2;save();setRoute('notes')}
+ else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];S.source='지도 · '+nd.n+' — 잠깐! '+nd.q;save();setRoute('debug');go(0)}
+ else if(act==='bookGo'){var q2v=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q2v){$('#bkQuote').focus();return}S=DB.draft=blank();S.mode=iss?'deep':'quick';S.thought=q2v;S.issue=iss;S.source='《'+CONFIG.bookTitle+'》'+(w?' '+w:'');save();bk={q:'',w:'',i:''};setRoute('debug')}
+ else if(act==='chGo'){chGo(CHAPTERS[curCh])}
+ else if(act==='copyCanvas'){copy(canvasText(),function(m){var e2=$('#cvMsg');if(e2)e2.textContent=m},$('#cvMsg'))}
+ else if(act==='saveCanvas'){dl('미래설계_'+today()+'.txt',canvasText(),'text/plain').then(function(ok){if(!ok)showText($('#cvMsg'),canvasText())})}
+ else if(act==='exportJson'){var jt=JSON.stringify(DB.records,null,2);dl('잠깐진짜_기록_'+today()+'.json',jt,'application/json').then(function(ok){if(!ok)showText($('#notesMsg'),jt)})}
+ else if(act==='exportTxt'){var tt=DB.records.map(recText).join('\n\n----------------\n\n');dl('잠깐진짜_기록_'+today()+'.txt',tt,'text/plain').then(function(ok){if(!ok)showText($('#notesMsg'),tt)})}
  else if(act==='importJson')$('#imp').click();
 });
 render();
