@@ -817,12 +817,17 @@ function vHome(){
 }
 
 /* ---------- 뷰: 순환 지도 ---------- */
-/* 개인 층위 도식(이미지) 위의 단계별 누름 영역: [중심x, 중심y, 너비, 높이] (원본 1483×1061 기준) */
-var PHOT=[[743,165,375,150],[1144,290,332,150],[1241,538,333,165],[1115,815,334,160],[741,920,342,160],[344,815,332,160],[233,541,334,173],[344,290,332,150]];
-function personalFig(){
- var W=1483,H=1061,N=MAP.personal.nodes;
- return '<div class="figwrap"><img src="assets/personal-cycle.webp" alt="개인 층위 도식: 외부 자극, 감각, 기억·감정·욕구, 해석, 생각, 판단·선택, 행동, 경험·결과로 이어지는 한 사람 안의 순환" width="1483" height="1061">'+
-  PHOT.map(function(h,i){var l=(h[0]-h[2]/2)/W*100,t=(h[1]-h[3]/2-35)/H*100,w=h[2]/W*100,hh=(h[3]+35)/H*100;
+/* 이미지 도식과 단계별 누름 영역: hot = [중심x, 중심y, 너비, 높이] (이미지 원본 픽셀 기준) */
+var FIGS={
+ personal:{src:'assets/personal-cycle.webp',w:1483,h:1061,alt:'개인 층위 도식: 외부 자극, 감각, 기억·감정·욕구, 해석, 생각, 판단·선택, 행동, 경험·결과로 이어지는 한 사람 안의 순환',
+  hot:[[743,165,375,150],[1144,290,332,150],[1241,538,333,165],[1115,815,334,160],[741,920,342,160],[344,815,332,160],[233,541,334,173],[344,290,332,150]]},
+ social:{src:'assets/social-cycle.webp',w:1451,h:1084,alt:'사회 층위 도식: 개인의 생각, 반복·습관, 집단의 행동, 문화·규범, 조직·제도, 사회 시스템, 환경, 새로운 경험으로 이어지는 사람과 시스템의 순환',
+  hot:[[730,163,334,163],[1065,269,336,162],[1231,521,348,172],[1115,838,344,175],[725,919,364,178],[318,775,357,175],[227,504,354,172],[413,268,333,164]]}
+};
+function mapFig(kind){
+ var F=FIGS[kind],N=MAP[kind].nodes;
+ return '<div class="figwrap"><img src="'+F.src+'" alt="'+esc(F.alt)+'" width="'+F.w+'" height="'+F.h+'">'+
+  F.hot.map(function(h,i){var l=(h[0]-h[2]/2)/F.w*100,t=(h[1]-h[3]/2-35*F.w/1483)/F.h*100,w=h[2]/F.w*100,hh=(h[3]+35*F.w/1483)/F.h*100;
    return '<button type="button" class="hot'+(i===mapSel?' sel':'')+'" data-node="'+i+'" aria-label="'+esc(N[i].n)+'" aria-pressed="'+(i===mapSel)+'" style="left:'+l.toFixed(2)+'%;top:'+t.toFixed(2)+'%;width:'+w.toFixed(2)+'%;height:'+hh.toFixed(2)+'%"></button>'}).join('')+'</div>';
 }
 function vMap(){
@@ -837,7 +842,7 @@ function vMap(){
  N.forEach(function(nd,i){var p=pts[i],w=Math.max(96,nd.n.length*16+26);
   svg+='<g class="node'+(i===mapSel?' sel':'')+'" data-node="'+i+'" tabindex="0" role="button" aria-label="'+esc(nd.n)+'" aria-pressed="'+(i===mapSel)+'"><rect x="'+(p[0]-w/2).toFixed(1)+'" y="'+(p[1]-18).toFixed(1)+'" width="'+w+'" height="36" rx="10"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+5).toFixed(1)+'">'+esc(nd.n)+'</text></g>'});
  svg+='<text x="240" y="232" text-anchor="middle" font-family="var(--font-display)" font-size="19" font-weight="700" fill="var(--fg)">'+M.title+'</text><text x="240" y="256" text-anchor="middle" font-size="12.5" fill="var(--muted)">'+M.center+'</text></svg>';
- if(mapKind==='personal')svg=personalFig();
+ if(FIGS[mapKind])svg=mapFig(mapKind);
  var nd=N[mapSel],refs=(nd.r||[]).map(function(i){return '<li>'+esc(REFS[i-1])+(BOOKREFS.indexOf(i)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('');
  var tabs=MAPTABS.map(function(t){return '<button data-kind="'+t[0]+'" aria-pressed="'+(mapKind===t[0])+'">'+t[1]+'</button>'}).join('');
  var sw=mapKind==='closed'?'<button class="btn ghost sm" data-kind="open">열린 순환 보기</button>':mapKind==='open'?'<button class="btn ghost sm" data-kind="closed">닫힌 순환 보기</button>':'';
