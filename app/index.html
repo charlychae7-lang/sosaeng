@@ -179,6 +179,9 @@ ul.plain{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
 .hot{position:absolute;border:0;background:transparent;border-radius:28px;cursor:pointer;padding:0}
 .hot:hover{background:rgba(11,110,110,.08)}
 .hot.sel{outline:3px solid var(--accent);outline-offset:-2px;background:rgba(11,110,110,.10)}
+.mapbox svg.loopsvg{max-width:780px}
+.lnode{cursor:pointer}.lnode:focus-visible rect{stroke:var(--accent);stroke-width:5}
+.lnode:hover rect{filter:brightness(.97)}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -830,6 +833,64 @@ function mapFig(kind){
   F.hot.map(function(h,i){var l=(h[0]-h[2]/2)/F.w*100,t=(h[1]-h[3]/2-35*F.w/1483)/F.h*100,w=h[2]/F.w*100,hh=(h[3]+35*F.w/1483)/F.h*100;
    return '<button type="button" class="hot'+(i===mapSel?' sel':'')+'" data-node="'+i+'" aria-label="'+esc(N[i].n)+'" aria-pressed="'+(i===mapSel)+'" style="left:'+l.toFixed(2)+'%;top:'+t.toFixed(2)+'%;width:'+w.toFixed(2)+'%;height:'+hh.toFixed(2)+'%"></button>'}).join('')+'</div>';
 }
+/* 닫힌·열린 순환: 사회 층위 도식 컨셉(알약 카드 + 아이콘 원 + 중앙 원)으로 그린 벡터 도식 */
+var ICONS={
+ scale:'M12 4v16M6 7h12M6 7l-3 6h6zM18 7l-3 6h6zM8 20h8',
+ mega:'M4 10v4h3l5 4V6l-5 4zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11',
+ lock:'M7 11V8a5 5 0 0110 0v3M5 11h14v9H5zM12 15v2',
+ group:'M12 7.5a2.5 2.5 0 100 .01M5.5 10a2 2 0 100 .01M18.5 10a2 2 0 100 .01M7 20v-3a5 5 0 0110 0v3M2 19v-2a3 3 0 013-3M22 19v-2a3 3 0 00-3-3',
+ warn:'M12 3l10 18H2zM12 10v5M12 18v.5',
+ doc:'M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h7',
+ eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z',
+ down:'M3 8l6 6 4-4 8 8M21 13v5h-5',
+ swap:'M4 12a8 8 0 0113-6l3 3M20 4v5h-5M20 12a8 8 0 01-13 6l-3-3M4 20v-5h5',
+ book:'M3 5h8a1 1 0 011 1v14a1 1 0 00-1-1H3zM21 5h-8a1 1 0 00-1 1v14a1 1 0 011-1h8z',
+ spark:'M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z',
+ sprout:'M12 21v-9M12 12c0-4 3-6 7-6 0 4-3 6-7 6zM12 14c0-3-2-5-6-5 0 3 2 5 6 5z'
+};
+var LOOPS={
+ closed:{title:'닫힌 순환',sub:['“내가 맞다”에서','출발'],icon:'lock',gapTo:0,gapNote:'틈을 열면 열린 순환으로',
+  colors:['#9A6B4F','#8E6C57','#826C63','#766B70','#6A6A7D','#5F6A89'],
+  nodes:[['scale','합리화',['기존 신념에 맞는','정보만 모은다']],['mega','편향 강화',['모은 정보로 결론을','정당화한다']],['lock','고착',['틀이 굳어 반대 증거를','밀어낸다']],['group','집단사고',['비판보다 동조와','합의가 앞선다']],['warn','오류의 사회화',['고집이 흔들리지 않는','상식이 된다']],['doc','공식 제도화',['편향된 상식이 규정과','절차가 된다']]]},
+ open:{title:'열린 순환',sub:['“내가 틀릴 수도 있다”','에서 출발'],icon:'sprout',gapTo:0,gapNote:'생각의 틈을 연다',
+  colors:['#3F7A63','#468471','#3F8A8A','#3F7C99','#5774A8','#6C6BB0'],
+  nodes:[['eye','성찰(메타인지)',['내가 틀릴 수도 있다고','다시 바라본다']],['down','편향 약화',['반대 정보와 다양한','관점을 살핀다']],['swap','관점 전환',['시야의 울타리를','넓힌다']],['book','새로운 학습',['새로운 지식과','관계를 배운다']],['spark','새로운 경험·시도',['작은 실험으로','시도한다']],['sprout','새 패턴 내면화',['더 나은 습관이','기본이 된다']]]}
+};
+function loopFig(kind){
+ var L=LOOPS[kind],N=MAP[kind].nodes,cx=630,cy=400,rx=385,ry=290,hw=132,hh=66,pad=8;
+ var pts=L.nodes.map(function(_,i){var a=-Math.PI/2+i*2*Math.PI/L.nodes.length;return [cx+rx*Math.cos(a),cy+ry*Math.sin(a)]});
+ var o='<svg class="loopsvg" viewBox="0 0 1260 800" role="group" aria-label="'+esc(L.title)+' 도식"><defs>'+
+  '<marker id="lar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker>'+
+  '<marker id="larg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--pause)"/></marker></defs>';
+ /* 중앙 */
+ o+='<circle cx="'+cx+'" cy="'+cy+'" r="168" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="3 7"/><circle cx="'+cx+'" cy="'+cy+'" r="142" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/>'+
+  '<g transform="translate('+(cx-29)+','+(cy-118)+') scale(2.4)" fill="none" stroke="'+L.colors[0]+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="'+ICONS[L.icon]+'"/></g>'+
+  '<text x="'+cx+'" y="'+(cy+22)+'" text-anchor="middle" font-family="var(--font-display)" font-size="44" font-weight="700" fill="var(--fg)">'+esc(L.title)+'</text>'+
+  '<line x1="'+(cx-70)+'" y1="'+(cy+40)+'" x2="'+(cx+70)+'" y2="'+(cy+40)+'" stroke="var(--line)"/>'+
+  L.sub.map(function(t,i){return '<text x="'+cx+'" y="'+(cy+72+i*27)+'" text-anchor="middle" font-size="21" fill="var(--muted)">'+esc(t)+'</text>'}).join('');
+ /* 화살표 */
+ pts.forEach(function(a,i){
+  var j=(i+1)%pts.length,b=pts[j],dx=b[0]-a[0],dy=b[1]-a[1],hw8=hw+pad,hh8=hh+pad;
+  var sa=Math.min(Math.abs(dx)>1e-6?hw8/Math.abs(dx):1e9,Math.abs(dy)>1e-6?hh8/Math.abs(dy):1e9);
+  var s0=[a[0]+dx*sa,a[1]+dy*sa],e0=[b[0]-dx*sa,b[1]-dy*sa];
+  if(s0[1]<a[1]-hh&&Math.abs(s0[0]-a[0])<40)s0[1]-=32;
+  if(e0[1]<b[1]-hh&&Math.abs(e0[0]-b[0])<40)e0[1]-=32;
+  var mx=(s0[0]+e0[0])/2,my=(s0[1]+e0[1])/2,ox=mx-cx,oy=my-cy,ol=Math.sqrt(ox*ox+oy*oy)||1,qx=mx+ox/ol*26,qy=my+oy/ol*26;
+  var gap=(j===L.gapTo);
+  o+='<path d="M'+s0[0].toFixed(1)+' '+s0[1].toFixed(1)+' Q'+qx.toFixed(1)+' '+qy.toFixed(1)+' '+e0[0].toFixed(1)+' '+e0[1].toFixed(1)+'" fill="none" stroke="'+(gap?'var(--pause)':'var(--muted)')+'" stroke-width="'+(gap?3:2.4)+'"'+(gap?' stroke-dasharray="8 6"':'')+' stroke-linecap="round" marker-end="url(#'+(gap?'larg':'lar')+')"/>';
+  if(gap)o+='<text text-anchor="end" x="'+(e0[0]-18).toFixed(1)+'" y="'+(e0[1]-50).toFixed(1)+'" font-size="26" font-weight="700" fill="var(--pause)">잠깐!</text><text text-anchor="end" x="'+(e0[0]-18).toFixed(1)+'" y="'+(e0[1]-26).toFixed(1)+'" font-size="19" fill="var(--pause)">'+esc(L.gapNote)+'</text>';
+ });
+ /* 단계 */
+ L.nodes.forEach(function(n,i){
+  var c=pts[i],col=L.colors[i],sel=(i===mapSel);
+  o+='<g class="lnode'+(sel?' sel':'')+'" data-node="'+i+'" tabindex="0" role="button" aria-pressed="'+sel+'" aria-label="'+esc(n[1])+'" transform="translate('+c[0].toFixed(1)+','+c[1].toFixed(1)+')">'+
+   '<rect x="'+(-hw)+'" y="'+(-hh)+'" width="'+(hw*2)+'" height="'+(hh*2)+'" rx="'+hh+'" style="fill:color-mix(in srgb,'+col+' 14%,var(--surface));stroke:'+(sel?'var(--accent)':'color-mix(in srgb,'+col+' 60%,var(--surface))')+'" stroke-width="'+(sel?5:2.5)+'"/>'+
+   '<text y="9" text-anchor="middle" font-family="var(--font-display)" font-size="28" font-weight="700" fill="var(--fg)">'+esc(n[1])+'</text>'+
+   n[2].map(function(t,k){return '<text y="'+(36+k*25)+'" text-anchor="middle" font-size="20" fill="var(--muted)">'+esc(t)+'</text>'}).join('')+
+   '<g transform="translate(0,'+(-hh)+')"><circle r="32" fill="'+col+'" stroke="var(--surface)" stroke-width="4"/><g transform="translate(-16,-16) scale(1.33)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="'+ICONS[n[0]]+'"/></g></g></g>';
+ });
+ return o+'</svg>';
+}
 function vMap(){
  var M=MAP[mapKind],N=M.nodes,cx=240,cy=240,R=165,pts=N.map(function(_,i){var a=-Math.PI/2+i*2*Math.PI/N.length;return [cx+R*Math.cos(a),cy+R*Math.sin(a)]});
  var svg='<svg viewBox="0 0 480 480" role="group" aria-label="'+M.title+'의 '+N.length+'단계 순환"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker><marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--pause)"/></marker></defs>';
@@ -842,7 +903,7 @@ function vMap(){
  N.forEach(function(nd,i){var p=pts[i],w=Math.max(96,nd.n.length*16+26);
   svg+='<g class="node'+(i===mapSel?' sel':'')+'" data-node="'+i+'" tabindex="0" role="button" aria-label="'+esc(nd.n)+'" aria-pressed="'+(i===mapSel)+'"><rect x="'+(p[0]-w/2).toFixed(1)+'" y="'+(p[1]-18).toFixed(1)+'" width="'+w+'" height="36" rx="10"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+5).toFixed(1)+'">'+esc(nd.n)+'</text></g>'});
  svg+='<text x="240" y="232" text-anchor="middle" font-family="var(--font-display)" font-size="19" font-weight="700" fill="var(--fg)">'+M.title+'</text><text x="240" y="256" text-anchor="middle" font-size="12.5" fill="var(--muted)">'+M.center+'</text></svg>';
- if(FIGS[mapKind])svg=mapFig(mapKind);
+ if(FIGS[mapKind])svg=mapFig(mapKind);else if(LOOPS[mapKind])svg=loopFig(mapKind);
  var nd=N[mapSel],refs=(nd.r||[]).map(function(i){return '<li>'+esc(REFS[i-1])+(BOOKREFS.indexOf(i)>=0?' <span class="tag">책 수록</span>':'')+'</li>'}).join('');
  var tabs=MAPTABS.map(function(t){return '<button data-kind="'+t[0]+'" aria-pressed="'+(mapKind===t[0])+'">'+t[1]+'</button>'}).join('');
  var sw=mapKind==='closed'?'<button class="btn ghost sm" data-kind="open">열린 순환 보기</button>':mapKind==='open'?'<button class="btn ghost sm" data-kind="closed">닫힌 순환 보기</button>':'';
