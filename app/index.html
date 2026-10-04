@@ -909,9 +909,9 @@ function vMap(){
  var sw=mapKind==='closed'?'<button class="btn ghost sm" data-kind="open">열린 순환 보기</button>':mapKind==='open'?'<button class="btn ghost sm" data-kind="closed">닫힌 순환 보기</button>':'';
  return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">사유의 지도</div><h1>사고의 순환 지도</h1><p class="lead">물질에서 마음, 행동, 사회까지. 개인 층위와 사회 층위는 같은 구조입니다. 그리고 같은 느린 사고도 “내가 맞다”에서 출발하면 닫힌 순환, “내가 틀릴 수도 있다”에서 출발하면 열린 순환이 됩니다. 각 단계를 눌러 그 자리에서 던질 질문을 확인하세요.</p></header>'+
  '<div class="row" style="margin-bottom:12px"><div class="seg" role="group" aria-label="지도 선택">'+tabs+'</div></div>'+
- '<div class="mapbox">'+svg+'</div>'+(M.note?'<p class="hint" style="margin-top:10px">'+esc(M.note)+'</p>':'')+(sw?'<div class="row" style="margin-top:8px">'+sw+'</div>':'')+mapSummary(mapKind)+
- '<div class="detail" style="margin:18px 0"><div class="eyebrow">'+(mapSel+1)+' / '+N.length+(nd.ch?'  ·  책 '+esc(nd.ch.join(', ')):'')+'</div><h3>'+esc(nd.n)+'</h3><p>'+esc(nd.d)+'</p><div class="quote">잠깐! '+esc(nd.q)+'</div>'+(refs?'<ul class="refs" style="margin:0;padding-left:18px">'+refs+'</ul>':'')+
- '<div class="row"><button class="btn sm" data-act="mapDebug">이 질문으로 내 생각 검토하기</button></div></div>'+
+ '<div class="mapbox">'+svg+'</div>'+(M.note?'<p class="hint" style="margin-top:10px">'+esc(M.note)+'</p>':'')+(sw?'<div class="row" style="margin-top:8px">'+sw+'</div>':'')+
+ '<div class="detail" style="margin:18px 0 0"><div class="eyebrow">선택한 단계 '+(mapSel+1)+' / '+N.length+(nd.ch?'  ·  책 '+esc(nd.ch.join(', ')):'')+'</div><h3>'+esc(nd.n)+'</h3><p>'+esc(nd.d)+'</p><div class="quote">잠깐! '+esc(nd.q)+'</div>'+(refs?'<ul class="refs" style="margin:0;padding-left:18px">'+refs+'</ul>':'')+
+ '<div class="row"><button class="btn sm" data-act="mapDebug">이 질문으로 내 생각 검토하기</button></div></div>'+mapSummary(mapKind)+
  '<div class="insight"><div class="eyebrow">한 줄로 읽으면</div><h3 style="margin-top:6px">개인 층위와 사회 층위는 같은 그림이다.</h3><p style="margin-top:8px">작은 것들이 쌓이면 합과는 다른 ‘하나’가 나타나고, 그 ‘하나’는 다시 작은 것들의 다음 모습을 결정합니다. 요소가 입자·세포·뉴런이면 물질과 생명의 이야기, 한 사람의 생각과 행동이면 사회의 이야기입니다. 두 순환이 만나는 자리가 인간입니다.</p><div class="formula">'+SAME+'</div></div>'+
  '<div class="msum" style="margin-top:26px;gap:8px"><div class="eyebrow">더 읽어 보기</div><h3>배경과 근거가 궁금하다면</h3><p class="hint">물질에서 마음까지의 배경 설명, 과학적으로 알려진 것과 열린 질문은 「책과 함께」의 ‘깊이 읽기’에 모아 두었습니다.</p><div class="row"><button class="btn sm" data-sc="dp">깊이 읽기로 가기</button></div></div>';
 }
