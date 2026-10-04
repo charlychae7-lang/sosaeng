@@ -295,21 +295,6 @@ var CHAPTERS=[
   root:'분별력은 소중히 다듬되 편을 가르는 분별심과 분리의식을 넘어, 분별하되 분리하지 않는 지혜를 갖는다. 오늘 건네는 “내가 틀릴 수도 있나?”라는 한마디, 3초의 생각의 틈, 30일 실험 하나가 백캐스팅의 첫걸음이다.',
   qs:[],lab:'',go:'canvas'}
 ];
-var GLOSSARY=[
- ['분별력 · 분별심 · 분리의식','분별력은 차이를 알아보는 중립적 지혜, 분별심은 거기에 “내가 맞고 너는 틀렸다”는 우열을 얹는 마음, 분리의식은 그것이 굳어 “저 부류와는 함께할 수 없다”며 벽을 세우는 상태입니다.'],
- ['생각의 틈 (Thought Gap)','자동으로 떠오른 생각과 반응 사이에 만드는 3~5초의 멈춤. 생각을 억지로 바꾸지 않고 제3자의 시선으로 바라보게 하는 메타인지의 스위치입니다.'],
- ['빠른 대충이 · 신중한 완벽이','System 1(직관적·자동적·에너지 절약)과 System 2(의식적·논리적·에너지 소모)를 가리키는 책의 표현입니다.'],
- ['내 편 전담 변호사','System 2가 정직한 판사로 일하지 않고, System 1이 내린 결론을 정당화할 논리와 증거만 모으는 확증편향의 상태입니다.'],
- ['합성의 오류','부서나 개인 차원에서는 합리적인 선택들이 모여 전체에서는 사각지대와 비합리적 결과를 만드는 역설. 칸막이 행정의 본질입니다.'],
- ['업스트림 사고','강 하류의 증상만 퍼내는 대신 상류로 올라가 문제가 반복되는 구조와 원인을 찾아 재설계하는 사고방식입니다.'],
- ['레버리지 포인트','큰 힘을 쏟지 않고도 시스템 전체의 선순환을 깨울 수 있는 결정적인 변화의 지점입니다.'],
- ['디폴트 재설계','마음을 설득하는 대신, 내버려 두어도 협력과 선순환이 일어나도록 환경의 기본값을 바꾸는 일입니다.'],
- ['창발','개체들의 촘촘한 상호작용으로 개별 요소에는 없던 새로운 질서와 가치가 피어나는 현상. 전체는 부분의 합보다 큽니다.'],
- ['관계의 온도','단순한 접속을 넘어 존재 인지 → 관심 → 신뢰 → 협력 → 공동 가치 창출로 깊어지는 관계의 깊이와 온기입니다.'],
- ['백캐스팅','과거 추세에 매인 예측 대신, 원하는 미래를 먼저 정의하고 거슬러 올라와 오늘 할 일을 정하는 역산의 설계법입니다.'],
- ['연결의 운영체제 (Connection OS)','AI를 일을 빼앗는 정복자가 아니라, 사람과 자원이 부딪히지 않고 가치를 주고받도록 조율하는 신경망 플랫폼으로 보는 관점입니다.'],
- ['연결 설계자 (Connection Designer)','자기 칸막이 안의 지식에 머무르지 않고, 쪼개진 전문성과 자원을 이어 새로운 선순환을 만드는 인재상입니다.']
-];
 var PILLARS=[['사람','모든 것의 목적이자 출발점'],['관계','소유에서 존재의 연결로'],['순환','일회성 소모에서 생태적 재투자로'],['실험','완벽주의를 넘어 빠르게 배우는 시스템'],['설계','파라미터 조정을 넘어 레버리지 포인트 개혁']];
 var DECL=['[사람] 나는 사람의 존엄성을 중심에 두는 (   )을(를) 만들겠습니다.','[관계] 나는 단절되어 있던 (   )와(과) (   ) 사이의 온기 있는 다리를 놓겠습니다.','[순환] 나는 자원과 신뢰가 한 번 쓰이고 버려지지 않고 순환하는 (   ) 구조를 설계하겠습니다.','[실험] 나는 이번 달 안에 (   )라는 가벼운 30일 실험을 시작해 보겠습니다.','[설계] 나는 AI를 (   )을(를) 위한 지혜로운 운영체제로 활용하겠습니다.'];
 var CANVAS=[
@@ -692,7 +677,7 @@ function vHome(){
  '<p class="lead">책에서 만난 질문을 내 삶과 우리 사회의 문제로 가져와 연습하는 곳입니다. 생각을 억지로 바꾸라고 하지 않습니다. 생각과 반응 사이에 3초의 틈을 만들고, 사실·해석·가능성을 나누고, 작은 선택 하나로 마칩니다.</p>'+flowStrip()+'</header>'+
  '<div class="entry"><a href="#/debug"><b>사고 디버깅</b><span>큰 “잠깐! 진짜?” 화면에서 시작해, 문제 정의 · 의식구조 · 다섯 질문 · 재해석 · 작은 실험까지 6단계로 내 생각을 살펴봅니다.</span></a>'+
  '<a href="#/map"><b>사고의 순환 지도</b><span>물질에서 마음, 사회까지의 순환과, 닫힌 순환·열린 순환을 눌러 보며 읽습니다.</span></a>'+
- '<a href="#/book"><b>책과 함께</b><span>장별 질문과 실험, 핵심 용어집. 밑줄 친 문장을 디버깅으로 가져갑니다.</span></a>'+
+ '<a href="#/book"><b>책과 함께</b><span>장별 질문과 실험, 깊이 읽기. 밑줄 친 문장을 디버깅으로 가져갑니다.</span></a>'+
  '<a href="#/canvas"><b>미래 설계</b><span>5단계 캔버스, 30일 실험 카드, 미래 설계 선언문을 작성합니다.</span></a></div>'+
  '<div class="sec" style="margin-top:26px"><span class="eyebrow">책 한 장으로 보기</span><h2>전체 흐름</h2>'+
  '<ol class="story">'+STORY.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ol>'+
@@ -746,14 +731,13 @@ function vBook(){
   (c.lab?'<p class="hint"><b>관점 전환 실험실</b> '+esc(c.lab)+'</p>':'')+
   '<div class="row"><button class="btn sm" data-act="chGo">'+goLabel+'</button></div></div>';
  }
- var gl=GLOSSARY.map(function(g){return '<details class="part"><summary>'+esc(g[0])+'</summary><div class="bd"><p>'+esc(g[1])+'</p></div></details>'}).join('');
- return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">책과 함께</div><h1>밑줄을 질문으로</h1><p class="lead">《'+esc(CONFIG.bookTitle)+'》'+(CONFIG.author?' · '+esc(CONFIG.author)+' 지음':'')+(CONFIG.publisher?' · '+esc(CONFIG.publisher):'')+'. 읽고 있는 장을 고르면 그 장의 질문과 실험이 나옵니다. 마음에 걸린 문장은 디버깅으로 이어 갑니다.</p><div class="row"><button class="btn ghost sm" data-sc="gl">용어집</button><button class="btn ghost sm" data-sc="dp">깊이 읽기</button><button class="btn ghost sm" data-sc="rf">참고문헌</button></div></header>'+
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">책과 함께</div><h1>밑줄을 질문으로</h1><p class="lead">《'+esc(CONFIG.bookTitle)+'》'+(CONFIG.author?' · '+esc(CONFIG.author)+' 지음':'')+(CONFIG.publisher?' · '+esc(CONFIG.publisher):'')+'. 읽고 있는 장을 고르면 그 장의 질문과 실험이 나옵니다. 마음에 걸린 문장은 디버깅으로 이어 갑니다.</p><div class="row"><button class="btn ghost sm" data-sc="dp">깊이 읽기</button><button class="btn ghost sm" data-sc="rf">참고문헌</button></div></header>'+
  '<div class="card">'+groups+det+
  '<div class="sec"><span class="label">장 또는 쪽수</span><input type="text" id="bkWhere" placeholder="예: 3장, p.84" value="'+esc(bk.w)+'"></div>'+
  '<div class="sec"><span class="label">마음에 걸린 문장 또는 내 생각</span><textarea id="bkQuote" placeholder="책의 문장이나, 읽고 떠오른 내 생각을 적어 주세요">'+esc(bk.q)+'</textarea></div>'+
  '<div class="sec"><span class="label">이 문장과 닿아 있는 사회문제 (선택)</span><div class="chips">'+ISSUES.map(function(x){return '<button class="chip" data-bkissue="'+esc(x)+'" aria-pressed="'+(bk.i===x)+'">'+esc(x)+'</button>'}).join('')+'</div><input type="text" id="bkIssue" placeholder="직접 입력" value="'+esc(bk.i)+'"></div>'+
  '<div class="row end"><span class="note">긴 인용은 피하고 한두 문장만 적어 주세요.</span><button class="btn" data-act="bookGo">디버깅으로 가져가기</button></div></div>'+
- '<h2 id="gl" style="margin:30px 0 12px">핵심 용어집</h2><div class="sec">'+gl+'</div>'+deepRead()+
+ deepRead()+
  '<div class="card" style="margin-top:22px"><h3>읽기 전후 질문</h3><ul class="hint" style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px"><li>읽기 전 — 이 주제에 대해 나는 “원래” 어떻게 생각해 왔는가?</li><li>읽는 중 — 어느 문장에서 마음이 불편하거나 반가웠는가?</li><li>읽은 뒤 — 책 때문에 바뀐 것과 바뀌지 않은 것은 무엇인가?</li><li>함께 읽기 — 같은 문장을 다르게 읽은 사람은 누구인가?</li></ul></div>'+
  (CONFIG.purchaseUrl?'<p style="margin-top:16px"><a href="'+esc(CONFIG.purchaseUrl)+'" target="_blank" rel="noopener">도서 안내 보기</a></p>':'');
 }
