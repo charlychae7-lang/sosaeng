@@ -156,6 +156,13 @@ ul.plain{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
 .before-after{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:640px){.before-after{grid-template-columns:1fr}}
 .ba-after{border-color:var(--accent)}
+.msum{margin-top:16px;padding:18px 18px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);display:flex;flex-direction:column;gap:12px}
+.flow.wrap{flex-wrap:wrap;row-gap:8px;overflow:visible}
+.flow.wrap .bar{width:10px}
+.mlines{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.mres{border-left:3px solid var(--pause);background:var(--pause-soft);padding:10px 14px;border-radius:0 10px 10px 0}
+.mres b{display:block;font-size:12px;letter-spacing:.08em;color:var(--pause);margin-bottom:2px}
+.mres p{font-size:15px}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -374,6 +381,44 @@ var MAP={
  ]}
 };
 var MAPTABS=[['personal','개인 층위'],['social','사회 층위'],['closed','닫힌 순환'],['open','열린 순환']];
+/* 순환 지도별 흐름 요약: 외부 자극이 이 순환에서 어떤 결과로 나타나는가 */
+var MAPSUM={
+ personal:{head:'외부 자극은 어떻게 한 사람의 현실이 되는가',
+  flow:['외부 자극','감각','기억·감정·욕구','해석','생각','판단·선택','행동','경험·결과','다시 생각'],
+  lines:['외부 자극은 그대로 사실로 기록되지 않습니다. 감각을 거쳐 들어온 신호는 과거의 기억, 그때의 감정, 지금의 욕구와 섞입니다.',
+   '그 위에서 해석이 이루어지고 해석이 생각이 됩니다. 같은 비가 아이에게는 놀이, 농부에게는 안도, 신랑에게는 걱정이 되는 이유입니다. 여기가 “생각의 틈”을 만들 수 있는 자리입니다.',
+   '생각은 판단과 선택을 거쳐 행동이 됩니다. 이때 확증편향, 손실 회피, 동조 같은 구조적 한계가 개입합니다.',
+   '행동의 결과는 새로운 경험이 되어 뇌와 마음을 바꾸고 다음 생각의 재료가 됩니다. 생각이 행동을 만들고, 행동의 결과가 생각을 강화합니다.'],
+  result:'같은 외부 자극도 해석에 따라 서로 다른 경험이 되고, 그 경험이 다음 해석을 닮게 만듭니다. 그래서 자극 자체보다 해석이 일어나는 지점을 알아차리는 것이 순환을 바꾸는 시작입니다.'},
+ social:{head:'개인의 생각은 어떻게 사회 시스템이 되고, 다시 나를 만드는가',
+  flow:['개인의 생각','반복·습관','집단의 행동','문화·규범','조직·제도','사회 시스템','환경','새로운 경험','다시 개인의 생각'],
+  lines:['한 사람의 인지적 지름길이 반복되면 습관이 됩니다. 비슷한 환경의 사람들이 같은 습관을 공유하면 집단의 행동이 됩니다.',
+   '집단의 행동은 “원래 다 이렇게 해”라는 규범이 되고, 조직의 관행을 거쳐 법·매뉴얼 같은 제도로 굳어집니다. 이 과정에서 부분의 합리성이 전체의 비합리성을 낳기도 합니다(칸막이, 각자도생, 단기성과, 경로의존성).',
+   '제도와 시스템은 개인이 놓이는 환경이 되어 어떤 선택지가 보이고 어떤 경험을 하는지를 정합니다. 그 경험이 다시 개인의 마음과 생각을 만듭니다.',
+   '외부에서 오는 충격(새로운 기술, 위기, 정책)도 이 순환을 거칩니다. 기존 규범과 제도의 논리로 해석되고 익숙한 방식으로 처리되어, 시스템은 스스로를 유지하고 강화합니다.'],
+  result:'사람이 시스템을 만들고, 시스템이 다시 사람의 생각을 빚습니다. 개인과 사회는 따로 있지 않고 서로를 만들어 내는 하나의 순환입니다. 그래서 사람을 탓하기보다 순환의 어느 지점(규범, 제도, 기본값)을 바꿀 수 있는지를 묻습니다.'},
+ closed:{head:'“내가 맞다”에서 출발한 자극은 어디로 가는가',
+  flow:['외부 자극','합리화','편향 강화','고착','집단사고','오류의 사회화','공식 제도화','더 강한 확신'],
+  lines:['새로운 자극이나 정보가 들어와도 전제가 “내가 맞다”이면, 느린 사고(System 2)는 정직한 판사가 아니라 “내 편 전담 변호사”로 일합니다.',
+   '기존 신념에 맞는 정보만 모으고(합리화), 그것으로 이전의 결론을 정당화하며(편향 강화), 사고의 틀이 굳어 반대 증거에 대한 저항이 커집니다(고착).',
+   '집단 안에서는 비판보다 동조가 앞서고(집단사고), 개인의 고집이 흔들리지 않는 상식이 되며(오류의 사회화), 마침내 규정과 절차로 문서화됩니다(공식 제도화).',
+   '각 단계는 앞 단계의 편향을 검증 없이 키웁니다. 그리고 제도는 다음 자극을 다시 같은 방식으로 해석하게 만듭니다.'],
+  result:'자극이 새로운 배움이 아니라 기존 확신을 더 단단하게 하는 재료가 됩니다. 문제를 알면서도 바꾸지 못하는 이유입니다.'},
+ open:{head:'“내가 틀릴 수도 있다”에서 출발한 자극은 어디로 가는가',
+  flow:['외부 자극','성찰(메타인지)','편향 약화','관점 전환','새로운 학습','새로운 경험·시도','새 패턴 내면화','더 나은 순환'],
+  lines:['같은 자극이라도 “잠깐! 진짜?” 하고 멈추면 생각의 틈이 열립니다. 내가 틀릴 수도 있다는 전제에서 판단과 신념을 다시 봅니다(성찰).',
+   '반대되는 정보와 다양한 관점을 능동적으로 살피고(편향 약화), 갇혀 있던 시야를 넓혀 대상의 맥락을 봅니다(관점 전환).',
+   '새로운 지식과 관계를 배우고(새로운 학습), 작은 실험으로 시도하며(새로운 경험·시도), 더 나은 사고와 행동이 새 습관이 됩니다(새 패턴 내면화).',
+   '다만 성찰하겠다는 마음가짐만으로는 편향이 줄지 않습니다. 반대 증거를 검토하는 절차와 좋은 기본값이 함께 있어야 이 순환이 유지됩니다.'],
+  result:'자극이 확신을 굳히는 재료가 아니라 배움의 재료가 됩니다. 닫힌 순환과 열린 순환의 갈림길은, 생각의 틈에서 “내가 틀릴 수도 있다”를 여는가에 있습니다.'}
+};
+function mapSummary(k){
+ var m=MAPSUM[k];if(!m)return '';
+ return '<section class="msum" aria-label="흐름 요약"><div class="eyebrow">이 순환을 한눈에</div><h3>'+esc(m.head)+'</h3>'+
+  '<div class="flow wrap">'+m.flow.map(function(x,i){return (i?'<span class="bar"></span>':'')+'<span class="n'+(i===0?' on':'')+'">'+esc(x)+'</span>'}).join('')+'</div>'+
+  '<ol class="mlines">'+m.lines.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ol>'+
+  '<div class="mres"><b>결과</b><p>'+esc(m.result)+'</p></div></section>';
+}
 var SAME='요소가 쌓인다 → 질적으로 다른 전체가 나타난다 → 그 전체가 다시 요소를 바꾼다 → 반복된다';
 
 var REFS=['Frank Wilczek, The Lightness of Being (Basic Books, 2008).','Brian Greene, The Fabric of the Cosmos (Knopf, 2004).','P. W. Anderson, “More Is Different,” Science 177(4047), 1972: 393–396.','Donella H. Meadows, Thinking in Systems: A Primer (Chelsea Green, 2008).','Bruce Alberts et al., Molecular Biology of the Cell, 6th ed. (Garland Science, 2014).','Eric R. Kandel et al., Principles of Neural Science, 6th ed. (McGraw-Hill, 2021).','Antonio Damasio, Descartes’ Error (Putnam, 1994).','Anil Seth, Being You (Dutton, 2021).','Chris Frith, Making Up the Mind (Blackwell, 2007).','Lisa Feldman Barrett, How Emotions Are Made (Houghton Mifflin Harcourt, 2017).','Richard Lazarus, Emotion and Adaptation (Oxford UP, 1991).','Joseph LeDoux, The Emotional Brain (Simon & Schuster, 1996).','Aaron T. Beck, Cognitive Therapy and the Emotional Disorders (International Universities Press, 1976).','Albert Ellis & Robert A. Harper, A Guide to Rational Living (Wilshire, 1961) — ABC 모델.','Robert K. Merton, “The Self-Fulfilling Prophecy,” The Antioch Review 8(2), 1948: 193–210.','Daniel Kahneman, Thinking, Fast and Slow (FSG, 2011).','Keith E. Stanovich & Richard F. West, “Individual Differences in Reasoning,” Behavioral and Brain Sciences 23(5), 2000: 645–665.','Raymond S. Nickerson, “Confirmation Bias,” Review of General Psychology 2(2), 1998: 175–220.','Daniel Kahneman & Amos Tversky, “Prospect Theory,” Econometrica 47(2), 1979: 263–291.','Pierre Bourdieu, Outline of a Theory of Practice (Cambridge UP, 1977).','Peter L. Berger & Thomas Luckmann, The Social Construction of Reality (Doubleday, 1966).','Anthony Giddens, The Constitution of Society (Polity, 1984).','David J. Chalmers, “Facing Up to the Problem of Consciousness,” Journal of Consciousness Studies 2(3), 1995: 200–219.','Benjamin Libet et al., “Time of Conscious Intention to Act in Relation to Onset of Cerebral Activity,” Brain 106(3), 1983: 623–642.','William James, The Principles of Psychology (Henry Holt, 1890).',
@@ -675,7 +720,7 @@ function vMap(){
  var sw=mapKind==='closed'?'<button class="btn ghost sm" data-kind="open">열린 순환 보기</button>':mapKind==='open'?'<button class="btn ghost sm" data-kind="closed">닫힌 순환 보기</button>':'';
  return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">사유의 지도</div><h1>사고의 순환 지도</h1><p class="lead">물질에서 마음, 행동, 사회까지. 개인 층위와 사회 층위는 같은 구조입니다. 그리고 같은 느린 사고도 “내가 맞다”에서 출발하면 닫힌 순환, “내가 틀릴 수도 있다”에서 출발하면 열린 순환이 됩니다. 각 단계를 눌러 그 자리에서 던질 질문을 확인하세요.</p></header>'+
  '<div class="row" style="margin-bottom:12px"><div class="seg" role="group" aria-label="지도 선택">'+tabs+'</div></div>'+
- '<div class="mapbox">'+svg+'</div>'+(M.note?'<p class="hint" style="margin-top:10px">'+esc(M.note)+'</p>':'')+(sw?'<div class="row" style="margin-top:8px">'+sw+'</div>':'')+
+ '<div class="mapbox">'+svg+'</div>'+(M.note?'<p class="hint" style="margin-top:10px">'+esc(M.note)+'</p>':'')+(sw?'<div class="row" style="margin-top:8px">'+sw+'</div>':'')+mapSummary(mapKind)+
  '<div class="detail" style="margin:18px 0"><div class="eyebrow">'+(mapSel+1)+' / '+N.length+(nd.ch?'  ·  책 '+esc(nd.ch.join(', ')):'')+'</div><h3>'+esc(nd.n)+'</h3><p>'+esc(nd.d)+'</p><div class="quote">잠깐! '+esc(nd.q)+'</div>'+(refs?'<ul class="refs" style="margin:0;padding-left:18px">'+refs+'</ul>':'')+
  '<div class="row"><button class="btn sm" data-act="mapDebug">이 질문으로 내 생각 검토하기</button></div></div>'+
  '<div class="insight"><div class="eyebrow">한 줄로 읽으면</div><h3 style="margin-top:6px">개인 층위와 사회 층위는 같은 그림이다.</h3><p style="margin-top:8px">작은 것들이 쌓이면 합과는 다른 ‘하나’가 나타나고, 그 ‘하나’는 다시 작은 것들의 다음 모습을 결정합니다. 요소가 입자·세포·뉴런이면 물질과 생명의 이야기, 한 사람의 생각과 행동이면 사회의 이야기입니다. 두 순환이 만나는 자리가 인간입니다.</p><div class="formula">'+SAME+'</div></div>'+
