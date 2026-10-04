@@ -163,6 +163,17 @@ ul.plain{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
 .mres{border-left:3px solid var(--pause);background:var(--pause-soft);padding:10px 14px;border-radius:0 10px 10px 0}
 .mres b{display:block;font-size:12px;letter-spacing:.08em;color:var(--pause);margin-bottom:2px}
 .mres p{font-size:15px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.cmp{grid-template-columns:1fr}}
+.cmp>div{border-radius:10px;padding:12px 14px;font-size:15px}
+.cmp b{display:block;font-size:12px;letter-spacing:.06em;margin-bottom:4px}
+.cmp-from{background:var(--bg);border:1px dashed var(--line);color:var(--muted)}
+.cmp-to{background:var(--soft);border:1px solid var(--accent)}
+.cmp-to b{color:var(--accent)}
+.ladder{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ladder li{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border-left:4px solid var(--accent);background:var(--bg);border-radius:0 10px 10px 0;font-size:15px}
+.ladder li:nth-child(1){border-left-color:var(--line)}.ladder li:nth-child(2){border-left-color:var(--muted)}
+.ladder li span{color:var(--muted);font-size:14.5px}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -174,6 +185,7 @@ footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direc
   <a class="brand" href="#/home">잠깐! 진짜?</a>
   <a class="tab" href="#/debug" data-r="debug">사고 디버깅</a>
   <a class="tab" href="#/map" data-r="map">순환 지도</a>
+  <a class="tab" href="#/methods" data-r="methods">사고법</a>
   <a class="tab" href="#/book" data-r="book">책과 함께</a>
   <a class="tab" href="#/canvas" data-r="canvas">미래 설계</a>
   <a class="tab" href="#/notes" data-r="notes">내 기록</a>
@@ -259,19 +271,19 @@ var CHAPTERS=[
  {id:'13',part:4,label:'13장',title:'통합적 사고: 코끼리와 다섯 장님',quote:'장님들의 대답은 저마다 참이었다. 문제는 그 다름을 틀림으로 바꾼 분별심과, 전체를 보지 못한 분절된 시야였다.',
   root:'통합적 사고는 모든 것을 아는 것이 아니라 쪼개진 부분들 사이의 관계를 읽는 시선이다. 서로 다른 지혜를 이어 전체 그림을 그리는 통합 설계자가 필요하다.',
   qs:['“내 분야가 아니야”라며 담을 쌓았지만 사실은 내 일과 연결된 것은 무엇인가요?','나와 다른 전문성의 말을 오답으로 배척했나요, 코끼리의 다른 면을 보여 주는 조각으로 받아들였나요?','우리 지역이나 조직의 복잡한 문제 뒤에서 서로 연결되는 서로 다른 세 분야는 무엇인가요?'],
-  lab:'',go:'debug'},
+  lab:'',go:'method:int'},
  {id:'14',part:4,label:'14장',title:'업스트림 사고와 구조적 설계',quote:'강에 빠진 사람을 건져내는 것도 소중한 용기다. 그러나 더 위대한 지혜는 왜 사람들이 계속 강에 빠지는지를 묻는 것이다.',
   root:'증상을 퍼내는 사람은 평생 소모되지만 상류에서 질문하는 사람은 문제가 반복되지 않는 구조를 디자인한다. 구호보다 강한 것은 시스템의 보이지 않는 규칙과 인센티브다.',
   qs:['매일 처리하는 일 중 당장의 증상만 가라앉히는 ‘하류의 처방’은 무엇인가요?','그 문제가 반복되는 ‘상류’의 구조나 규칙은 무엇일까요?','비난이나 노력 강요 대신 사람들이 저절로 협력하게 만드는 환경 구조는 무엇일까요?'],
-  lab:'',go:'debug'},
+  lab:'',go:'method:up'},
  {id:'15',part:4,label:'15장',title:'레버리지 포인트 (작은 변화가 세상을 바꾸는 지점)',quote:'세상을 바꾸는 것은 거대한 힘이 아니라, 올바른 지점을 찾는 지혜이다.',
   root:'성과는 노력의 총량이 아니라 레버리지의 정확성이 결정한다. 규칙, 기본값, 목적을 바꾸는 것이 힘이 세고, 가장 깊은 레버리지는 나 자신의 패러다임과 관점의 전환이다.',
   qs:['가장 많은 에너지와 예산을 쓰는 곳이 바닥의 물을 퍼내는 하류는 아닌가요?','예산이나 수치를 조금 조절하는 ‘약한 개입’에 머물고 있지 않나요?','가장 작은 힘으로 선순환을 일깨울 나의 ‘수도꼭지’는 어디에 있을까요?'],
-  lab:'',go:'canvas'},
+  lab:'',go:'method:str'},
  {id:'16',part:5,label:'16장',title:'예측에서 백캐스팅(Backcasting)으로',quote:'미래는 기다리는 사람의 것이 아니라, 원하는 미래를 먼저 정의하고 거꾸로 오늘을 설계하는 사람의 것이다.',
   root:'현재의 제약과 과거 추세에 매인 예측은 경로의존성을 강화한다. 바라는 미래를 먼저 정의하고 거슬러 올라와 오늘 할 일을 정하는 백캐스팅이 변화의 동력이다.',
   qs:['내 목표는 ‘현재 제약에서 가능한 예측’에서 시작하나요, ‘정말 원하는 미래 비전’에서 시작하나요?','새로운 미래를 그리지 못하게 막는 대표적인 ‘현재의 제약’은 무엇인가요?','10년 뒤 바람직한 모습을 위해 오늘 시작할 가장 작은 변화는 무엇인가요?'],
-  lab:'',go:'canvas'},
+  lab:'',go:'method:back'},
  {id:'17',part:5,label:'17장',title:'디폴트(기본값) 변경과 레버리지 정책 (Opt-in vs Opt-out)',quote:'사람들의 마음을 억지로 바꾸려 애쓰지 마라. 좋은 선택이 저절로 이루어지도록 환경의 기본값을 바꿔라.',
   root:'마음을 설득하는 호소는 가장 약한 개입이다. 좋은 선택이 저절로 이루어지게 기본값을 바꾸는 것이 가장 강력하다. 단, 기본값만으로 모든 것이 풀리지는 않으며 스스로 생각하는 일과 함께 굴러야 하는 두 바퀴다.',
   qs:['내 회사·학교·가정에서 아무 생각 없이 두면 작동하는 ‘현재의 기본값’은 무엇인가요? (침묵, 경쟁, 소비, 개별 처리…)','마음을 설득하는 대신 좋은 행동이 선택되도록 바꿀 서식이나 절차의 기본값은 무엇일까요?','내가 원하는 삶이 자동으로 실행되도록 환경의 기본값을 바꿀 작은 부분은 무엇인가요?'],
@@ -319,7 +331,7 @@ var FLOW=[
  ['제1부 · 1~4장','인식의 뿌리','우리는 정말 세상을 있는 그대로 보고 있는가?','같은 비도 네 사람에게 네 개의 현실이다. 인식은 해석이고, 4개의 벽(효율·확증편향·손실 회피·동조)이 생각을 가둔다.','debug','잠깐! 진짜? 해 보기'],
  ['제2부 · 5~9장','문명의 뿌리','왜 우리는 세상을 쪼개어 보게 되었는가?','분업은 문명을 키웠지만 부분만 최적화하는 합성의 오류를 낳았다. 연결은 원래의 질서이고, 연결에서 창발이 일어난다.','map:personal','순환 지도 보기'],
  ['제3부 · 10~12장','사고의 순환과 병리','생각은 어떻게 제도가 되어 다시 나를 만드는가?','지름길 → 습관 → 규범 → 관행 → 제도의 사슬이 칸막이·각자도생·단기성과·경로의존성을 낳는다. 같은 느린 사고가 닫힌 순환과 열린 순환으로 갈린다.','map:closed','닫힌·열린 순환 보기'],
- ['제4부 · 13~15장','통합의 기술','전체를 보고 어디를 건드릴까?','다름을 틀림이 아닌 조각으로 잇는 통합적 사고, 증상이 아닌 상류를 보는 업스트림, 작은 힘으로 큰 변화를 만드는 레버리지 포인트.','debug','깊게 디버깅하기'],
+ ['제4부 · 13~15장','통합의 기술','전체를 보고 어디를 건드릴까?','다름을 틀림이 아닌 조각으로 잇는 통합적 사고, 증상이 아닌 상류를 보는 업스트림, 작은 힘으로 큰 변화를 만드는 레버리지 포인트.','method:int','사고법 보기'],
  ['제5부 · 16~18장','연결 사회의 디자인','어떤 미래를 어떻게 설계할 것인가?','예측이 아닌 백캐스팅, 설득이 아닌 기본값(디폴트) 재설계, AI는 대체가 아닌 연결의 운영체제.','canvas','캔버스 작성하기'],
  ['제6부 · 19~20장','실천 도구','오늘 당장 무엇을 해 볼까?','완벽한 계획 대신 30일 작은 실험, 그리고 생각과 반응 사이에 3초의 틈을 만드는 「잠깐! 진짜?」.','canvas','30일 실험 카드 쓰기'],
  ['제7부 · 21장·에필로그','다섯 기둥','우리는 오늘 무엇을 연결할 용기를 낼 것인가?','사람·관계·순환·실험·설계의 다섯 기둥이 함께 서고, 분별하되 분리하지 않는 인간으로 살아간다.','canvas','선언문 쓰기']
@@ -404,6 +416,73 @@ function mapSummary(k){
   '<ol class="mlines">'+m.lines.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ol>'+
   '<div class="mres"><b>결과</b><p>'+esc(m.result)+'</p></div></section>';
 }
+/* 사고법 — 책 13~16장 */
+var METHODS=[
+ {k:'int',name:'통합적 사고',ch:'13',short:'전체를 본다',
+  tag:'다름을 틀림이 아닌 ‘전체’로 이어 붙이는 사고',
+  from:'“누가 옳은가?” 한쪽 손을 들어 주는 판사의 질문',
+  to:'“두 주장이 모두 부분적인 참이 되려면, 전체 코끼리는 어떤 모양일까?”',
+  story:'다섯 장님은 각자 코끼리의 진짜 부분을 만졌습니다. 다리는 기둥, 코는 뱀, 귀는 부채, 꼬리는 밧줄, 배는 벽이었습니다. 모두 직접 확인한 사실이었지만 아무도 전체를 보지 못했고, 서로를 오답이라 불렀습니다. 문제는 차이를 알아본 분별력이 아니라, 거기에 “내가 맞고 너는 틀렸다”를 얹은 분별심이었습니다.',
+  steps:[['문제를 고른다','한 분야의 처방으로는 풀리지 않던, 복잡하게 얽힌 문제 하나를 고릅니다.'],
+   ['서로 다른 관점을 모은다','그 문제를 다루는 서로 다른 분야나 사람 세 가지를 찾습니다. (예: 교육 + 복지 + 일자리)'],
+   ['각자가 만진 ‘부분’을 적는다','각 관점이 직접 확인한 사실과, 그래서 보이는 모습을 적습니다. 누구의 것도 오답으로 판정하지 않습니다.'],
+   ['연결 고리를 찾는다','부딪히는 두 주장이 모두 부분적인 참이 되려면 그 뒤에 어떤 전체 모양이 있어야 하는지 묻습니다.'],
+   ['전체 그림을 한 문장으로 쓴다','조각을 이어 붙인 전체를 한 문장으로 적고, 어느 연결 지점을 먼저 건드릴지 정합니다.']],
+  case:'한 중년 남성이 혈압, 당뇨, 불면증, 우울감으로 내과, 정형외과, 정신건강의학과를 돌며 각각 최선의 처방을 받았지만 고통은 사라지지 않습니다. 수면 부족은 스트레스를, 스트레스는 혈압을, 운동 부족은 당뇨를, 고립은 우울을 키우기 때문입니다. 몸은 하나의 시스템인데 증상이라는 부품만 따로 고쳤기 때문입니다.',
+  apply:'저출생 — 경제(주거비), 노동(장시간·불안정), 교육(경쟁), 돌봄(독박)이 각자 한 면을 만지고 있습니다. 이어 붙이면 “집과 돌봄과 일자리가 모두 불안정한 삶”이라는 하나의 전체 그림이 보이고, 해법의 범위도 출산장려금을 넘어섭니다.',
+  pit:['모든 분야의 지식을 혼자 다 아는 “만능 백과사전”이 되는 것이 아닙니다. 서로 다른 전문성 사이의 보이지 않는 관계를 읽는 능력입니다.','차이를 없애 똑같이 만드는 통합이 아닙니다. 차이를 유지한 채 서로를 살리는 구조를 설계하는 일입니다.','두 사람 중 한 명의 손을 들어주는 판사가 되지 않고, 두 관점을 이어 더 큰 그림을 그립니다.'],
+  qs:['“내 분야가 아니야”라며 담을 쌓았지만 사실은 내 일과 깊이 연결된 것은 무엇인가요?','나와 다른 시각의 말을 ‘틀린 오답’으로 배척했나요, ‘소중한 조각’으로 끌어안았나요?','우리 지역이나 조직의 복잡한 문제 뒤에 숨은 서로 다른 세 분야의 연결 고리는 무엇일까요?'],
+  ws:[['고른 문제','예: 청년이 지방을 떠난다'],['관점 ① — 분야·사람, 그리고 그들이 보는 것',''],['관점 ② — 분야·사람, 그리고 그들이 보는 것',''],['관점 ③ — 분야·사람, 그리고 그들이 보는 것',''],['연결 고리 — 서로 어떻게 이어져 있나','부딪히는 주장이 모두 부분적인 참이 되려면?'],['전체 그림 한 문장','']]},
+ {k:'up',name:'업스트림 사고',ch:'14',short:'상류로 거슬러 오른다',
+  tag:'문제가 발생한 곳이 아니라, 문제가 시작된 곳을 묻는 사고',
+  from:'“누가 잘못했는가? 누구를 비난하고 처벌할 것인가?”',
+  to:'“어떤 구조와 규칙이 사람들에게 이 행동을 반복하게 만드는가?”',
+  story:'마을 사람들은 강 하류로 떠내려오는 사람들을 구하려고 구명보트를 들이고 응급실까지 세웠습니다. 그래도 사람들은 계속 떠내려왔습니다. 강 상류로 올라간 노인이 발견한 것은 무너진 나무다리의 난간과, 밤에 길을 비출 등불 하나 없는 산길이었습니다. 난간을 고치자 하류의 응급실은 한가해졌습니다.',
+  steps:[['증상을 확인한다','지금 내가 보고 있는 것은 문제의 결과(증상)인가요, 원인인가요?'],
+   ['상류를 추적한다','이 문제는 그 이전에 어떤 구조적 배경에서 시작되었나요?'],
+   ['규칙을 탐색한다','이 상황을 계속 되풀이하게 만드는 보이지 않는 규칙이나 기본값은 무엇인가요?'],
+   ['장기 설계를 해 본다','만약 10년 동안 이 문제를 뿌리 뽑아야 한다면 오늘 무엇을 바꾸겠습니까?'],
+   ['시선을 전환한다','그 변화는 사람을 바꾸는 것인가요, 구조를 다시 설계하는 것인가요?']],
+  case:'사장이 해마다 “창의적으로 도전하라”고 외쳤지만 아무도 새로운 시도를 하지 않았습니다. 살펴보니 한 번이라도 실패하면 인사고과에서 큰 불이익을 받았고, 회의에서 상사에게 반대하면 승진에서 탈락하는 구조가 있었습니다. 직원들은 창의성이 없는 것이 아니라 구조 속에서 가장 합리적으로 행동한 것이었습니다.',
+  apply:'저출생 — 하류에서는 출산 지원금을 몇백만 원 더 줍니다. 상류에는 치솟는 주거비, 불안정한 일자리, 장시간 노동, 경쟁적 교육, 미래에 대한 불안이 얽혀 있습니다. 출산은 원인이 아니라 삶의 구조가 무너졌음을 알리는 마지막 결과 신호입니다.',
+  pit:['하류의 노력도 소중하고 필요합니다. 대체가 아니라 병행입니다. 당장 고통받는 사람을 구하면서 상류도 묻습니다.','사람을 탓하는 것은 쉽고, 구조를 바꾸는 것은 지혜를 요구합니다.','하나의 원인을 콕 집는 일이 아닙니다. 여러 원인이 얽힌 그물을 거슬러 오릅니다.'],
+  qs:['매일 바쁘게 처리하는 일 중 증상만 가라앉히는 ‘하류의 처방’은 무엇인가요?','그 문제가 반복되는 ‘상류’의 무너진 구조나 규칙은 무엇일까요?','비난이나 노력 강요 대신 사람들이 저절로 협력하게 만드는 환경은 어떻게 바꿀 수 있을까요?'],
+  ws:[['고른 문제','가장 까다로웠던 문제 하나'],['하류의 처방 — 지금 내가 하고 있는 일',''],['지금 보는 것은 증상인가, 원인인가',''],['상류의 구조 — 이 문제가 시작된 곳',''],['되풀이하게 만드는 규칙·기본값',''],['10년 동안 뿌리 뽑는다면 오늘 바꿀 것',''],['사람을 바꾸는가, 구조를 설계하는가','']]},
+ {k:'str',name:'구조적 사고',ch:'14·15',short:'규칙과 기본값을 설계한다',
+  tag:'사람을 바꾸려 하기 전에, 사람이 그렇게 행동하게 만드는 구조를 설계하는 사고',
+  from:'“요즘 사람들은 노력이 부족해.” 훈계와 구호',
+  to:'“어떤 규칙, 인센티브, 기본값, 목적이 이 행동을 만들고 있는가?”',
+  story:'숲은 나무에게 “열심히 열매를 맺어라”라고 강요하지 않습니다. 토양을 기름지게 하고, 물길이 순환하게 하고, 햇살과 미생물이 살 환경을 먼저 설계합니다. 좋은 구조가 차려지면 생명은 지시하지 않아도 스스로 자랍니다. 바닥에 넘치는 물을 닦고 퍼내는 사람들 사이에서, 조용히 수도꼭지를 잠그는 사람이 진짜 레버리지 포인트를 찾은 사람입니다.',
+  steps:[['반복되는 행동을 확인한다','사람들이 되풀이하는 행동을 사람의 결함이 아니라 구조 속의 합리적인 생존 선택으로 바라봅니다.'],
+   ['그 행동을 부추기는 구조를 찾는다','인사고과, 성과지표, 서식, 평가 방식처럼 보이지 않는 규칙과 인센티브를 찾습니다.'],
+   ['레버리지 4단계에서 어디를 건드릴지 고른다','아래 사다리에서 아래로 갈수록 힘이 큽니다. 내가 지금 어느 단계에서 애쓰고 있는지 확인합니다.'],
+   ['가장 작은 개입을 설계한다','최소의 개입으로 선순환을 부를 수도꼭지를 정합니다.'],
+   ['작은 시제품으로 시험한다','30일 안에 해볼 수 있는 가장 작은 실험으로 바꿉니다. (미래 설계 탭)']],
+  ladder:[['① 파라미터 · 약한 개입','시간이나 돈 같은 수치를 조절합니다. 교과서를 새로 만들고, 시험 수치를 바꾸고, 예산을 늘리는 일입니다.'],
+   ['② 디폴트 · 기본값','반복되지 않도록 기본 행동 규칙을 바꿉니다. 장기기증을 신청제에서 “거부하지 않으면 자동 등록”으로 바꾼 것이 예입니다.'],
+   ['③ 목적','이 일을 가로지르는 궁극적 목적을 묻습니다. 교육의 목적이 줄 세우기냐, 함께 살아가는 좋은 시민을 기르는 것이냐에 따라 평가와 수업이 달라집니다.'],
+   ['④ 패러다임 · 가장 깊은 레버리지','이 문제를 바라보는 나 자신의 관점을 바꿉니다. 뿌리의 지점이 바뀌면 열매는 스스로 달라집니다.']],
+  case:'장기기증 등록을 “스스로 신청해야 등록되는 방식(옵트인)”에서 “거부하지 않으면 자동으로 등록되는 방식(옵트아웃)”으로 바꾸자 사람들을 설득하지 않고도 등록이 크게 늘었습니다. 마음을 바꾸는 호소는 가장 약한 개입이고, 기본값을 바꾸는 것은 강한 개입입니다.',
+  apply:'지역소멸 — 출산·귀농 지원금은 순환 고리에 칠하는 윤활유일 뿐입니다. 사람과 자원이 모여 가치를 순환시키는 운영체계(OS)를 설계하는 곳, 끊어진 순환 고리를 잇는 곳이 진짜 레버리지 포인트입니다.',
+  pit:['기본값만으로 모든 것이 풀리지는 않습니다. 정해 준 기본값이 스스로 깊이 생각할 기회를 앗아갈 수 있어서, 구조를 바꾸는 일과 스스로 생각해 보는 일은 함께 굴러가야 하는 두 바퀴입니다.','예산이나 수치를 조금 조절하는 것은 약한 개입입니다. 많이 투입하는 것보다 제대로 된 지점을 찾는 것이 중요합니다.','구조를 보라는 것은 개인의 책임을 없애자는 뜻이 아니라, 반복되는 행동의 원인을 정확히 찾자는 뜻입니다.'],
+  qs:['가장 많은 에너지와 예산을 쓰는 곳이 바닥의 물을 퍼내는 하류는 아닌가요?','예산이나 수치를 조금 조절하는 ‘약한 개입’에 머물고 있지 않나요?','가장 작은 힘으로 선순환을 일깨울 나의 ‘수도꼭지’는 어디에 있을까요?'],
+  ws:[['고른 문제','가장 크게 얽혀 있는 고민 하나'],['반복되는 행동',''],['그 행동을 부추기는 구조 — 규칙·인센티브',''],['① 파라미터 — 지금 조절하려는 수치는',''],['② 디폴트 — 바꿀 수 있는 기본 행동 규칙은',''],['③ 목적 — 이 문제를 가로지르는 궁극적 목적은',''],['④ 패러다임 — 내가 이 문제를 보는 관점을 바꾸면',''],['가장 작은 개입 (30일 안에)','']]},
+ {k:'back',name:'백캐스팅 사고법',ch:'16',short:'미래에서 오늘로 역산한다',
+  tag:'원하는 미래를 먼저 정의하고, 거꾸로 오늘을 설계하는 사고',
+  from:'예측(Forecasting): “지금의 기술과 추세로 무엇이 가능할까?”',
+  to:'백캐스팅: “10년 뒤 원하는 미래가 되려면 5년 전에는, 그리고 오늘은 무엇을 해야 하는가?”',
+  story:'1961년 케네디 대통령은 “10년이 끝나기 전에 인간을 달에 보내겠다”고 선언했습니다. 당시 기술로는 불가능해 보였지만 그는 “지금 기술로 갈 수 있을까?” 대신 “5년 전에는 어떤 기술이, 3년 전에는 어떤 수송선이 완성되어 있어야 하는가, 오늘 무엇을 시작해야 하는가”를 물었습니다. 그 질문이 수많은 과학자와 기업, 대학을 하나의 목표로 묶었고, 1969년 아폴로 11호가 달에 닿았습니다.',
+  steps:[['미래의 완성을 그린다','10년 뒤 우리 일터·지역·가족이 가장 건강하고 지속가능하게 변한 모습을 선명하게 그립니다. 그 시점에서 오늘의 나에게 편지를 쓴다고 상상해 보세요.'],
+   ['역산한다','그 미래가 현실이 되려면 5년 전에는 어떤 제도나 환경이 이미 만들어져 있어야 하나요? 3년 전에는요?'],
+   ['현재의 제약을 확인한다','“예산이 이것밖에 없으니까”, “과거부터 이렇게 해왔으니까” 같은 제약이 미래를 가두고 있지 않은지 살핍니다.'],
+   ['오늘의 결단을 내린다','오늘 버릴 습관은 무엇이고, 시작할 가장 작은 첫걸음은 무엇인가요?'],
+   ['30일 실험으로 옮긴다','30일 안에 시작해 배울 수 있는 실험 하나로 바꿉니다. (미래 설계 탭의 캔버스)']],
+  case:'UN의 지속가능발전목표(SDGs)는 2030년까지 빈곤 퇴치, 기후위기 대응, 양질의 교육 같은 17가지 미래 상태를 먼저 정해 두었습니다. 그 목표가 각국의 공공 정책, 기업의 ESG 경영, 시민사회의 행동을 끌어당기는 나침반으로 작동하고 있습니다.',
+  apply:'예시 · 지역 — 10년 뒤 청년이 이 지역에서 배우고 일하며 신뢰하는 공동체를 누리는 모습을 먼저 정합니다. 그러면 5년 전에는 이미 있는 자원을 잇는 순환 구조가 돌고 있어야 하고, 오늘은 서로 단절된 자원 하나를 잇는 작은 실험을 시작하게 됩니다.',
+  pit:['막연한 희망 사항을 늘어놓는 일이 아닙니다. 통합적·업스트림·구조적 사고가 맞물려 작동하는 정교한 설계입니다.','현재의 제약과 과거 추세에만 매달리는 예측은 경로의존성을 강화할 뿐입니다.','AI가 시나리오를 시뮬레이션해도 어떤 미래를 선택할지의 가치와 목적은 인간이 정합니다.'],
+  qs:['내 목표는 ‘현재 제약에서 가능한 예측’에서 시작하나요, ‘정말 원하는 미래 비전’에서 시작하나요?','새로운 미래를 그리지 못하게 막는 대표적인 ‘현재의 제약’은 무엇인가요?','10년 뒤의 바람직한 모습을 위해 오늘 시작할 가장 작은 변화는 무엇인가요?'],
+  ws:[['미래의 완성 — 10년 뒤 무엇이 달라져 있나','가장 건강하고 지속가능하게 변한 모습'],['그 미래를 가두는 현재의 제약',''],['역산 — 5년 전에 이미 만들어져 있어야 할 제도·환경',''],['오늘 버릴 습관',''],['오늘의 첫걸음 — 30일 안에 해볼 작은 실험','']]}
+];
 var SAME='요소가 쌓인다 → 질적으로 다른 전체가 나타난다 → 그 전체가 다시 요소를 바꾼다 → 반복된다';
 
 var REFS=['Frank Wilczek, The Lightness of Being (Basic Books, 2008).','Brian Greene, The Fabric of the Cosmos (Knopf, 2004).','P. W. Anderson, “More Is Different,” Science 177(4047), 1972: 393–396.','Donella H. Meadows, Thinking in Systems: A Primer (Chelsea Green, 2008).','Bruce Alberts et al., Molecular Biology of the Cell, 6th ed. (Garland Science, 2014).','Eric R. Kandel et al., Principles of Neural Science, 6th ed. (McGraw-Hill, 2021).','Antonio Damasio, Descartes’ Error (Putnam, 1994).','Anil Seth, Being You (Dutton, 2021).','Chris Frith, Making Up the Mind (Blackwell, 2007).','Lisa Feldman Barrett, How Emotions Are Made (Houghton Mifflin Harcourt, 2017).','Richard Lazarus, Emotion and Adaptation (Oxford UP, 1991).','Joseph LeDoux, The Emotional Brain (Simon & Schuster, 1996).','Aaron T. Beck, Cognitive Therapy and the Emotional Disorders (International Universities Press, 1976).','Albert Ellis & Robert A. Harper, A Guide to Rational Living (Wilshire, 1961) — ABC 모델.','Robert K. Merton, “The Self-Fulfilling Prophecy,” The Antioch Review 8(2), 1948: 193–210.','Daniel Kahneman, Thinking, Fast and Slow (FSG, 2011).','Keith E. Stanovich & Richard F. West, “Individual Differences in Reasoning,” Behavioral and Brain Sciences 23(5), 2000: 645–665.','Raymond S. Nickerson, “Confirmation Bias,” Review of General Psychology 2(2), 1998: 175–220.','Daniel Kahneman & Amos Tversky, “Prospect Theory,” Econometrica 47(2), 1979: 263–291.','Pierre Bourdieu, Outline of a Theory of Practice (Cambridge UP, 1977).','Peter L. Berger & Thomas Luckmann, The Social Construction of Reality (Doubleday, 1966).','Anthony Giddens, The Constitution of Society (Polity, 1984).','David J. Chalmers, “Facing Up to the Problem of Consciousness,” Journal of Consciousness Studies 2(3), 1995: 200–219.','Benjamin Libet et al., “Time of Conscious Intention to Act in Relation to Onset of Cerebral Activity,” Brain 106(3), 1983: 623–642.','William James, The Principles of Psychology (Henry Holt, 1890).',
@@ -676,6 +755,7 @@ function vHome(){
  '<p class="lead">책에서 만난 질문을 내 삶과 우리 사회의 문제로 가져와 연습하는 곳입니다. 생각을 억지로 바꾸라고 하지 않습니다. 생각과 반응 사이에 3초의 틈을 만들고, 사실·해석·가능성을 나누고, 작은 선택 하나로 마칩니다.</p>'+flowStrip()+'</header>'+
  '<div class="entry"><a href="#/debug"><b>사고 디버깅</b><span>큰 “잠깐! 진짜?” 화면에서 시작해, 문제 정의 · 의식구조 · 다섯 질문 · 재해석 · 작은 실험까지 6단계로 내 생각을 살펴봅니다.</span></a>'+
  '<a href="#/map"><b>사고의 순환 지도</b><span>물질에서 마음, 사회까지의 순환과, 닫힌 순환·열린 순환을 눌러 보며 읽습니다.</span></a>'+
+ '<a href="#/methods"><b>사고법</b><span>통합적 · 업스트림 · 구조적 · 백캐스팅. 문제를 전체와 구조로 보고 미래를 설계하는 네 가지 방법.</span></a>'+
  '<a href="#/book"><b>책과 함께</b><span>장별 질문과 실험, 깊이 읽기. 밑줄 친 문장을 디버깅으로 가져갑니다.</span></a>'+
  '<a href="#/canvas"><b>미래 설계</b><span>5단계 캔버스, 30일 실험 카드, 미래 설계 선언문을 작성합니다.</span></a></div>'+
  '<div class="sec" style="margin-top:26px"><span class="eyebrow">책 한 장으로 보기</span><h2>전체 흐름</h2>'+
@@ -715,6 +795,34 @@ function deepRead(){
  '<div class="grid2" style="margin-top:22px"><div class="known"><h3>비교적 확실하게 알려진 것</h3><ul>'+KNOWN.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div><div class="open"><h3>아직 열린 질문</h3><ul>'+OPEN.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div></div>'+
  '<p class="hint" style="margin-top:12px">과학적 사실과 철학적 해석은 섞지 않습니다. 마지막 두 질문은 특히 구분해서 접근해야 하는 영역입니다. 그리고 이 구조는 “아래 단계가 위 단계를 일방적으로 만든다”가 아니라 “서로 다른 층위가 상호작용하며 하나의 복잡한 시스템을 이룬다”로 읽어야 합니다.</p>';
 }
+
+/* ---------- 뷰: 사고법 ---------- */
+if(!DB.methods)DB.methods={};
+var mtKind='int';
+function mwText(m){return ['['+m.name+'] 내 문제에 적용하기'].concat(m.ws.map(function(w,i){return (i+1)+'. '+w[0]+': '+(DB.methods[m.k+'_'+i]||'')})).join('\n')}
+function vMethods(){
+ var m=METHODS.filter(function(x){return x.k===mtKind})[0]||METHODS[0];
+ var tabs=METHODS.map(function(x){return '<button data-mt="'+x.k+'" aria-pressed="'+(x.k===m.k)+'">'+esc(x.name)+'</button>'}).join('');
+ var flow='<div class="flow wrap">'+METHODS.map(function(x,i){return (i?'<span class="bar"></span>':'')+'<span class="n'+(x.k===m.k?' on':'')+'">'+esc(x.short)+'</span>'}).join('')+'</div>';
+ var steps='<ol class="mlines">'+m.steps.map(function(x){return '<li><b>'+esc(x[0])+'</b> — '+esc(x[1])+'</li>'}).join('')+'</ol>';
+ var ladder=m.ladder?'<div class="sec"><span class="label">레버리지 4단계 · 아래로 갈수록 힘이 큽니다</span><ol class="ladder">'+m.ladder.map(function(x){return '<li><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></li>'}).join('')+'</ol></div>':'';
+ var ws=m.ws.map(function(w,i){var k=m.k+'_'+i;return '<div class="sec"><label class="label" for="mw_'+k+'">'+(i+1)+'. '+esc(w[0])+'</label><textarea id="mw_'+k+'" data-mw="'+k+'" placeholder="'+esc(w[1]||'')+'" style="min-height:64px">'+esc(DB.methods[k]||'')+'</textarea></div>'}).join('');
+ return '<header class="sec" style="gap:12px;margin-bottom:18px"><div class="eyebrow">사고법 · 책 13~16장</div><h1>문제를 구조로 보는 네 가지 방법</h1>'+
+  '<p class="lead">사고 디버깅이 내 생각을 바라보는 연습이라면, 사고법은 문제를 전체와 구조로 바라보고 미래를 설계하는 도구입니다. 하나씩 순서대로 쓰기보다 서로 맞물려 쓰는 것이 좋습니다. 각 방법마다 이야기, 단계, 오해하기 쉬운 점, 그리고 내 문제에 적용해 보는 칸이 있습니다.</p></header>'+
+  '<div class="row" style="margin-bottom:10px"><div class="seg" role="group" aria-label="사고법 선택">'+tabs+'</div></div>'+flow+
+  '<section class="card" style="margin-top:14px"><div class="sec"><div class="eyebrow">책 '+esc(m.ch)+'장</div><h2>'+esc(m.name)+'</h2><p class="lead">'+esc(m.tag)+'</p></div>'+
+  '<div class="cmp"><div class="cmp-from"><b>기존의 질문</b>'+esc(m.from)+'</div><div class="cmp-to"><b>이 사고법의 질문</b>'+esc(m.to)+'</div></div>'+
+  '<div class="sec"><span class="label">이야기로 이해하기</span><p>'+esc(m.story)+'</p></div>'+
+  '<div class="sec"><span class="label">이렇게 해 봅니다</span>'+steps+'</div>'+ladder+
+  '<div class="sec"><span class="label">책 속 사례</span><p>'+esc(m.case)+'</p></div>'+
+  '<div class="sec"><span class="label">한 문제에 적용해 보면</span><div class="box">'+esc(m.apply)+'</div></div>'+
+  '<div class="sec"><span class="label">오해하기 쉬운 점</span><ul class="exl" style="color:var(--fg)">'+m.pit.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'+
+  '<div class="sec"><span class="label">생각해 볼 질문</span><ul class="exl" style="color:var(--fg)">'+m.qs.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'+
+  '<div class="row"><button class="btn ghost sm" data-bkch="'+esc(m.ch.split('·')[0])+'">책 '+esc(m.ch)+'장 질문 보기</button><button class="btn ghost sm" data-act="mtDebug">이 사고법으로 내 문제 디버깅하기</button></div></section>'+
+  '<section class="card" style="margin-top:18px"><div class="sec"><h2>내 문제에 적용해 보기</h2><p class="hint">'+esc(m.name)+'의 단계를 따라 한 칸씩 적어 보세요. 비워 둔 칸이 있어도 괜찮고, 내용은 이 기기에 자동 저장됩니다.</p></div>'+ws+
+  '<div class="row"><button class="btn ghost sm" data-act="mwCopy">복사</button><button class="btn ghost sm" data-act="mwSave">파일로 저장</button><button class="btn ghost sm" data-act="mwCanvas">미래 설계의 30일 실험 카드로 옮기기</button><span class="note" id="mwMsg" role="status"></span></div></section>';
+}
+
 /* ---------- 뷰: 책과 함께 ---------- */
 function vBook(){
  var groups=PARTS_BOOK.map(function(pn,pi){
@@ -723,7 +831,7 @@ function vBook(){
  }).join('');
  var c=curCh>=0?CHAPTERS[curCh]:null,det='';
  if(c){
-  var go=c.go||'debug',goLabel={debug:'사고 디버깅 열기',canvas:'미래 설계 열기'}[go]||'지도에서 보기';
+  var go=c.go||'debug',goLabel=go.indexOf('method:')===0?'사고법 열기':({debug:'사고 디버깅 열기',canvas:'미래 설계 열기'}[go]||'지도에서 보기');
   det='<div class="detail" style="margin:16px 0"><div class="eyebrow">'+esc(PARTS_BOOK[c.part])+' · '+esc(c.label)+'</div><h3>'+esc(c.title)+'</h3><div class="quote">“'+esc(c.quote)+'”</div><p><b>뿌리 노트</b> '+esc(c.root)+'</p>'+
   (c.qs.length?'<div class="sec"><span class="label">생각해 볼 질문 — 눌러서 아래 칸으로 가져가기</span>'+c.qs.map(function(q,i){return '<button class="chip qchip" data-bq="'+i+'">'+esc(q)+'</button>'}).join('')+'</div>':'')+
   (c.lab?'<p class="hint"><b>관점 전환 실험실</b> '+esc(c.lab)+'</p>':'')+
@@ -771,7 +879,7 @@ function vNotes(){
 }
 
 /* ---------- 라우팅 / 렌더 ---------- */
-var ROUTES=['home','debug','map','book','canvas','notes'],ROUTE='home';
+var ROUTES=['home','debug','map','methods','book','canvas','notes'],ROUTE='home';
 try{var h0=(location.hash||'').replace('#/','').replace('#','');if(ROUTES.indexOf(h0)>=0)ROUTE=h0}catch(e){}
 function route(){return ROUTE}
 function setRoute(r,keep){
@@ -788,7 +896,7 @@ function render(){
  document.querySelectorAll('.top a.tab').forEach(function(a){if(a.dataset.r===r)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
  var c0=$('#cf');if(c0){c0.hidden=true;pend=null}
  clearInterval(pt);
- $('#view').innerHTML={home:vHome,debug:vDebug,map:vMap,book:vBook,canvas:vCanvas,notes:vNotes}[r]();
+ $('#view').innerHTML={home:vHome,debug:vDebug,map:vMap,methods:vMethods,book:vBook,canvas:vCanvas,notes:vNotes}[r]();
  if(r==='debug'&&D.started&&D.pause&&!D.busy)startPause();
 }
 function dGo(n){D.step=n;D.err='';save();render();window.scrollTo({top:0})}
@@ -816,6 +924,7 @@ document.addEventListener('input',function(e){
  else if(t.id==='bkQuote'){bk.q=t.value}
  else if(t.id==='bkIssue'){bk.i=t.value;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed','false')})}
  else if(t.dataset&&t.dataset.cv){DB.canvas[t.dataset.cv]=t.value;save()}
+ else if(t.dataset&&t.dataset.mw){DB.methods[t.dataset.mw]=t.value;save()}
 });
 document.addEventListener('change',function(e){
  if(e.target.id!=='imp')return;
@@ -828,12 +937,13 @@ function chGo(c){
  var g=c.go||'debug';
  if(g==='debug')openDebug(c.issue||'','','《'+CONFIG.bookTitle+'》 '+c.label);
  else if(g==='canvas')setRoute('canvas');
+ else if(g.indexOf('method:')===0){mtKind=g.slice(7);setRoute('methods')}
  else if(g.indexOf('map:')===0){mapKind=g.slice(4);mapSel=0;setRoute('map')}
 }
 document.addEventListener('click',function(e){
  var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
  var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
- var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl],[data-sc]');
+ var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl],[data-sc],[data-mt],[data-bkch]');
  if(!el)return;var d=el.dataset;
  /* 사고 디버깅 */
  if(d.dIssue!==undefined){D.issue=d.dIssue;startIssue();return}
@@ -859,6 +969,8 @@ document.addEventListener('click',function(e){
  }
  /* 지도 · 책 · 기록 */
  if(d.sc){var tid=d.sc;if(ROUTE!=='book')setRoute('book');var tg=document.getElementById(tid);if(tg){if(tg.tagName==='DETAILS')tg.open=true;tg.scrollIntoView({block:'start'})}return}
+ if(d.mt){mtKind=d.mt;render();return}
+ if(d.bkch){var ci=CHAPTERS.map(function(c){return c.id}).indexOf(d.bkch);if(ci>=0){curCh=ci;bk.w=CHAPTERS[ci].label}setRoute('book');return}
  if(d.fl!==undefined){var fl=FLOW[+d.fl];chGo({go:fl[4],label:fl[0]});return}
  if(d.node!==undefined){mapSel=+d.node;render();return}
  if(d.kind){mapKind=d.kind;mapSel=0;render();return}
@@ -869,7 +981,12 @@ document.addEventListener('click',function(e){
  if(d.bq!==undefined){var c2=CHAPTERS[curCh],q=c2.qs[+d.bq];bk.q=q;var qt=$('#bkQuote');if(qt){qt.value=q;qt.focus()}if(c2.issue&&!bk.i){bk.i=c2.issue;var bi=$('#bkIssue');if(bi)bi.value=c2.issue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.bkissue===c2.issue))})}return}
  if(d.bkissue){bk.i=d.bkissue;var bi2=$('#bkIssue');if(bi2)bi2.value=d.bkissue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});return}
  var act=d.act;
- if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];openDebug('','','지도 · '+nd.n+' — 잠깐! '+nd.q)}
+ var mm=METHODS.filter(function(x){return x.k===mtKind})[0];
+ if(act==='mwCopy'){copy(mwText(mm),function(m2){var e3=$('#mwMsg');if(e3)e3.textContent=m2},$('#mwMsg'))}
+ else if(act==='mwSave'){dl('사고법_'+mm.name+'_'+today()+'.txt',mwText(mm),'text/plain').then(function(ok){if(!ok)showText($('#mwMsg'),mwText(mm))})}
+ else if(act==='mwCanvas'){var lastv=DB.methods[mm.k+'_'+(mm.ws.length-1)],firstv=DB.methods[mm.k+'_0'];if(lastv&&!DB.canvas.e1)DB.canvas.e1=lastv;if(firstv&&mm.k!=='back'&&!DB.canvas.e0)DB.canvas.e0=firstv;save();setRoute('canvas')}
+ else if(act==='mtDebug'){openDebug('','','사고법 · '+mm.name)}
+ else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];openDebug('','','지도 · '+nd.n+' — 잠깐! '+nd.q)}
  else if(act==='bookGo'){var q2v=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q2v){$('#bkQuote').focus();return}openDebug(iss,q2v,'《'+CONFIG.bookTitle+'》'+(w?' '+w:''));bk={q:'',w:'',i:''}}
  else if(act==='chGo'){chGo(CHAPTERS[curCh])}
  else if(act==='copyCanvas'){copy(canvasText(),function(m){var e2=$('#cvMsg');if(e2)e2.textContent=m},$('#cvMsg'))}
