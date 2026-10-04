@@ -416,10 +416,10 @@ var DB=store.get()||{};
 if(!DB.records)DB.records=[]; if(!DB.canvas)DB.canvas={};
 /* 사고 디버깅 상태 */
 var DSTEPS=['문제 고르기','문제 정의','의식구조','다섯 질문','재해석','작은 실험'];
-function blankD(){return {started:false,pause:false,step:0,issue:'',thought:'',source:'',def:null,pats:null,picked:[],dbg:null,ans:{},rf:null,exp:null,ex:{pred:'',real:'',found:''},busy:false,err:''}}
+function blankD(){return {s0:'issue',started:false,pause:false,step:0,issue:'',thought:'',source:'',def:null,pats:null,picked:[],dbg:null,ans:{},rf:null,exp:null,ex:{pred:'',real:'',found:''},busy:false,err:''}}
 var D=Object.assign(blankD(),DB.dbg||{});
 D.busy=false;D.pause=false;D.err='';if(!D.ans)D.ans={};if(!D.ex)D.ex={pred:'',real:'',found:''};if(!D.picked)D.picked=[];
-D.started=D.step>0;
+D.started=D.step>0; if(!D.s0)D.s0=(D.issue&&D.step===0)?'thought':'issue';
 function save(){DB.dbg=D;store.set(DB)}
 var mapKind='personal', mapSel=0, curCh=-1, bk={q:'',w:'',i:''};
 
@@ -524,16 +524,35 @@ function vPause(){
  '<p class="lead" style="text-align:center">판단도 정답도 없습니다. 숨을 한 번 천천히 쉬고, 방금 쓴 생각을 바라보세요.</p>'+
  '<button class="btn" id="pauseGo" data-d-act="pauseGo" disabled>숨을 쉬는 중…</button></div>';
 }
+var ISSUE_EX={
+ '저출생':['저출생은 결국 요즘 젊은 사람들이 이기적이어서 생기는 일이다.','아이를 낳으려면 돈이 있어야 하니 결국 경제 문제일 뿐이다.'],
+ '초고령사회와 노인의 빈곤·고립':['노인 빈곤은 젊을 때 준비하지 않은 본인 책임이다.','노인 인구가 늘면 나라 재정은 무너질 수밖에 없다.'],
+ '청년 일자리와 불평등':['일자리가 없는 게 아니라 청년들이 눈높이가 높은 것이다.','불평등은 어느 사회에나 있으니 어쩔 수 없다.'],
+ '지역소멸':['사람들이 다 서울로 가니 지방은 어쩔 수 없다.','지방에 돈을 쏟아부어 봐야 소용없다.'],
+ 'AI 대전환과 일자리·정체성 상실':['AI가 내 일자리를 대체할 것이다.','나이 들어 새로운 기술을 배우기는 어렵다.'],
+ '교육 경쟁':['남들이 다 하니 우리 아이만 안 시킬 수는 없다.','교육 경쟁은 공정한 경쟁이니 어쩔 수 없다.'],
+ '갈등과 혐오':['저쪽 사람들은 원래 말이 안 통한다.','다들 편이 갈려 있어서 대화는 소용없다.'],
+ '기후위기':['나 한 사람이 실천해 봐야 아무 소용 없다.','기후위기는 결국 정부와 기업이 해결할 문제다.']
+};
+function issueEx(){return ISSUE_EX[D.issue]||['이 문제는 결국 누군가 노력하지 않아서 생기는 일이다.','이 문제는 원래 그런 것이라 바뀌기 어렵다.']}
 function v0(){
+ if(D.s0==='thought'&&D.issue.trim()){
+  var ex=issueEx(),ok=D.thought.trim().length>3;
+  return '<div class="card">'+
+   '<div class="sec"><div class="row end"><span class="label">선택한 문제</span><button class="btn ghost sm" data-d-act="changeIssue">문제 바꾸기</button></div><h2>'+esc(D.issue)+'</h2></div>'+
+   '<div class="sec"><h3>이 문제에 대해 평소 드는 생각은요?</h3><p class="hint">한두 문장이면 충분합니다. 맞는지 틀린지 따지지 않고 떠오르는 대로 적어 주세요.</p>'+
+   '<textarea id="dThought" placeholder="예: '+esc(ex[0])+'">'+esc(D.thought)+'</textarea>'+
+   '<span class="hint">떠오르지 않으면 예시를 눌러 시작해 보세요.</span><div class="chips">'+ex.map(function(x){return '<button type="button" class="chip" data-d-ex="'+esc(x)+'">'+esc(x)+'</button>'}).join('')+'</div>'+
+   (D.source?'<p class="note">가져온 곳: '+esc(D.source)+'</p>':'')+'</div>'+
+   '<div class="row end"><span class="note">다음 단계에서 AI가 문제를 먼저 정의합니다.</span><button class="btn" data-d-act="to1" id="dGo0"'+(ok?'':' disabled')+'>문제 정의하기</button></div></div>';
+ }
  var chips=ISSUES.map(function(x){return '<button type="button" class="chip" aria-pressed="'+(D.issue===x)+'" data-d-issue="'+esc(x)+'">'+esc(x)+'</button>'}).join('');
- var ok=D.issue.trim().length>0 && D.thought.trim().length>3;
+ var ok2=D.issue.trim().length>0;
  return '<div class="card">'+
-  '<div class="sec"><h2>어떤 문제를 바라볼까요?</h2><p class="lead">우리 사회가 마주한 문제를 하나 고르거나 직접 적어 주세요.</p><div class="chips">'+chips+'</div>'+
-  '<label class="hint" for="dIssue">직접 입력</label><input type="text" id="dIssue" placeholder="예: 돌봄의 공백, 비정규직, 주거 불안" value="'+(ISSUES.indexOf(D.issue)<0?esc(D.issue):'')+'"></div>'+
-  '<div class="sec"><h3>이 문제에 대해 평소 드는 생각은요?</h3><p class="hint">한두 문장이면 충분합니다. 맞는지 틀린지 따지지 않고 떠오르는 대로 적어 주세요.</p>'+
-  '<textarea id="dThought" placeholder="예: 저출생은 결국 요즘 젊은 사람들이 이기적이어서 생기는 일이다.">'+esc(D.thought)+'</textarea>'+
+  '<div class="sec"><h2>어떤 문제를 바라볼까요?</h2><p class="lead">우리 사회가 마주한 문제를 하나 고르거나 직접 적어 주세요. 누르면 바로 다음으로 넘어갑니다.</p><div class="chips">'+chips+'</div>'+
+  '<label class="hint" for="dIssue">직접 입력</label><input type="text" id="dIssue" placeholder="예: 돌봄의 공백, 비정규직, 주거 불안" value="'+(ISSUES.indexOf(D.issue)<0?esc(D.issue):'')+'">'+
   (D.source?'<p class="note">가져온 곳: '+esc(D.source)+'</p>':'')+'</div>'+
-  '<div class="row end"><span class="note">다음 단계에서 AI가 문제를 먼저 정의합니다.</span><button class="btn" data-d-act="to1" id="dGo0"'+(ok?'':' disabled')+'>문제 정의하기</button></div></div>';
+  '<div class="row end"><span class="note">고른 문제에 대해 다음 화면에서 내 생각을 적습니다.</span><button class="btn" data-d-act="issueNext" id="dIssueGo"'+(ok2?'':' disabled')+'>이 문제로 계속</button></div></div>';
 }
 function v1(){
  if(D.busy) return dLoading('문제를 정의하는 중입니다');
@@ -591,9 +610,9 @@ function v5(){
  if(!D.exp) return '<div class="card"><h2>작은 실험</h2>'+dErr('exp')+dNav(true,'','')+'</div>';
  var e=D.exp;
  return '<div class="card"><div class="sec"><div class="eyebrow">행동 → 경험 → 다시 생각</div><h2>오늘 해볼 작은 실험</h2><div class="quote">'+esc(e.action)+'</div><p class="hint">'+esc(e.why)+'</p></div>'+
-  '<div class="sec"><span class="label">예상</span><span class="hint">'+esc(e.predict)+'</span><textarea id="exPred" data-d-ex="pred">'+esc(D.ex.pred)+'</textarea></div>'+
-  '<div class="sec"><span class="label">실제 경험</span><span class="hint">'+esc(e.observe)+' (실험을 마친 뒤 적어 주세요)</span><textarea id="exReal" data-d-ex="real">'+esc(D.ex.real)+'</textarea></div>'+
-  '<div class="sec"><span class="label">새로운 발견</span><textarea id="exFound" data-d-ex="found">'+esc(D.ex.found)+'</textarea></div>'+
+  '<div class="sec"><span class="label">예상</span><span class="hint">'+esc(e.predict)+'</span><textarea id="exPred" data-d-fx="pred">'+esc(D.ex.pred)+'</textarea></div>'+
+  '<div class="sec"><span class="label">실제 경험</span><span class="hint">'+esc(e.observe)+' (실험을 마친 뒤 적어 주세요)</span><textarea id="exReal" data-d-fx="real">'+esc(D.ex.real)+'</textarea></div>'+
+  '<div class="sec"><span class="label">새로운 발견</span><textarea id="exFound" data-d-fx="found">'+esc(D.ex.found)+'</textarea></div>'+
   '<div class="row"><button class="btn ghost" data-d-act="copy" id="copyBtn">내 기록 복사</button><button class="btn" data-d-act="saveRec">내 기록에 저장</button><span class="note" id="copyNote" role="status"></span></div>'+
   '<div class="final">내가 지금 생각하고 있는 것이<br>정말 내가 선택한 생각인가?<small>멈추고 · 질문하고 · 구분하고 · 바라보고 · 확장하고 · 선택하고 · 행동한다</small></div>'+
   '<div class="row end"><button class="btn ghost" data-d-act="back">이전</button><button class="btn ghost" data-d-act="restart">처음부터 다시</button></div></div>';
@@ -619,7 +638,7 @@ function dRecord(){
  return {id:Date.now().toString(36),date:today(),issue:D.issue,thought:D.thought,source:D.source,mode:'debug',
   f:{q1:a.q1||'',q2:a.q2||'',q3:a.q3||'',before:r.before||'',after:r.after||'',q5:a.q5||'',keep:r.keepAsking||'',personal:(r.personal||[]).join('\n'),community:(r.community||[]).join('\n'),action:e.action||'',pred:D.ex.pred||'',real:D.ex.real||'',found:D.ex.found||''}};
 }
-function openDebug(issue,thought,source){D=blankD();D.started=true;D.issue=issue||'';D.thought=thought||'';D.source=source||'';save();setRoute('debug',true)}
+function openDebug(issue,thought,source){D=blankD();D.started=true;D.s0=issue?'thought':'issue';D.issue=issue||'';D.thought=thought||'';D.source=source||'';save();setRoute('debug',true)}
 
 /* ---------- 뷰: 홈 ---------- */
 function vHome(){
@@ -755,7 +774,7 @@ function ask2(msg,fn){pend=fn;var c=$('#cf');c.hidden=false;c.innerHTML=esc(msg)
 function say(m){var e=$('#notesMsg');if(e)e.textContent=m}
 function copy(t,after,box){(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){after('복사했습니다.')}).catch(function(){var m=box||$('#notesMsg');if(m)m.innerHTML='복사하지 못했습니다. 아래 내용을 선택해 복사하세요.<textarea readonly style="min-height:120px;margin-top:8px">'+esc(t)+'</textarea>'})}
 function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function dUpd(){var g=$('#dGo0');if(g)g.disabled=!(D.issue.trim().length>0&&D.thought.trim().length>3)}
+function dUpd(){var g=$('#dGo0');if(g)g.disabled=!(D.issue.trim().length>0&&D.thought.trim().length>3);var h=$('#dIssueGo');if(h)h.disabled=!D.issue.trim().length}
 
 /* ---------- 이벤트 ---------- */
 document.addEventListener('input',function(e){
@@ -763,7 +782,7 @@ document.addEventListener('input',function(e){
  if(t.id==='dThought'){D.thought=t.value;save();dUpd()}
  else if(t.id==='dIssue'){D.issue=t.value.trim();document.querySelectorAll('[data-d-issue]').forEach(function(b){b.setAttribute('aria-pressed','false')});save();dUpd()}
  else if(t.dataset&&t.dataset.dAns!==undefined){D.ans[t.dataset.dAns]=t.value;save()}
- else if(t.dataset&&t.dataset.dEx!==undefined){D.ex[t.dataset.dEx]=t.value;save()}
+ else if(t.dataset&&t.dataset.dFx!==undefined){D.ex[t.dataset.dFx]=t.value;save()}
  else if(t.id==='bkWhere'){bk.w=t.value}
  else if(t.id==='bkQuote'){bk.q=t.value}
  else if(t.id==='bkIssue'){bk.i=t.value;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed','false')})}
@@ -785,15 +804,18 @@ function chGo(c){
 document.addEventListener('click',function(e){
  var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
  var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
- var el=e.target.closest('[data-d-issue],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl]');
+ var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl]');
  if(!el)return;var d=el.dataset;
  /* 사고 디버깅 */
- if(d.dIssue!==undefined){D.issue=d.dIssue;var it=$('#dIssue');if(it)it.value='';document.querySelectorAll('[data-d-issue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});dUpd();save();return}
+ if(d.dIssue!==undefined){D.issue=d.dIssue;D.s0='thought';save();render();window.scrollTo({top:0});var tt=$('#dThought');if(tt)tt.focus({preventScroll:true});return}
+ if(d.dEx!==undefined){var tx=$('#dThought');if(tx){tx.value=d.dEx;D.thought=d.dEx;save();dUpd();tx.focus({preventScroll:true})}return}
  if(d.dPat!==undefined){var i=+d.dPat,k=D.picked.indexOf(i);if(k>=0)D.picked.splice(k,1);else D.picked.push(i);el.setAttribute('aria-pressed',String(k<0));save();return}
  if(d.dGo!==undefined){dGo(+d.dGo);return}
  if(d.dAct){
   var a=d.dAct;
-  if(a==='start'){D.started=true;save();render();window.scrollTo({top:0})}
+  if(a==='issueNext'){if(D.issue.trim()){D.s0='thought';save();render();window.scrollTo({top:0});var t2=$('#dThought');if(t2)t2.focus({preventScroll:true})}}
+  else if(a==='changeIssue'){D.s0='issue';save();render()}
+  else if(a==='start'){D.started=true;save();render();window.scrollTo({top:0})}
   else if(a==='back')dGo(Math.max(0,D.step-1));
   else if(a==='to1'){D.pause=true;save();render();window.scrollTo({top:0})}
   else if(a==='pauseGo'){D.pause=false;D.def=null;D.pats=null;D.dbg=null;D.rf=null;D.exp=null;D.step=1;doDefine()}
