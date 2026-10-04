@@ -36,7 +36,7 @@ h2{font-size:clamp(23px,4.5vw,30px)} h3{font-size:19px} p{margin:0}
 .note{font-size:13px;color:var(--muted)} .hint{font-size:14px;color:var(--muted)}
 a{color:var(--accent)}
 /* top nav */
-.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .top .in{max-width:780px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:6px;overflow-x:auto}
 .brand{font-family:var(--font-display);font-weight:700;margin-right:auto;white-space:nowrap;color:var(--fg);text-decoration:none}
 .top a.tab{white-space:nowrap;text-decoration:none;color:var(--muted);font-size:14px;padding:8px 12px;border-radius:999px;min-height:40px;display:inline-flex;align-items:center}
@@ -107,6 +107,8 @@ details.part .bd{padding:0 0 16px;display:flex;flex-direction:column;gap:10px}
 /* records */
 .rec{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 .rec pre{white-space:pre-wrap;font:inherit;font-size:14px;margin:8px 0 0;color:var(--muted)}
+.cf{position:sticky;top:56px;z-index:4;margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cf[hidden]{display:none}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -121,7 +123,7 @@ footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direc
   <a class="tab" href="#/book" data-r="book">책과 함께</a>
   <a class="tab" href="#/notes" data-r="notes">내 기록</a>
 </div></nav>
-<div class="wrap"><main id="view"></main>
+<div class="wrap"><div id="cf" class="err cf" role="alert" hidden></div><main id="view"></main>
 <footer>
   <div>입력한 글은 이 기기의 브라우저 안에만 저장되며 서버로 전송되지 않습니다. (AI 보조를 켠 경우에만 해당 단계의 글이 AI에 전달됩니다.)</div>
   <div>이 앱은 진단이나 치료 도구가 아니라 생각을 바라보는 연습 도구입니다. 마음이 많이 힘들 때는 가까운 사람이나 전문가의 도움을 받으세요.</div>
@@ -401,17 +403,27 @@ function vNotes(){
 }
 
 /* ---------- 라우팅 / 렌더 ---------- */
-function route(){var h=(location.hash||'#/home').replace('#/','');return ['home','debug','map','book','notes'].indexOf(h)>=0?h:'home'}
+var ROUTES=['home','debug','map','book','notes'],ROUTE='home';
+try{var h0=(location.hash||'').replace('#/','').replace('#','');if(ROUTES.indexOf(h0)>=0)ROUTE=h0}catch(e){}
+function route(){return ROUTE}
+function setRoute(r){ROUTE=r;errMsg='';render();window.scrollTo({top:0})}
 function render(){
  var r=route();
  document.querySelectorAll('.top a.tab').forEach(function(a){if(a.dataset.r===r)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ var c0=$('#cf');if(c0){c0.hidden=true;pend=null}
  $('#view').innerHTML={home:vHome,debug:vDebug,map:vMap,book:vBook,notes:vNotes}[r]();
  if(r==='debug')aiAvailable().then(function(ok){if(!ok)document.querySelectorAll('[data-ai]').forEach(function(b){b.hidden=true})});
 }
 function go(n){S.step=n;errMsg='';save();render();window.scrollTo({top:0})}
-function dl(name,text,type){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+async function dl(name,text,type){
+ try{var d=await claude.use('downloads');if(d){await d.save({filename:name,data:text});return}}catch(e){if(e&&e.code==='declined')return}
+ try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}catch(e){}
+ var m=$('#notesMsg');if(m)m.innerHTML='내려받기를 사용할 수 없어 아래에 내용을 표시합니다. 전체 선택해 복사하세요.<textarea readonly style="min-height:140px;margin-top:8px">'+esc(text)+'</textarea>'
+}
+var pend=null;
+function ask2(msg,fn){pend=fn;var c=$('#cf');c.hidden=false;c.innerHTML=esc(msg)+' <button class="btn sm" data-cf="y">확인</button> <button class="btn ghost sm" data-cf="n">취소</button>';c.scrollIntoView({block:'nearest'})}
 function say(m){var e=$('#notesMsg');if(e)e.textContent=m}
-function copy(t,after){(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){after('복사했습니다.')}).catch(function(){window.prompt('아래 내용을 복사하세요',t)})}
+function copy(t,after){(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){after('복사했습니다.')}).catch(function(){var m=$('#notesMsg');if(m)m.innerHTML='복사하지 못했습니다. 아래 내용을 선택해 복사하세요.<textarea readonly style="min-height:120px;margin-top:8px">'+esc(t)+'</textarea>'})}
 function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
 document.addEventListener('input',function(e){
@@ -429,6 +441,8 @@ document.addEventListener('change',function(e){
 });
 document.addEventListener('keydown',function(e){var n=e.target.closest&&e.target.closest('[data-node]');if(n&&(e.key==='Enter'||e.key===' ')){e.preventDefault();mapSel=+n.dataset.node;render()}});
 document.addEventListener('click',function(e){
+ var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
+ var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
  var el=e.target.closest('[data-issue],[data-pat],[data-go],[data-act],[data-node],[data-kind],[data-starter],[data-exp],[data-copy],[data-del],[data-resume],[data-ch],[data-bkissue]');
  if(!el)return;var d=el.dataset;
  if(d.issue!==undefined){S.issue=d.issue;var it=$('#issueIn');if(it)it.value='';document.querySelectorAll('[data-issue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});var g=$('#go0');if(g)g.disabled=!(S.issue&&S.thought.trim().length>3);save();return}
@@ -439,24 +453,23 @@ document.addEventListener('click',function(e){
  if(d.starter){var a=$('[data-f="after"]');if(a){a.value=(a.value?a.value+'\n':'')+d.starter;S.f.after=a.value;save();a.focus()}return}
  if(d.exp){var x=$('[data-f="action"]');if(x){x.value=d.exp;S.f.action=d.exp;save()}return}
  if(d.copy){var r=DB.records.filter(function(r){return r.id===d.copy})[0];if(r)copy(recText(r),say);return}
- if(d.del){if(confirm('이 기록을 삭제할까요? 되돌릴 수 없습니다.')){DB.records=DB.records.filter(function(r){return r.id!==d.del});save();render()}return}
- if(d.resume){var rr=DB.records.filter(function(r){return r.id===d.resume})[0];if(rr){S=DB.draft=Object.assign(blank(),{step:5,issue:rr.issue,thought:rr.thought,source:rr.source||'',f:Object.assign({},rr.f)});save();location.hash='#/debug';render()}return}
+ if(d.del){ask2('이 기록을 삭제할까요? 되돌릴 수 없습니다.',function(){DB.records=DB.records.filter(function(r){return r.id!==d.del});save();render()});return}
+ if(d.resume){var rr=DB.records.filter(function(r){return r.id===d.resume})[0];if(rr){S=DB.draft=Object.assign(blank(),{step:5,issue:rr.issue,thought:rr.thought,source:rr.source||'',f:Object.assign({},rr.f)});save();setRoute('debug')}return}
  if(d.ch!==undefined){var c=CONFIG.chapters[+d.ch];$('#bkWhere').value=c.title;if(c.question)$('#bkQuote').placeholder=c.question;if(c.issue)$('#bkIssue').value=c.issue;return}
  if(d.bkissue){$('#bkIssue').value=d.bkissue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});return}
  var act=d.act;
  if(act==='back')go(Math.max(0,S.step-1));
- else if(act==='next'){var n=Math.min(STEPS.length-1,S.step+1);if(n===5&&S.step===4&&!S.f.after&&!confirm('새로운 해석을 비워 둔 채로 넘어갈까요?'))return;go(n)}
+ else if(act==='next'){var n=Math.min(STEPS.length-1,S.step+1);if(n===5&&S.step===4&&!S.f.after){ask2('새로운 해석을 비워 둔 채로 넘어갈까요?',function(){go(5)});return}go(n)}
  else if(act==='ai-define')runAI('define');
  else if(act==='ai-reframe')runAI('reframe');
- else if(act==='restart'){if(confirm('지금까지 쓴 내용을 지우고 새로 시작할까요? (저장한 기록은 유지됩니다)')){S=DB.draft=blank();save();render();window.scrollTo({top:0})}}
- else if(act==='saveRec'){DB.records.push({id:Date.now().toString(36),date:today(),issue:S.issue,thought:S.thought,source:S.source,f:Object.assign({},S.f)});S=DB.draft=blank();save();location.hash='#/notes'}
- else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];S.issue=S.issue||'';S.source=nd.n+' — 잠깐! '+nd.q;save();location.hash='#/debug';go(0)}
- else if(act==='bookGo'){var q=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q){$('#bkQuote').focus();return}S=DB.draft=blank();S.thought=q;S.issue=iss;S.source=(w?w+' · ':'')+(CONFIG.bookTitle?'《'+CONFIG.bookTitle+'》':'책');save();location.hash='#/debug';render()}
+ else if(act==='restart'){ask2('지금까지 쓴 내용을 지우고 새로 시작할까요? (저장한 기록은 유지됩니다)',function(){S=DB.draft=blank();save();render();window.scrollTo({top:0})})}
+ else if(act==='saveRec'){DB.records.push({id:Date.now().toString(36),date:today(),issue:S.issue,thought:S.thought,source:S.source,f:Object.assign({},S.f)});S=DB.draft=blank();save();setRoute('notes')}
+ else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];S.issue=S.issue||'';S.source=nd.n+' — 잠깐! '+nd.q;save();setRoute('debug');go(0)}
+ else if(act==='bookGo'){var q=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q){$('#bkQuote').focus();return}S=DB.draft=blank();S.thought=q;S.issue=iss;S.source=(w?w+' · ':'')+(CONFIG.bookTitle?'《'+CONFIG.bookTitle+'》':'책');save();setRoute('debug')}
  else if(act==='exportJson')dl('잠깐진짜_기록_'+today()+'.json',JSON.stringify(DB.records,null,2),'application/json');
  else if(act==='exportTxt')dl('잠깐진짜_기록_'+today()+'.txt',DB.records.map(recText).join('\n\n----------------\n\n'),'text/plain');
  else if(act==='importJson')$('#imp').click();
 });
-window.addEventListener('hashchange',function(){render();window.scrollTo({top:0})});
 render();
 })();
 </script>
