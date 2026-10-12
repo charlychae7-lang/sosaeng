@@ -1040,7 +1040,7 @@ function bindPlan(){
  $("#pl-filter").querySelectorAll("button").forEach(b=>b.onclick=()=>{planFilter=b.dataset.f;renderMain()});
  $("#pl-add").onclick=()=>{const t=$("#pl-ct").value.trim(),d=$("#pl-cd").value;if(!t||!d){toast("할 일과 날짜를 모두 넣어 주세요");return}upd(p=>p.custom.push({id:"c"+Date.now(),title:t,date:d,memo:$("#pl-cm").value.trim()}));toast("일정을 추가했습니다")};
  $("#pl-jump").onclick=()=>{const el=document.querySelector(".ev[data-up]");if(el)el.scrollIntoView({behavior:"smooth",block:"center"})};
- $("#pl-ics").onclick=()=>{const p=getPlan();const ev=genPlan(p).filter(e=>!p.done[e.id]&&diff(e.date)>=0);
+ $("#pl-ics").onclick=()=>{if(!/github\.io$/.test(location.hostname)&&location.protocol!=="file:"){$("#pl-msg").innerHTML=`이 화면에서는 파일을 내려받을 수 없습니다. <a href="https://charlychae7-lang.github.io/sosaeng/coop-guide/" target="_blank" rel="noopener">같이세움 사이트</a>에서 같은 버튼을 누르거나, 각 일정의 <b>달력+</b> 버튼을 이용하세요.`;return}const p=getPlan();const ev=genPlan(p).filter(e=>!p.done[e.id]&&diff(e.date)>=0);
   try{const blob=new Blob([icsText(ev)],{type:"text/calendar;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="같이세움_일정.ics";document.body.appendChild(a);a.click();a.remove();
    $("#pl-msg").innerHTML=`남은 일정 ${ev.length}건을 파일로 만들었습니다. 내려받은 <b>같이세움_일정.ics</b> 파일을 열면 휴대폰·구글·아웃룩 달력에 들어갑니다. 파일이 내려받아지지 않으면 각 일정의 <b>달력+</b> 버튼으로 하나씩 넣을 수 있습니다.`}catch(e){$("#pl-msg").textContent="이 화면에서는 파일을 내려받을 수 없습니다. 각 일정의 '달력+' 버튼을 이용하세요."}};
  $("#pl-noti").onclick=async()=>{const p=getPlan();if(p.notify){upd(q=>q.notify=false);return}
