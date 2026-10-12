@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>사회적경제 창립 길잡이</title>
-<meta name="description" content="협동조합·사회적협동조합·사회적기업·마을기업·자활기업의 창립 절차, 창립 이후 운영 의무, 협동조합 서식 자료실을 한곳에 모은 매뉴얼">
-<meta property="og:title" content="사회적경제 창립 길잡이">
-<meta property="og:description" content="협동조합·사회적협동조합·사회적기업·마을기업·자활기업 창립과 운영 매뉴얼, 서식 35종 자료실">
+<title>같이세움 · 사회연대경제 창립·운영 내비게이터</title>
+<meta name="description" content="협동조합·사회적협동조합·사회적기업·마을기업·자활기업 — 창립총회 D-day 일정표, 설립 절차, 운영 의무, 서식 35종 자료실">
+<meta property="og:title" content="같이세움 · 사회연대경제 창립·운영 내비게이터">
+<meta property="og:description" content="함께 세우고, 오래 가는 조직. 창립 D-day부터 매년의 운영까지 한곳에서">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#1f5a44">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='8' fill='none' stroke='%23b8322a' stroke-width='5'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='30' font-family='serif' font-weight='700' fill='%23b8322a'%3E%E5%8D%94%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='8' fill='none' stroke='%23b8322a' stroke-width='5'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='30' font-family='sans-serif' font-weight='900' fill='%23b8322a'%3E%EC%84%B8%3C/text%3E%3C/svg%3E">
 <style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 /* Layout: 공문서 서류철 — 상단 조직유형 탭(도장 칩) + 좌측 장(章) 목차 + 본문 서식 카드. 인주 빨강은 도장·경고에만 */
 :root{
-  --paper:#f5f7f4; --sheet:#ffffff; --ink:#1d2a24; --ink-2:#4a5a52; --line:#d5ddd8; --line-2:#e7ece9;
+  --paper:#f5f7f4; --sheet:#ffffff; --ink:#15201b; --ink-2:#3c4a43; --line:#d5ddd8; --line-2:#e7ece9;
   --forest:#1f5a44; --forest-soft:#e3eee8; --seal:#b8322a; --seal-soft:#f8e7e5;
   --ok:#2c7a4b; --warn:#a86a0c; --warn-soft:#fbf1df; --bad:#b8322a;
-  --f-display:"Gowun Batang","Noto Serif KR",serif;
-  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-display:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -33,11 +33,13 @@
   --forest:#7cc4a2; --forest-soft:#1f3229; --seal:#f07a6f; --seal-soft:#3a2120;
   --ok:#74c995; --warn:#e5b25a; --warn-soft:#3a2f1b; --bad:#f07a6f; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.75;letter-spacing:-.005em;word-break:keep-all;-webkit-font-smoothing:antialiased}
 a{color:var(--forest)}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
 header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:8px 18px;border-bottom:2px solid var(--ink)}
-.brand h1{font-family:var(--f-display);font-size:clamp(26px,4vw,38px);line-height:1.2;margin:0;text-wrap:balance}
+.brand h1{font-family:var(--f-display);font-weight:900;font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.04em;margin:0;text-wrap:balance}
+.brand h1 em{font-style:normal;color:var(--seal)}
+.brand .sub{font-size:clamp(16px,2.2vw,20px);font-weight:700;color:var(--ink);margin:6px 0 0;letter-spacing:-.02em}
 .brand p{margin:4px 0 0;color:var(--ink-2);font-size:14.5px}
 .stamp{font-family:var(--f-display);color:var(--seal);border:2px solid var(--seal);border-radius:6px;padding:4px 10px;transform:rotate(-3deg);font-weight:700;font-size:14px;letter-spacing:.05em;white-space:nowrap}
 .types{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);display:flex;gap:8px;overflow-x:auto;padding-block:12px;border-bottom:1px solid var(--line)}
@@ -52,11 +54,11 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 @media (max-width:820px){.layout{grid-template-columns:1fr;gap:14px}.nav{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}.nav button{border-left:0;border-bottom:3px solid transparent;white-space:nowrap;padding:6px 10px}.nav button[aria-current="true"]{border-bottom-color:var(--seal)}}
 main{min-width:0}
 section.pane{display:flex;flex-direction:column;gap:18px}
-h2{font-family:var(--f-display);font-size:clamp(22px,3vw,28px);margin:0;line-height:1.3;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:800;letter-spacing:-.03em;font-size:clamp(23px,3vw,30px);margin:0;line-height:1.3;text-wrap:balance}
 h3{font-size:17px;margin:0 0 8px;font-weight:700}
 .lead{color:var(--ink-2);margin:0;max-width:68ch}
 .sheet{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:20px}
-.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);margin:0 0 4px}
+.eyebrow{font-family:var(--f-body);font-weight:700;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--forest);margin:0 0 4px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
 .grid2>*{min-width:0}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
@@ -109,7 +111,7 @@ textarea{min-height:90px;resize:vertical}
 .doc-tabs{display:flex;flex-wrap:wrap;gap:6px}
 .doc-tabs button{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
 .doc-tabs button[aria-pressed="true"]{border-color:var(--seal);color:var(--seal);font-weight:700}
-.docpaper{background:var(--sheet);border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 8px 24px -16px rgba(0,0,0,.25);padding:clamp(18px,4vw,40px);font-family:var(--f-display);font-size:16px;line-height:1.85;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;min-width:0}
+.docpaper{background:var(--sheet);border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 8px 24px -16px rgba(0,0,0,.25);padding:clamp(18px,4vw,40px);font-family:var(--f-body);font-size:16px;line-height:1.9;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;min-width:0}
 .docpaper .dt{font-size:22px;font-weight:700;text-align:center;display:block;margin-bottom:12px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:6px;font-size:14px;z-index:20}
 ul.clean{margin:0;padding-left:20px} ul.clean li{margin:3px 0}
@@ -151,7 +153,7 @@ ul.clean{margin:0;padding-left:20px} ul.clean li{margin:3px 0}
 .cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .cal>div{min-width:0;background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px}
 .cal>div.now{border:2px solid var(--seal)}
-.cal h4{margin:0 0 8px;font-family:var(--f-display);font-size:19px;display:flex;justify-content:space-between;align-items:baseline}
+.cal h4{margin:0 0 8px;font-family:var(--f-display);font-weight:800;font-size:19px;display:flex;justify-content:space-between;align-items:baseline}
 .cal h4 small{font-family:var(--f-body);font-size:12px;color:var(--seal);font-weight:700}
 .cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
 .cal li{font-size:14px;line-height:1.5;display:grid;grid-template-columns:52px minmax(0,1fr);gap:6px}
@@ -169,6 +171,44 @@ ul.clean{margin:0;padding-left:20px} ul.clean li{margin:3px 0}
 .dl>div:last-child{border-bottom:0}
 .dl b{display:block}
 .dl span{color:var(--ink-2);font-size:14.5px}
+
+/* ── 일정표 ── */
+.navgrp.home{color:var(--seal)}
+.phase.home{background:var(--seal-soft);color:var(--seal)}
+.alertbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:var(--warn-soft);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:15px}
+.alertbar.red{background:var(--seal-soft);border-color:var(--seal)}
+.alertbar.calm{background:var(--forest-soft);border-color:var(--forest)}
+.alertbar b{white-space:nowrap}
+.alertbar .lnk{margin-left:auto;font:inherit;font-weight:700;background:none;border:0;color:var(--forest);cursor:pointer;text-decoration:underline;padding:0}
+.hero-dd{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px 28px;align-items:center}
+@media (max-width:640px){.hero-dd{grid-template-columns:1fr}}
+.ddnum{font-family:var(--f-mono);font-weight:600;font-size:clamp(44px,9vw,76px);line-height:1;letter-spacing:-.04em;color:var(--seal);font-variant-numeric:tabular-nums}
+.ddlab{font-size:14px;font-weight:700;color:var(--ink-2)}
+.tl{display:flex;flex-direction:column;gap:18px}
+.tl-month h4{margin:0 0 6px;font-size:16px;font-weight:800;display:flex;gap:8px;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:4px}
+.tl-month h4 small{font-weight:500;color:var(--ink-2);font-size:13px}
+.ev{display:grid;grid-template-columns:28px 92px minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:10px 4px;border-bottom:1px solid var(--line-2)}
+@media (max-width:640px){.ev{grid-template-columns:28px minmax(0,1fr) auto}.ev .when{grid-column:2/4}.ev .what{grid-column:2/3}}
+.ev input{width:20px;height:20px;margin-top:3px;accent-color:var(--forest)}
+.ev .when{font-family:var(--f-mono);font-size:13.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+.ev .when .dl{display:inline-block;font-weight:600;border-radius:4px;padding:0 5px;margin-top:3px;background:var(--line-2);color:var(--ink-2)}
+.ev .what b{font-weight:700}
+.ev .what p{margin:2px 0 0;color:var(--ink-2);font-size:14.5px;line-height:1.6}
+.ev .acts{display:flex;gap:6px;align-items:center}
+.ev .acts a,.ev .acts button{font-size:12.5px;font-weight:700;white-space:nowrap;border:1px solid var(--line);border-radius:4px;padding:2px 7px;background:var(--sheet);color:var(--forest);text-decoration:none;cursor:pointer;font-family:inherit}
+.ev.done .what b{text-decoration:line-through;color:var(--ink-2)}
+.ev.done{opacity:.65}
+.ev.over .when .dl{background:var(--seal);color:var(--sheet)}
+.ev.soon .when .dl{background:var(--warn);color:var(--sheet)}
+.ev.today .when .dl{background:var(--seal);color:var(--sheet)}
+.ev.dday{background:var(--seal-soft);border-radius:6px}
+.ev.dday .what b{color:var(--seal);font-size:17px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.kpi>div{border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.kpi .k{font-size:13px;color:var(--ink-2)} .kpi .v{font-size:22px;font-weight:800;font-family:var(--f-mono)}
+.kpi .red{border-color:var(--seal)} .kpi .red .v{color:var(--seal)}
+.kpi .amb{border-color:var(--warn)} .kpi .amb .v{color:var(--warn)}
+.kpi .grn{border-color:var(--forest)} .kpi .grn .v{color:var(--forest)}
 footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
 </style>
 
@@ -177,9 +217,10 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-si
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <p class="eyebrow">사회적경제 · 사회연대경제 조직 설립·운영 매뉴얼</p>
-      <h1>사회적경제 창립 길잡이</h1>
-      <p>협동조합 · 사회적협동조합 · 사회적기업 · 마을기업 · 자활기업 — Ⅰ. 창립 전 설립 절차부터 Ⅱ. 창립 이후 운영 의무까지</p>
+      <p class="eyebrow">사회연대경제 창립·운영 내비게이터</p>
+      <h1>같이<em>세움</em></h1>
+      <p class="sub">함께 세우고, 오래 가는 조직 — 창립 D-day부터 매년의 운영까지</p>
+      <p>협동조합 · 사회적협동조합 · 사회적기업 · 마을기업 · 자활기업</p>
     </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn ghost" type="button" id="share-link">링크 복사해서 공유하기</button><div class="stamp">2026.10 기준</div></div>
   </header>
@@ -292,14 +333,15 @@ self:{name:"자활기업",short:"자활기업",law:"국민기초생활 보장법
 const ORDER=["coop","social","se","village","self"];
 
 const SECTIONS=[
+ ["plan","D-day 일정표","home"],
  ["compare","한눈에 비교","pre"],["prep","창립 준비 점검","pre"],["road","설립 로드맵","pre"],["calc","일정·정족수 계산","pre"],["equity","출자 설계","pre"],["charter","정관·사업목적","pre"],["docsgen","창립총회 서류","pre"],["submit","제출서류 점검","pre"],
  ["first","설립 직후 30일","post"],["ops","상시 운영 의무","post"],["year","연간 운영 달력","post"],["meet","총회·이사회 운영","post"],["change","변경신고·등기","post"],["risk","위반·취소 예방","post"],["policy","2026 제도 변화","post"],
  ["lib","협동조합 서식 자료실","lib"]
 ];
-const GRP={pre:"Ⅰ. 창립 전",post:"Ⅱ. 창립 이후",lib:"Ⅲ. 자료실"};
-const PHASE={pre:"Ⅰ. 창립 전 — 설립 매뉴얼",post:"Ⅱ. 창립 이후 — 운영 매뉴얼",lib:"Ⅲ. 자료실 — 서식 모음"};
+const GRP={home:"◎ 내 일정",pre:"Ⅰ. 창립 전",post:"Ⅱ. 창립 이후",lib:"Ⅲ. 자료실"};
+const PHASE={home:"◎ 내 일정 — 창립 D-day부터 운영 알림까지",pre:"Ⅰ. 창립 전 — 설립 매뉴얼",post:"Ⅱ. 창립 이후 — 운영 매뉴얼",lib:"Ⅲ. 자료실 — 서식 모음"};
 
-let state=store.get("sec-state",{type:"coop",sec:"compare"});
+let state=store.get("sec-state",{type:"coop",sec:"plan"});
 if(!TYPES[state.type])state.type="coop";
 if(!SECTIONS.find(s=>s[0]===state.sec))state.sec="compare";
 const ini=(location.hash||"").slice(1);
@@ -320,14 +362,14 @@ function renderNav(){
  $("#nav").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.sec=b.dataset.s;save();renderNav();renderMain();window.scrollTo({top:0})});
 }
 function renderMain(){
- const fn={compare:secCompare,prep:secPrep,road:secRoad,calc:secCalc,equity:secEquity,charter:secCharter,docsgen:secDocs,submit:secSubmit,first:secFirst,ops:secOps,lib:secLib,year:secYear,meet:secMeet,change:secChange,risk:secRisk,policy:secPolicy}[state.sec];
+ const fn={plan:secPlan,compare:secCompare,prep:secPrep,road:secRoad,calc:secCalc,equity:secEquity,charter:secCharter,docsgen:secDocs,submit:secSubmit,first:secFirst,ops:secOps,lib:secLib,year:secYear,meet:secMeet,change:secChange,risk:secRisk,policy:secPolicy}[state.sec];
  const idx=SECTIONS.findIndex(s=>s[0]===state.sec);const phase=SECTIONS[idx][2];
  const prev=SECTIONS[idx-1],next=SECTIONS[idx+1];
- $("#main").innerHTML=`<div class="phase ${phase}">${PHASE[phase]}${phase==="lib"?"":" · "+TYPES[state.type].name}</div><section class="pane">${fn()}</section>
+ $("#main").innerHTML=`${state.sec==="plan"?"":alertBar()}<div class="phase ${phase}">${PHASE[phase]}${phase==="lib"||phase==="home"?"":" · "+TYPES[state.type].name}</div><section class="pane">${fn()}</section>
  <div class="pager">${prev?`<button class="btn ghost" type="button" data-go="${prev[0]}">← ${prev[1]}</button>`:"<span></span>"}${next?`<button class="btn ghost" type="button" data-go="${next[0]}">${next[1]} →</button>`:""}</div>`;
  const eb=$("#main .pane .eyebrow");if(eb)eb.textContent=`${String(idx+1).padStart(2,"0")} · ${SECTIONS[idx][1]}`;
  $("#main").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{state.sec=b.dataset.go;save();renderNav();renderMain();window.scrollTo({top:0})});
- const after={prep:bindChecks,road:bindRoad,calc:bindCalc,equity:bindEquity,docsgen:bindDocs,submit:bindSubmit,first:bindChecks,meet:bindMeet,year:bindChecks,lib:bindLib}[state.sec];
+ const after={plan:bindPlan,prep:bindChecks,road:bindRoad,calc:bindCalc,equity:bindEquity,docsgen:bindDocs,submit:bindSubmit,first:bindChecks,meet:bindMeet,year:bindChecks,lib:bindLib}[state.sec];
  if(after)after();
 }
 
@@ -869,6 +911,148 @@ function secRisk(){const t=state.type;
  <div class="sheet"><h3>${TYPES[t].name}에서 특히 주의</h3><div class="dl">${byType.map(r=>`<div><b class="flag">${r[0]}</b><span>예방: ${r[1]}</span></div>`).join("")}</div></div></div>
  <div class="note green">한 사람에게 맡기지 말고 이사장, 회계 담당 이사, 감사가 분기마다 함께 이 목록을 점검하세요.</div>`;}
 
+/* ───────── ◎ D-day 일정표 ───────── */
+const pd=s=>{if(!s)return null;const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const plus=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const today0=()=>{const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())};
+const diff=d=>Math.round((d-today0())/864e5);
+const biz=d=>{const x=new Date(d);while(x.getDay()===0||x.getDay()===6)x.setDate(x.getDate()+1);return x};
+const ymd=(y,m,d)=>new Date(y,m-1,d);
+const endOfMonth=(y,m)=>new Date(y,m,0);
+function getPlan(){return store.get("plan",{dday:"",fy:12,term:4,months:15,taxfree:false,custom:[],done:{},filter:"all",notify:false})}
+function setPlan(p){store.set("plan",p)}
+function genPlan(p){
+ const D=pd(p.dday);if(!D)return[];const t=state.type;const ev=[];
+ const add=(date,title,desc,phase,kind,id)=>ev.push({id:id||(phase+"-"+title+"-"+iso(date)),date,title,desc,phase,kind});
+ const pre=[[-60,"발기인 5인 이상 확정, 역할 분담","정관·서류, 회계, 홍보, 사업 담당을 정합니다.","task"],
+  [-50,"조직명 중복 확인 · 주사무소 확보","인터넷등기소 상호 검색, 임대차계약서 또는 무상사용승낙서 준비","task"],
+  [-45,"정관 초안 작성","표준정관례를 바탕으로 필수기재사항 14개를 모두 넣습니다.","task"],
+  [-35,"사업계획서·수입지출 예산서 초안","첫 사업연도 계획과 예산. 출자금은 영업수입과 구분","task"],
+  [-30,"설립동의자 모집 시작","설립동의서 배포, 출자 1좌 금액·좌수 안내","task"],
+  [-21,"발기인 회의: 정관·사업계획 최종안 확정","창립총회에 올릴 안건을 확정합니다.","task"],
+  [-14,"임원 후보 확정 · 공고문 작성","이사장, 이사(3명 이상), 감사 후보와 선출 방식 결정","task"],
+  [-10,"창립총회 공고 게시 (권장일)","법정 마감보다 며칠 앞서 게시하고 사진·발송 기록을 남깁니다.","task"],
+  [-7,"창립총회 공고 게시 마감","정관례상 총회 7일 전까지. 놓치면 총회를 다시 잡아야 할 수 있습니다.","law"],
+  [-3,"설립동의서 회수 점검 · 총회 자료 인쇄","정관, 계획서·예산서, 서명부, 투표용지, 의사록 양식","task"],
+  [-1,"총회 리허설 · 정족수 예상 점검","시나리오 낭독, 과반 출석 가능 여부 확인","task"]];
+ pre.forEach(r=>add(plus(D,r[0]),r[1],r[2],"pre",r[3]));
+ add(D,"창립총회 D-day","과반수 출석, 출석자 3분의 2 이상 찬성으로 의결합니다.","dday","law","dday");
+ let base;
+ if(t==="social"){
+  [[3,"의사록 서명·날인 완료","의장과 서명인 날인","task"],[7,"설립인가 신청","주사업 소관 부처(진흥원 경유 확인)에 서류 제출","law"],
+   [67,"인가 결과 통지 최대 기한","신청일부터 60일 이내 통지 (연장 가능)","law"],[70,"설립사무 인계 · 출자금 납입","발기인 대표 → 이사장, 납입 증빙 보관","task"],
+   [127,"설립등기 기한","인가 문서 도달일부터 60일 이내. 등기를 마쳐야 법인 성립","law"],[134,"사업자등록","관할 세무서","law"],[140,"법인 통장·인감, 홈택스 등록","출자금을 법인 통장으로 이전","task"],[150,"첫 이사회: 회계·인사 규정 제정","조합원 명부·출자금 대장 정비","task"]]
+   .forEach(r=>add(plus(D,r[0]),r[1],r[2],"post",r[3]));base=plus(D,127);
+ }else{
+  [[3,"의사록 서명·날인 완료","의장과 서명인 날인, 등기용 공증 준비","task"],[7,"설립신고 제출","주사무소 관할 시·도(위임 지역은 시·군·구)","law"],
+   [27,"신고 수리 통지 최대 기한","신고일부터 20일 이내. 통지가 없으면 수리된 것으로 봅니다.","law"],[28,"설립사무 인계","발기인 대표 → 이사장, 서류 일체","task"],
+   [30,"출자금 납입 완료","조합원별 납입 확인, 납입증명 준비","task"],[44,"설립등기 기한","출자금 납입 완료일부터 14일 이내. 등록면허세 먼저 납부","law"],
+   [50,"사업자등록","관할 세무서. 업종이 정관 사업과 맞는지 확인","law"],[55,"법인 통장·인감, 홈택스 등록","출자금을 법인 통장으로 이전","task"],[60,"첫 이사회: 회계·인사 규정 제정","조합원 명부·출자금 대장, 출자증서 발급","task"]]
+   .forEach(r=>add(plus(D,r[0]),r[1],r[2],"post",r[3]));base=plus(D,44);
+ }
+ if(t==="se")add(plus(D,90),"예비사회적기업 지정 공고 확인","지자체형·부처형 공고 시기 확인 후 신청 준비","post","gov");
+ if(t==="village"){add(plus(D,70),"마을기업 의무 교육 이수","시·도 교육 일정 확인","post","gov");add(plus(D,90),"마을기업 공모 신청 확인","시·군·구 공고, 자부담 통장 준비","post","gov")}
+ if(t==="self")add(plus(D,70),"자활기업 인정 신청","관할 시·군·구, 지역자활센터와 상담","post","gov");
+ // 운영 반복 일정
+ const start=plus(base,1),stop=plus(D,Math.round((p.months||15)*30.5));
+ const fy=+p.fy||12;const firstYear=D.getFullYear();
+ for(let y=D.getFullYear();y<=stop.getFullYear()+1;y++)for(let m=1;m<=12;m++){
+  const on=(d,title,desc,kind,id)=>{if(d>=start&&d<=stop)add(d,title,desc,"ops",kind,id)};
+  on(biz(ymd(y,m,10)),"원천세 신고·납부","전월에 급여·강사료·용역비를 지급했다면 신고합니다.","tax","wh-"+y+m);
+  if(m===1)on(biz(ymd(y,1,25)),"부가가치세 2기 확정신고","과세사업자. 면세사업자는 해당 없음","tax");
+  if(m===4)on(biz(ymd(y,4,25)),"부가가치세 1기 예정신고","법인 과세사업자","tax");
+  if(m===7)on(biz(ymd(y,7,25)),"부가가치세 1기 확정신고","과세사업자","tax");
+  if(m===10)on(biz(ymd(y,10,25)),"부가가치세 2기 예정신고","법인 과세사업자","tax");
+  if(m===2&&p.taxfree)on(biz(ymd(y,2,10)),"면세사업자 사업장현황신고","교육용역 등 면세사업자","tax");
+  if(m===3)on(biz(ymd(y,3,10)),"지급명세서 제출","근로·사업소득 지급분","tax");
+  if([3,6,9,12].includes(m))on(ymd(y,m,25),"분기 이사회","사업 실적·재정 점검, 조합원 가입 승인, 의사록 작성","law","bd-"+y+m);
+  if(m===fy){
+   const fe=endOfMonth(y,fy);const add3=k=>{const x=new Date(fe);x.setMonth(x.getMonth()+k+1,0);return x};
+   on(plus(add3(2),-20),"결산·감사 실시","재무제표 작성, 감사보고서 받기","law");
+   on(plus(add3(3),-24),"정기총회 소집 통지 (7일 전까지)","안건: 결산 승인, 사업계획·예산, 임원 선출","law");
+   on(plus(add3(3),-15),"정기총회 개최","결산 승인, 다음 연도 사업계획·예산 승인 (정관에 정한 시기)","law");
+   on(biz(add3(3)),"법인세 신고","결산일로부터 3개월 이내","tax");
+   if(t==="coop"||t==="social")on(add3(3),"변경신고: 출자금 총액·조합원 수","회계연도 종료 후 3개월 이내 일괄 신고","law");
+   on(biz(add3(4)),"법인 지방소득세 신고","결산일로부터 4개월 이내","tax");
+   if(t==="social")on(add3(4),"경영공시 마감 (coop.go.kr)","사회적협동조합은 규모와 관계없이 의무. 주사업 증빙 첨부","law");
+   if(t==="coop")on(add3(4),"경영공시 대상 확인","조합원 200인 이상 또는 출자금 30억 원 이상이면 공시 의무","law");
+   if(y>firstYear)on(biz(new Date(fe.getFullYear(),fe.getMonth()+9,0)),"법인세 중간예납","직전 연도 법인세가 있으면 납부","tax");
+  }
+  if(t==="se"&&(m===4||m===10))on(endOfMonth(y,m),"사회적기업 사업보고서 제출","사회적기업 통합정보시스템","law");
+  if(t==="village"&&m===1)on(ymd(y,1,20),"마을기업 보조금 정산·실적 보고","지자체 일정 확인","gov");
+  if(m===11)on(ymd(y,11,20),"다음 연도 사업계획·예산안 초안","12월 이사회 검토용","task");
+ }
+ if(+p.term){const te=new Date(D);te.setFullYear(te.getFullYear()+(+p.term));add(plus(te,-90),"임원 임기 만료 3개월 전","후보 추천·총회 선출 준비. 선출 후 변경신고·변경등기","ops","law");add(te,"임원 임기 만료일","창립총회 선출 임원 기준","ops","law")}
+ (p.custom||[]).forEach(c=>{const d=pd(c.date);if(d)add(d,c.title,c.memo||"내가 추가한 일정",d<D?"pre":"ops","mine",c.id)});
+ return ev.sort((a,b)=>a.date-b.date||(a.kind==="law"?-1:1));
+}
+const KIND={law:["법정","law"],tax:["세무","tax"],gov:["행정","gov"],task:["준비","type"],mine:["내 일정","type"]};
+function dlab(n){return n===0?"오늘":n>0?`D-${n}`:`${-n}일 지남`}
+function evState(e,p){const n=diff(e.date);const done=!!p.done[e.id];return {n,done,cls:[done?"done":"",!done&&n<0?"over":"",!done&&n===0?"today":"",!done&&n>0&&n<=7?"soon":"",e.id==="dday"?"dday":""].join(" ")}}
+function alertBar(){const p=getPlan();if(!p.dday)return `<div class="alertbar calm"><b>일정 알림</b><span>창립총회 날짜를 정하면 준비 일정과 운영 마감일을 자동으로 알려 드립니다.</span><button class="lnk" type="button" data-go="plan">일정표 만들기 →</button></div>`;
+ const ev=genPlan(p).filter(e=>!p.done[e.id]);const over=ev.filter(e=>diff(e.date)<0),soon=ev.filter(e=>{const n=diff(e.date);return n>=0&&n<=7});
+ if(!over.length&&!soon.length){const nx=ev.find(e=>diff(e.date)>0);return `<div class="alertbar calm"><b>일정 알림</b><span>7일 안에 마감되는 일은 없습니다.${nx?` 다음 일정: ${nx.title} (${dlab(diff(nx.date))})`:""}</span><button class="lnk" type="button" data-go="plan">일정표 보기 →</button></div>`}
+ return `<div class="alertbar ${over.length?"red":""}"><b>⏰ 일정 알림</b><span>${over.length?`<b>지난 일 ${over.length}건</b> · `:""}${soon.length?`7일 안 ${soon.length}건: ${soon.slice(0,2).map(e=>`${e.title}(${dlab(diff(e.date))})`).join(", ")}${soon.length>2?" 외":""}`:""}</span><button class="lnk" type="button" data-go="plan">일정표 보기 →</button></div>`}
+let planFilter="all";
+function secPlan(){const p=getPlan();const D=pd(p.dday);
+ const form=`<div class="sheet"><div class="form">
+  <label class="f" for="pl-dday">창립총회 날짜 (D-day)<input type="date" id="pl-dday" value="${p.dday}"></label>
+  <label class="f" for="pl-fy">회계연도 마지막 달<select id="pl-fy">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${+p.fy===i+1?"selected":""}>${i+1}월 결산</option>`).join("")}</select></label>
+  <label class="f" for="pl-term">임원 임기<select id="pl-term">${[2,3,4].map(n=>`<option value="${n}" ${+p.term===n?"selected":""}>${n}년</option>`).join("")}</select></label>
+  <label class="f" for="pl-months">운영 일정 보기 기간<select id="pl-months">${[6,12,15,24].map(n=>`<option value="${n}" ${+p.months===n?"selected":""}>창립 후 ${n}개월</option>`).join("")}</select></label>
+  <label class="chk" for="pl-tf" style="align-self:end"><input type="checkbox" id="pl-tf" ${p.taxfree?"checked":""}> 면세사업자(교육용역 등)</label>
+ </div><p class="small mt">조직 유형은 화면 맨 위 탭(지금: <b>${TYPES[state.type].name}</b>)을 따릅니다. 날짜와 체크 표시는 이 기기의 브라우저에 저장됩니다.</p></div>`;
+ if(!D)return `<div><p class="eyebrow"></p><h2>창립총회를 D-day로, 거꾸로 짜는 일정표</h2></div>
+ <p class="lead">창립총회 날짜 하나만 정하면 ① 총회 전 준비 일정(D-60부터), ② 총회 후 신고·등기 일정, ③ 창립 이후 매달·매년 돌아오는 운영 마감일까지 한 줄로 만들어 드립니다.</p>${form}
+ <div class="note green">예: 창립총회를 두 달 뒤로 잡아 보세요. 바로 일정표가 나타납니다.</div>`;
+ const ev=genPlan(p);const st=ev.map(e=>evState(e,p));
+ const nD=diff(D),over=st.filter(x=>!x.done&&x.n<0).length,soon=st.filter(x=>!x.done&&x.n>=0&&x.n<=7).length,doneN=st.filter(x=>x.done).length;
+ const F={all:"전체",pre:"총회 전 준비",post:"총회 후 신고·등기",ops:"운영 일정",todo:"남은 일만"};
+ const list=ev.map((e,i)=>({e,s:st[i]})).filter(({e,s})=>planFilter==="all"||(planFilter==="todo"?!s.done:planFilter===e.phase||(planFilter==="pre"&&e.phase==="dday")));
+ const groups={};list.forEach(x=>{const k=x.e.date.getFullYear()+"년 "+(x.e.date.getMonth()+1)+"월";(groups[k]=groups[k]||[]).push(x)});
+ return `<div><p class="eyebrow"></p><h2>창립총회를 D-day로, 거꾸로 짜는 일정표</h2></div>
+ <div class="sheet"><div class="hero-dd"><div><div class="ddlab">창립총회까지</div><div class="ddnum">${nD>0?"D-"+nD:nD===0?"D-DAY":"D+"+(-nD)}</div><div class="small">${korDate(p.dday)}</div></div>
+  <div class="kpi"><div class="${over?"red":""}"><div class="k">지난 일 (미완료)</div><div class="v">${over}</div></div><div class="${soon?"amb":""}"><div class="k">7일 안 마감</div><div class="v">${soon}</div></div><div class="grn"><div class="k">완료</div><div class="v">${doneN}/${ev.length}</div></div></div></div></div>
+ ${form}
+ <div class="sheet"><h3>알림 받기</h3><p class="small">이 페이지는 열려 있을 때만 알려 줄 수 있습니다. 휴대폰에서 미리 알림을 받으려면 일정을 내 달력에 넣으세요. 넣은 일정은 하루 전(법정·세무 마감은 7일 전에도) 휴대폰이 알려 줍니다.</p>
+  <div class="btnrow mt"><button class="btn" type="button" id="pl-ics">전체 일정을 달력 파일(.ics)로 받기</button><button class="btn ghost" type="button" id="pl-noti">${p.notify?"브라우저 알림 끄기":"브라우저 알림 켜기"}</button></div>
+  <p class="small mt" id="pl-msg"></p></div>
+ <div class="sheet"><h3>내 일정 추가</h3><div class="form"><label class="f" for="pl-ct">할 일<input id="pl-ct" placeholder="예: 광명시 사회적경제지원센터 상담"></label><label class="f" for="pl-cd">날짜<input type="date" id="pl-cd"></label><label class="f" for="pl-cm">메모(선택)<input id="pl-cm"></label></div><div class="btnrow mt"><button class="btn" type="button" id="pl-add">일정 추가</button></div></div>
+ <div class="btnrow" style="justify-content:space-between"><div class="chips" id="pl-filter">${Object.entries(F).map(([k,v])=>`<button type="button" data-f="${k}" aria-pressed="${planFilter===k}">${v}</button>`).join("")}</div><button class="btn ghost" type="button" id="pl-jump">오늘로 이동</button></div>
+ <div class="sheet tl">${Object.entries(groups).map(([k,arr])=>`<div class="tl-month"><h4>${k}<small>${arr.length}건</small></h4>${arr.map(({e,s})=>`<div class="ev ${s.cls}" data-id="${esc(e.id)}" ${s.n>=0&&!s.done?"data-up":""}><input type="checkbox" aria-label="완료" ${s.done?"checked":""} ${e.id==="dday"?"":""}><div class="when">${e.date.getMonth()+1}.${e.date.getDate()}(${"일월화수목금토"[e.date.getDay()]})<br><span class="dl">${dlab(s.n)}</span></div><div class="what"><b><span class="tag ${KIND[e.kind][1]}">${KIND[e.kind][0]}</span>${esc(e.title)}</b><p>${esc(e.desc)}</p></div><div class="acts"><a href="${gcal(e)}" target="_blank" rel="noopener">달력+</a>${e.kind==="mine"?`<button type="button" data-del="${esc(e.id)}">삭제</button>`:""}</div></div>`).join("")}</div>`).join("")||`<p class="small">이 조건에 맞는 일정이 없습니다.</p>`}</div>
+ <div class="note">세무 마감이 주말이면 다음 월요일로 옮겨 표시했습니다. 공휴일은 반영하지 않았으니 홈택스 공지를 함께 확인하세요. 정기총회·이사회 시기는 정관에 정한 내용이 우선합니다.</div>`;}
+function gcal(e){const a=iso(e.date).replace(/-/g,""),b=iso(plus(e.date,1)).replace(/-/g,"");return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("[같이세움] "+e.title)+"&dates="+a+"/"+b+"&details="+encodeURIComponent(e.desc)}
+function icsText(ev){const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//gachiseum//KO","CALSCALE:GREGORIAN","X-WR-CALNAME:같이세움 일정"];
+ const clean=s=>String(s).replace(/[,;\\]/g,m=>"\\"+m).replace(/\n/g,"\\n");const stamp=new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
+ ev.forEach((e,i)=>{L.push("BEGIN:VEVENT","UID:gs-"+i+"-"+iso(e.date)+"@gachiseum","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+iso(e.date).replace(/-/g,""),"DTEND;VALUE=DATE:"+iso(plus(e.date,1)).replace(/-/g,""),"SUMMARY:"+clean("[같이세움] "+e.title),"DESCRIPTION:"+clean(e.desc),
+  "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+clean(e.title),"TRIGGER:-PT15H","END:VALARM");
+  if(e.kind==="law"||e.kind==="tax")L.push("BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+clean("7일 전: "+e.title),"TRIGGER:-P7D","END:VALARM");L.push("END:VEVENT")});
+ L.push("END:VCALENDAR");return L.join("\r\n")}
+function bindPlan(){
+ const upd=f=>{const p=getPlan();f(p);setPlan(p);renderMain()};
+ $("#pl-dday").onchange=e=>upd(p=>p.dday=e.target.value);
+ const D=pd(getPlan().dday);if(!D)return;
+ $("#pl-fy").onchange=e=>upd(p=>p.fy=+e.target.value);$("#pl-term").onchange=e=>upd(p=>p.term=+e.target.value);
+ $("#pl-months").onchange=e=>upd(p=>p.months=+e.target.value);$("#pl-tf").onchange=e=>upd(p=>p.taxfree=e.target.checked);
+ document.querySelectorAll(".ev input").forEach(c=>c.onchange=()=>{const id=c.closest(".ev").dataset.id;upd(p=>{if(c.checked)p.done[id]=true;else delete p.done[id]})});
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>upd(p=>p.custom=p.custom.filter(x=>x.id!==b.dataset.del)));
+ $("#pl-filter").querySelectorAll("button").forEach(b=>b.onclick=()=>{planFilter=b.dataset.f;renderMain()});
+ $("#pl-add").onclick=()=>{const t=$("#pl-ct").value.trim(),d=$("#pl-cd").value;if(!t||!d){toast("할 일과 날짜를 모두 넣어 주세요");return}upd(p=>p.custom.push({id:"c"+Date.now(),title:t,date:d,memo:$("#pl-cm").value.trim()}));toast("일정을 추가했습니다")};
+ $("#pl-jump").onclick=()=>{const el=document.querySelector(".ev[data-up]");if(el)el.scrollIntoView({behavior:"smooth",block:"center"})};
+ $("#pl-ics").onclick=()=>{const p=getPlan();const ev=genPlan(p).filter(e=>!p.done[e.id]&&diff(e.date)>=0);
+  try{const blob=new Blob([icsText(ev)],{type:"text/calendar;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="같이세움_일정.ics";document.body.appendChild(a);a.click();a.remove();
+   $("#pl-msg").innerHTML=`남은 일정 ${ev.length}건을 파일로 만들었습니다. 내려받은 <b>같이세움_일정.ics</b> 파일을 열면 휴대폰·구글·아웃룩 달력에 들어갑니다. 파일이 내려받아지지 않으면 각 일정의 <b>달력+</b> 버튼으로 하나씩 넣을 수 있습니다.`}catch(e){$("#pl-msg").textContent="이 화면에서는 파일을 내려받을 수 없습니다. 각 일정의 '달력+' 버튼을 이용하세요."}};
+ $("#pl-noti").onclick=async()=>{const p=getPlan();if(p.notify){upd(q=>q.notify=false);return}
+  if(!("Notification" in window)){$("#pl-msg").textContent="이 브라우저는 알림을 지원하지 않습니다. 달력 파일을 이용하세요.";return}
+  try{const r=await Notification.requestPermission();if(r==="granted"){upd(q=>q.notify=true);notifyDue(true)}else $("#pl-msg").textContent="알림이 허용되지 않았습니다. 브라우저 주소창 왼쪽 자물쇠 → 알림 → 허용으로 바꿀 수 있습니다."}catch(e){$("#pl-msg").textContent="이 화면에서는 브라우저 알림을 쓸 수 없습니다. 달력 파일을 이용하세요."}};
+}
+function notifyDue(force){try{const p=getPlan();if(!p.notify||!p.dday||!("Notification" in window)||Notification.permission!=="granted")return;
+ const key="noti-"+iso(today0());if(!force&&store.get(key,false))return;
+ const ev=genPlan(p).filter(e=>!p.done[e.id]);const due=ev.filter(e=>{const n=diff(e.date);return n>=0&&n<=1}),late=ev.filter(e=>diff(e.date)<0);
+ if(due.length||late.length){new Notification("같이세움 일정 알림",{body:[...due.map(e=>`${dlab(diff(e.date))} ${e.title}`),late.length?`지난 일 ${late.length}건`:""].filter(Boolean).join("\n")})}
+ store.set(key,true)}catch(e){}}
+
 /* ───────── Ⅲ. 자료실 ───────── */
 const L=(t,b)=>`<span class="dt">${t}</span>${b}`;
 const nm=()=>esc(getInfo().name||"○○협동조합");
@@ -1261,6 +1445,7 @@ renderTypes();renderNav();renderMain();
 $("#share-link").onclick=()=>{const u=location.origin+location.pathname;const done=()=>toast("주소가 복사되었습니다. 카톡·문자에 붙여 넣으세요");
  if(navigator.share){navigator.share({title:document.title,url:u}).catch(()=>{});return}
  try{navigator.clipboard.writeText(u).then(done,()=>prompt("이 주소를 복사하세요",u))}catch(e){prompt("이 주소를 복사하세요",u)}};
+notifyDue(false);setInterval(()=>notifyDue(false),36e5);
 })();
 </script>
 
