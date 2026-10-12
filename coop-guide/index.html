@@ -209,6 +209,25 @@ ul.clean{margin:0;padding-left:20px} ul.clean li{margin:3px 0}
 .kpi .red{border-color:var(--seal)} .kpi .red .v{color:var(--seal)}
 .kpi .amb{border-color:var(--warn)} .kpi .amb .v{color:var(--warn)}
 .kpi .grn{border-color:var(--forest)} .kpi .grn .v{color:var(--forest)}
+
+/* ── 교육 안내·후원 ── */
+.partner{margin-top:44px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.partner{grid-template-columns:1fr}}
+.partner>div{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.edu{border-top:4px solid var(--seal)!important}
+.edu-t{font-size:clamp(19px,2.6vw,23px);font-weight:800;letter-spacing:-.03em;margin:0;line-height:1.35;text-wrap:balance}
+.edu-t em{font-style:normal;color:var(--seal)}
+.edu-d,.spon-d{margin:0;color:var(--ink-2);font-size:15.5px}
+.edu-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px}
+.edu-list li{border-left:3px solid var(--forest);padding:2px 0 2px 10px;display:flex;flex-direction:column}
+.edu-list b{font-size:15.5px}
+.edu-list span{font-size:14px;color:var(--ink-2);line-height:1.55}
+.partner .btn{text-decoration:none;display:inline-block}
+.spon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.spon-slot{aspect-ratio:16/9;max-width:100%;border:1.5px dashed var(--line);border-radius:8px;display:grid;place-items:center;text-align:center;font-size:13px;color:var(--ink-2);padding:8px;background:var(--paper);text-decoration:none}
+.spon-slot.on{border-style:solid;background:#fff}
+.spon-slot img{max-width:100%;max-height:100%;object-fit:contain}
+.spon-slot b{display:block;color:var(--ink);font-size:14px}
 footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
 </style>
 
@@ -231,6 +250,27 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-si
     <nav class="nav" id="nav" aria-label="장 목차"></nav>
     <main id="main"></main>
   </div>
+
+  <section class="partner" aria-label="교육·컨설팅 안내와 후원 기관">
+    <div class="edu">
+      <p class="eyebrow">같이세움을 만든 곳</p>
+      <h3 class="edu-t">혼자 하기 막막하다면, <em>소생커뮤니티</em>가 함께 세웁니다</h3>
+      <p class="edu-d">지역 사회연대경제 현장에서 활동해 온 소생커뮤니티가 교육과 컨설팅으로 곁에서 함께합니다.</p>
+      <ul class="edu-list">
+        <li><b>설립 실무 교육</b><span>정관·출자·창립총회 서류를 직접 만들어 보는 실습형 교육</span></li>
+        <li><b>창립총회 동행 컨설팅</b><span>D-day 일정 점검부터 신고·등기 서류 검토까지</span></li>
+        <li><b>운영 코칭</b><span>정기총회·결산·변경신고 등 해마다 돌아오는 운영 업무 점검</span></li>
+        <li><b>기관 단체 교육</b><span>지원센터·지자체·주민자치회 대상 설립·운영 교육과 같이세움 실습</span></li>
+      </ul>
+      <div class="btnrow"><a class="btn" href="https://sosaengcom.imweb.me" target="_blank" rel="noopener">교육·컨설팅 문의하기</a><a class="btn ghost" href="https://www.youtube.com/@%EC%86%8C%EC%83%9D%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0" target="_blank" rel="noopener">유튜브 소생커뮤니티</a></div>
+    </div>
+    <div class="spon">
+      <p class="eyebrow">함께하는 후원 기관</p>
+      <p class="spon-d">같이세움은 후원 기관의 도움으로 누구나 무료로 쓸 수 있게 운영됩니다.</p>
+      <div class="spon-grid" id="spon-grid"></div>
+      <p class="small">후원·제휴 문의는 <a href="https://sosaengcom.imweb.me" target="_blank" rel="noopener">소생커뮤니티 홈페이지</a>로 해 주세요. 후원 기관은 같이세움의 내용과 안내에 관여하지 않습니다.</p>
+    </div>
+  </section>
 
   <footer>
     이 매뉴얼은 2026년 10월 12일까지 확인된 법령·공고를 바탕으로 만든 실무 안내서입니다. 법률 자문이 아니며, 실제 제출 전에는 국가법령정보센터의 현행 조문, 관할 기관(시·도, 소관 부처, 시·군·구)의 최신 서식과 연도별 시행지침을 반드시 확인하세요.
@@ -1441,10 +1481,21 @@ function secPolicy(){
   <li>보건복지부 「자활사업 안내」 (연도별 확인)</li></ul></div>`;
 }
 
+
+/* 후원 기관: 아래 목록에 기관을 넣으면 로고 자리에 표시됩니다 (logo는 이미지 주소, 없으면 이름만 표시) */
+const SPONSORS=[
+ // {name:"○○신용협동조합", logo:"sponsors/shinhyup.png", url:"https://example.org"},
+];
+const SPONSOR_SLOTS=3;
+function renderSponsors(){const g=document.getElementById("spon-grid");if(!g)return;
+ const real=SPONSORS.map(x=>`<a class="spon-slot on" href="${esc(x.url||"#")}" target="_blank" rel="noopener" title="${esc(x.name)}">${x.logo?`<img src="${esc(x.logo)}" alt="${esc(x.name)}">`:`<b>${esc(x.name)}</b>`}</a>`);
+ const empty=Array.from({length:Math.max(0,SPONSOR_SLOTS-SPONSORS.length)},()=>`<div class="spon-slot"><span><b>후원 기관 자리</b>함께해 주실 곳을 찾습니다</span></div>`);
+ g.innerHTML=real.concat(empty).join("")}
 renderTypes();renderNav();renderMain();
 $("#share-link").onclick=()=>{const u=location.origin+location.pathname;const done=()=>toast("주소가 복사되었습니다. 카톡·문자에 붙여 넣으세요");
  if(navigator.share){navigator.share({title:document.title,url:u}).catch(()=>{});return}
  try{navigator.clipboard.writeText(u).then(done,()=>prompt("이 주소를 복사하세요",u))}catch(e){prompt("이 주소를 복사하세요",u)}};
+renderSponsors();
 notifyDue(false);setInterval(()=>notifyDue(false),36e5);
 })();
 </script>
