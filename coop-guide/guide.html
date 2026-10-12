@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>같이세움 사용 안내서</title>
+<meta name="description" content="같이세움(사회연대경제 창립·운영 내비게이터) 유저 스토리와 단계별 사용법">
+<meta property="og:title" content="같이세움 사용 안내서">
+<meta property="og:description" content="누가, 언제, 어떻게 쓰는지 — 유저 스토리와 단계별 사용법">
+<meta name="theme-color" content="#1f5a44">
+<style>body{margin:0}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 한 단 읽기형 안내서 — 상단 목차 칩, 유저 스토리 카드, 번호 단계(실제 순서), 화면 구성 도식 */
+:root{
+  --paper:#f5f7f4; --sheet:#ffffff; --ink:#15201b; --ink-2:#3c4a43; --line:#d5ddd8; --line-2:#e7ece9;
+  --forest:#1f5a44; --forest-soft:#e3eee8; --seal:#b8322a; --seal-soft:#f8e7e5; --warn:#a86a0c; --warn-soft:#fbf1df;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121815; --sheet:#1a221e; --ink:#e4ece7; --ink-2:#a7b6ae; --line:#33413a; --line-2:#26302b;
+  --forest:#7cc4a2; --forest-soft:#1f3229; --seal:#f07a6f; --seal-soft:#3a2120; --warn:#e5b25a; --warn-soft:#3a2f1b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121815; --sheet:#1a221e; --ink:#e4ece7; --ink-2:#a7b6ae; --line:#33413a; --line-2:#26302b;
+  --forest:#7cc4a2; --forest-soft:#1f3229; --seal:#f07a6f; --seal-soft:#3a2120; --warn:#e5b25a; --warn-soft:#3a2f1b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.8;word-break:keep-all;-webkit-font-smoothing:antialiased}
+a{color:var(--forest);font-weight:700}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:24px 64px}
+header{border-bottom:2px solid var(--ink);padding-bottom:18px}
+.eyebrow{font-weight:700;font-size:13px;color:var(--forest);margin:0}
+h1{font-weight:900;font-size:clamp(30px,6vw,44px);letter-spacing:-.04em;line-height:1.15;margin:4px 0 8px}
+h1 em{font-style:normal;color:var(--seal)}
+.lead{color:var(--ink-2);margin:0;max-width:62ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.toc a{font-size:14px;text-decoration:none;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;padding:5px 12px}
+.toc a:hover,.toc a:focus-visible{border-color:var(--forest);color:var(--forest)}
+section{padding-top:40px}
+h2{font-weight:800;font-size:clamp(23px,4vw,29px);letter-spacing:-.03em;margin:0 0 6px;text-wrap:balance}
+h2 .no{font-family:var(--f-mono);font-size:.7em;color:var(--seal);margin-right:8px;vertical-align:2px}
+h3{font-size:19px;font-weight:800;margin:26px 0 8px;letter-spacing:-.02em}
+p{margin:8px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.stories{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,370px),1fr));gap:14px;margin-top:14px}
+.story{display:flex;flex-direction:column;gap:8px;min-width:0}
+.who{display:flex;gap:12px;align-items:center}
+.avatar{flex:0 0 46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:19px;background:var(--forest-soft);color:var(--forest)}
+.who b{display:block;font-size:17px}
+.who span{font-size:14px;color:var(--ink-2)}
+.want{border-left:3px solid var(--seal);padding:2px 0 2px 12px;margin:4px 0;font-size:16px}
+.want em{font-style:normal;font-weight:700;color:var(--seal)}
+.path{font-size:15px;color:var(--ink-2);margin:0;padding-left:20px}
+.path li{margin:2px 0}
+.path b{color:var(--ink)}
+.done{font-size:14px;background:var(--forest-soft);color:var(--forest);border-radius:6px;padding:6px 10px;font-weight:600}
+ol.steps{list-style:none;margin:12px 0 0;padding:0;counter-reset:s}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:38px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px dashed var(--line)}
+ol.steps>li::before{content:counter(s);width:32px;height:32px;border-radius:50%;border:2px solid var(--forest);color:var(--forest);font-family:var(--f-mono);font-weight:600;display:grid;place-items:center;font-size:14px}
+ol.steps>li b{font-weight:800}
+.btnlike{display:inline-block;font-size:.88em;font-weight:700;border:1.5px solid var(--forest);color:var(--forest);border-radius:5px;padding:0 7px;white-space:nowrap;background:var(--sheet)}
+.btnlike.fill{background:var(--forest);color:var(--sheet)}
+.key{font-family:var(--f-mono);font-size:.85em;border:1px solid var(--line);border-bottom-width:3px;border-radius:5px;padding:0 6px;background:var(--sheet);white-space:nowrap}
+.note{background:var(--warn-soft);border-left:4px solid var(--warn);padding:10px 14px;border-radius:4px;font-size:15.5px;margin:14px 0}
+.note.red{background:var(--seal-soft);border-left-color:var(--seal)}
+.note.green{background:var(--forest-soft);border-left-color:var(--forest)}
+/* 화면 구성 도식 */
+.mock{border:2px solid var(--ink);border-radius:10px;background:var(--sheet);padding:12px;display:grid;gap:8px;font-size:13px;margin-top:12px}
+.mock .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mock .pill{border:1.5px solid var(--line);border-radius:99px;padding:1px 8px;background:var(--paper)}
+.mock .pill.on{background:var(--forest);color:var(--sheet);border-color:var(--forest)}
+.mock .body{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px}
+@media (max-width:560px){.mock .body{grid-template-columns:1fr}}
+.mock .side,.mock .main{border:1.5px dashed var(--line);border-radius:6px;padding:8px;min-width:0}
+.mock .side div{padding:1px 0;color:var(--ink-2)}
+.mock .alert{background:var(--warn-soft);border:1px solid var(--warn);border-radius:5px;padding:4px 8px}
+.mock .title{font-weight:900;font-size:18px;letter-spacing:-.03em}
+.mock .title em{font-style:normal;color:var(--seal)}
+.n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--seal);color:#fff;font-weight:800;font-size:12px;font-family:var(--f-mono);flex:0 0 auto}
+.legend{display:grid;gap:6px;margin-top:12px;padding:0;list-style:none;font-size:15.5px}
+.legend li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;align-items:start}
+.legend .n{margin-top:4px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border-bottom:1px solid var(--line-2);padding:9px 10px;text-align:left;vertical-align:top}
+thead th{background:var(--forest-soft);border-bottom:2px solid var(--forest);white-space:nowrap}
+tbody th{white-space:nowrap}
+.dev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px;margin-top:10px}
+.dev>div{min-width:0}
+.dev h4{margin:0 0 4px;font-size:16px}
+.dev ol{margin:0;padding-left:20px;font-size:15px}
+details{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-top:8px}
+details summary{cursor:pointer;font-weight:700}
+details p{color:var(--ink-2);font-size:15.5px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.cta a{text-decoration:none;border-radius:6px;padding:9px 16px;border:1.5px solid var(--forest)}
+.cta a.fill{background:var(--forest);color:var(--sheet)}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-2)}
+:focus-visible{outline:3px solid var(--seal);outline-offset:2px}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">같이세움 · 사회연대경제 창립·운영 내비게이터</p>
+  <h1>같이<em>세움</em> 사용 안내서</h1>
+  <p class="lead">처음 쓰는 분도 따라 할 수 있도록 누가, 언제, 어떻게 쓰는지를 이야기(유저 스토리)와 단계별 설명으로 정리했습니다.</p>
+  <div class="cta"><a class="fill" href="./" id="go-app">같이세움 열기</a></div>
+  <nav class="toc" aria-label="목차">
+    <a href="#stories">유저 스토리</a><a href="#start">시작하기</a><a href="#screen">화면 구성</a><a href="#plan">D-day 일정표</a><a href="#alarm">알림 받기</a><a href="#pre">창립 전</a><a href="#post">창립 이후</a><a href="#lib">서식 자료실</a><a href="#data">저장과 공유</a><a href="#faq">자주 묻는 질문</a>
+  </nav>
+</header>
+
+<section id="stories">
+  <h2><span class="no">01</span>유저 스토리 — 이런 분이 이렇게 씁니다</h2>
+  <p class="lead">같이세움을 쓰는 대표적인 네 사람의 이야기입니다. 내 상황과 비슷한 이야기를 골라 그 순서대로 따라 해 보세요.</p>
+  <div class="stories">
+    <article class="card story">
+      <div class="who"><div class="avatar">발</div><div><b>발기인 대표</b><span>5명이 교육·컨설팅 협동조합을 처음 세우는 분</span></div></div>
+      <p class="want">"창립총회를 두 달 앞둔 발기인 대표로서, <em>언제까지 무엇을 해야 하는지</em> 한눈에 보고 싶다. 그래야 공고 기한이나 서류를 놓쳐서 총회를 다시 여는 일이 없다."</p>
+      <ol class="path">
+        <li><b>D-day 일정표</b>에 창립총회 날짜 입력</li>
+        <li><b>출자 설계</b>에서 5명의 출자좌수 입력 → 30% 상한 확인</li>
+        <li><b>창립총회 서류</b>에서 공고문·의사록 자동 작성 → 복사</li>
+        <li><b>제출서류 점검</b>으로 설립신고 서류 체크</li>
+      </ol>
+      <p class="done">이렇게 되면 성공: 총회 7일 전 공고, 총회 후 20일 안 신고 수리, 14일 안 등기까지 일정대로 끝남</p>
+    </article>
+    <article class="card story">
+      <div class="who"><div class="avatar">총</div><div><b>총무·회계 담당 이사</b><span>창립을 마치고 살림을 맡은 분</span></div></div>
+      <p class="want">"창립 후 살림을 맡은 이사로서, <em>세금·총회·공시 마감일을 미리 알림으로</em> 받고 싶다. 그래야 과태료나 가산세 없이 조합을 운영할 수 있다."</p>
+      <ol class="path">
+        <li><b>D-day 일정표</b>에서 결산월·임원 임기 설정</li>
+        <li><b>달력 파일(.ics)로 받기</b> → 휴대폰 달력에 넣기</li>
+        <li><b>상시 운영 의무</b>·<b>연간 운영 달력</b>으로 할 일 확인</li>
+        <li><b>총회·이사회 운영</b>에서 소집 통지·의사록 작성</li>
+      </ol>
+      <p class="done">이렇게 되면 성공: 마감 7일 전과 하루 전에 휴대폰이 알려 주고, 정기총회와 변경신고를 기한 안에 마침</p>
+    </article>
+    <article class="card story">
+      <div class="who"><div class="avatar">주</div><div><b>마을 주민 모임 리더</b><span>마을기업 지정을 준비하는 분</span></div></div>
+      <p class="want">"마을기업을 꿈꾸는 주민 모임 리더로서, <em>법인을 먼저 세우고 지정을 받는 순서</em>와 지역주민 비율 요건을 확인하고 싶다. 그래야 공모에서 요건 미달로 떨어지지 않는다."</p>
+      <ol class="path">
+        <li>맨 위 탭에서 <b>마을기업</b> 선택</li>
+        <li><b>한눈에 비교</b>·<b>설립 로드맵</b>으로 순서 파악</li>
+        <li><b>출자 설계</b>에서 '지역주민' 체크 → 70% 이상인지 확인</li>
+        <li><b>D-day 일정표</b>에 교육 이수·공모 일정 추가</li>
+      </ol>
+      <p class="done">이렇게 되면 성공: 협동조합 법인 등기 후 공모 마감 전에 교육 이수와 자부담 통장까지 준비됨</p>
+    </article>
+    <article class="card story">
+      <div class="who"><div class="avatar">강</div><div><b>컨설턴트·강사</b><span>지원센터에서 설립 교육을 하는 분</span></div></div>
+      <p class="want">"설립 교육을 하는 강사로서, <em>수강생과 같은 화면을 보며 설명하고 링크로 나눠 주고</em> 싶다. 그래야 교육이 끝난 뒤에도 각자 자기 조합 일정을 관리할 수 있다."</p>
+      <ol class="path">
+        <li><b>링크 복사해서 공유하기</b>로 주소를 단톡방에 공유</li>
+        <li>유형 탭을 바꿔 가며 <b>비교표</b>로 강의</li>
+        <li>수강생 각자 휴대폰에서 <b>D-day 일정표</b> 작성 실습</li>
+        <li><b>서식 자료실</b>에서 필요한 서식 복사</li>
+      </ol>
+      <p class="done">이렇게 되면 성공: 수강생마다 자기 기기에 자기 조합 일정이 저장되고, 서로의 정보는 섞이지 않음</p>
+    </article>
+  </div>
+</section>
+
+<section id="start">
+  <h2><span class="no">02</span>시작하기</h2>
+  <h3>주소로 열기</h3>
+  <p>인터넷 창(크롬, 사파리, 엣지, 네이버 앱 등)의 주소칸에 아래 주소를 넣거나, 받은 링크를 누르세요. 회원가입이나 로그인은 필요 없습니다.</p>
+  <p class="card" style="font-family:var(--f-mono);font-size:15px;overflow-wrap:anywhere">charlychae7-lang.github.io/sosaeng/coop-guide/</p>
+  <h3>휴대폰 바탕화면에 앱처럼 두기</h3>
+  <div class="dev">
+    <div class="card"><h4>안드로이드 (삼성 등)</h4><ol><li>크롬으로 주소를 엽니다.</li><li>오른쪽 위 <span class="key">⋮</span> (점 세 개)를 누릅니다.</li><li><b>홈 화면에 추가</b>를 누릅니다.</li><li><b>추가</b>를 누르면 바탕화면에 아이콘이 생깁니다.</li></ol></div>
+    <div class="card"><h4>아이폰</h4><ol><li>사파리로 주소를 엽니다.</li><li>아래쪽 가운데 <span class="key">□↑</span> (공유) 버튼을 누릅니다.</li><li>목록을 올려 <b>홈 화면에 추가</b>를 누릅니다.</li><li>오른쪽 위 <b>추가</b>를 누릅니다.</li></ol></div>
+    <div class="card"><h4>컴퓨터</h4><ol><li>크롬이나 엣지로 주소를 엽니다.</li><li><span class="key">Ctrl</span> + <span class="key">D</span>를 눌러 즐겨찾기에 넣습니다.</li><li>다음부터 즐겨찾기 막대에서 바로 엽니다.</li></ol></div>
+  </div>
+</section>
+
+<section id="screen">
+  <h2><span class="no">03</span>화면 구성</h2>
+  <p>처음 열면 아래와 같은 모양입니다. 번호를 따라 각 부분이 하는 일을 확인하세요.</p>
+  <div class="mock" aria-hidden="true">
+    <div class="bar"><span class="title">같이<em>세움</em></span><span class="n">1</span><span style="margin-left:auto" class="pill">사용 안내</span><span class="pill">링크 복사해서 공유하기</span><span class="n">2</span></div>
+    <div class="bar"><span class="pill on">일반협동조합</span><span class="pill">사회적협동조합</span><span class="pill">사회적기업</span><span class="pill">마을기업</span><span class="pill">자활기업</span><span class="n">3</span></div>
+    <div class="body">
+      <div class="side"><div style="display:flex;gap:6px;align-items:center"><b style="color:var(--seal)">◎ 내 일정</b><span class="n">4</span></div><div>Ⅰ. 창립 전 (01~09)</div><div>Ⅱ. 창립 이후 (10~16)</div><div>Ⅲ. 자료실 (17)</div></div>
+      <div class="main"><div class="bar alert">⏰ 일정 알림 · 7일 안 2건 <span class="n">5</span></div><div style="margin-top:6px;display:flex;gap:6px;align-items:center"><b>선택한 장의 내용</b><span class="n">6</span></div><div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:6px"><span class="pill">← 이전 장</span><span class="n">7</span><span class="pill" style="margin-left:auto">다음 장 →</span></div></div>
+    </div>
+  </div>
+  <ol class="legend">
+    <li><span class="n">1</span><span><b>제목</b> — 같이세움 이름과 부제입니다.</span></li>
+    <li><span class="n">2</span><span><b>사용 안내·공유 버튼</b> — <b>사용 안내</b>는 지금 보는 이 안내서를 엽니다. <b>링크 복사해서 공유하기</b>를 누르면 사이트 주소가 복사되거나, 휴대폰에서는 카톡·문자 공유 창이 뜹니다.</span></li>
+    <li><span class="n">3</span><span><b>조직 유형 탭</b> — 내 조직 유형을 고르면 모든 장의 내용(절차, 일정, 의무)이 그 유형에 맞게 바뀝니다. 화면을 내려도 위에 붙어 있습니다.</span></li>
+    <li><span class="n">4</span><span><b>목차</b> — 컴퓨터에서는 왼쪽에 세로로, 휴대폰에서는 탭 아래에 가로로 나옵니다. 휴대폰에서는 손가락으로 옆으로 밀어 다른 장을 찾으세요.</span></li>
+    <li><span class="n">5</span><span><b>일정 알림 띠</b> — 어느 장을 보든 지난 일과 7일 안 마감 건수를 보여 줍니다. 노란색은 곧 마감, 빨간색은 지난 일이 있다는 뜻입니다.</span></li>
+    <li><span class="n">6</span><span><b>본문</b> — 고른 장의 내용과 입력칸이 나옵니다.</span></li>
+    <li><span class="n">7</span><span><b>이전·다음 장 버튼</b> — 본문 맨 아래에 있어 책장 넘기듯 순서대로 읽을 수 있습니다.</span></li>
+  </ol>
+</section>
+
+<section id="plan">
+  <h2><span class="no">04</span>D-day 일정표 쓰는 법</h2>
+  <p>창립총회 날짜 하나로 총회 전 준비, 총회 후 신고·등기, 창립 후 1년 넘는 운영 마감일까지 자동으로 만들어 주는 기능입니다. 목차 맨 위 <b>◎ 내 일정 → D-day 일정표</b>에 있습니다.</p>
+  <ol class="steps">
+    <li><span><b>조직 유형을 먼저 고릅니다.</b> 맨 위 탭에서 내 유형을 누르세요. 사회적협동조합은 인가 기간(60일)이 길어서 일정이 다르게 짜입니다.</span></li>
+    <li><span><b>창립총회 날짜를 넣습니다.</b> '창립총회 날짜 (D-day)' 칸을 누르면 달력이 뜹니다. 날짜를 고르면 바로 아래에 D-38 같은 남은 날과 일정 목록이 나타납니다.</span></li>
+    <li><span><b>설정을 맞춥니다.</b> 회계연도 마지막 달(대부분 12월 결산), 임원 임기(정관에 정한 기간), 보고 싶은 기간을 고르세요. 교육용역처럼 부가세가 면제되는 사업만 한다면 '면세사업자'에 체크합니다.</span></li>
+    <li><span><b>일정을 읽습니다.</b> 일정은 달별로 묶여 있고 각 줄에 날짜, 남은 날, 종류 표시, 할 일, 설명이 있습니다. 종류 표시의 뜻은 아래 표를 보세요.</span></li>
+    <li><span><b>끝낸 일은 체크합니다.</b> 왼쪽 네모 칸을 누르면 줄이 흐려지고 줄이 그어집니다. 실수로 눌렀으면 다시 누르면 됩니다.</span></li>
+    <li><span><b>내 일정을 더합니다.</b> '내 일정 추가'에 할 일과 날짜를 넣고 <span class="btnlike fill">일정 추가</span>를 누르세요. 지원센터 상담이나 법무사 방문 같은 일정을 함께 관리할 수 있고, 필요 없으면 <span class="btnlike">삭제</span>로 지웁니다.</span></li>
+    <li><span><b>보고 싶은 것만 골라 봅니다.</b> 목록 위 버튼으로 '총회 전 준비', '총회 후 신고·등기', '운영 일정', '남은 일만'을 골라 볼 수 있습니다. <span class="btnlike">오늘로 이동</span>을 누르면 지금 해야 할 곳으로 화면이 내려갑니다.</span></li>
+  </ol>
+  <div class="scroll"><table>
+    <thead><tr><th>표시</th><th>뜻</th><th>예</th></tr></thead>
+    <tbody>
+      <tr><th style="color:var(--seal)">법정</th><td>법이나 정관에서 정한 기한이 있는 일. 놓치면 과태료나 절차 무효가 될 수 있습니다.</td><td>공고 마감, 설립등기 기한, 정기총회</td></tr>
+      <tr><th style="color:var(--warn)">세무</th><td>세금 신고·납부 마감</td><td>원천세, 부가세, 법인세</td></tr>
+      <tr><th style="color:var(--forest)">행정</th><td>지원사업·지자체 지침에 따른 일</td><td>마을기업 공모, 예비사회적기업 공고</td></tr>
+      <tr><th>준비</th><td>법정 기한은 아니지만 미리 해 두면 좋은 일</td><td>정관 초안, 리허설</td></tr>
+      <tr><th>내 일정</th><td>직접 추가한 일정</td><td>센터 상담</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">남은 날 표시의 색깔: <b style="color:var(--warn)">주황</b>은 7일 안 마감, <b style="color:var(--seal)">빨강</b>은 오늘이거나 이미 지난 일입니다. 체크하면 색이 사라집니다.</div>
+</section>
+
+<section id="alarm">
+  <h2><span class="no">05</span>알림 받기</h2>
+  <p>같이세움 사이트는 열려 있을 때만 알려 줄 수 있습니다. <b>사이트를 닫아 두어도 알림을 받으려면 일정을 휴대폰 달력에 넣는 방법이 가장 확실합니다.</b></p>
+  <h3>방법 1. 전체 일정을 휴대폰 달력에 한 번에 넣기 (추천)</h3>
+  <ol class="steps">
+    <li><span>D-day 일정표의 '알림 받기'에서 <span class="btnlike fill">전체 일정을 달력 파일(.ics)로 받기</span>를 누릅니다. <b>같이세움_일정.ics</b> 파일이 내려받아집니다.</span></li>
+    <li><span><b>안드로이드:</b> 화면 위 알림창이나 '내 파일 → 다운로드'에서 파일을 누르고, '캘린더'(삼성 캘린더 또는 구글 캘린더)로 엽니다. 넣을 달력을 고르고 <b>저장</b>(또는 가져오기)을 누릅니다.</span></li>
+    <li><span><b>아이폰:</b> 사파리에서 받으면 바로 '모든 이벤트 추가' 화면이 뜹니다. <b>모두 추가</b>를 누르세요.</span></li>
+    <li><span><b>컴퓨터(구글 캘린더):</b> calendar.google.com → 오른쪽 위 톱니바퀴 → 설정 → 왼쪽 '가져오기/내보내기' → 파일 선택에서 받은 파일을 고르고 <b>가져오기</b>를 누릅니다.</span></li>
+  </ol>
+  <div class="note green">달력에 들어간 일정은 <b>하루 전</b>에 알림이 옵니다. 법정·세무 마감은 <b>7일 전</b>에 한 번 더 옵니다. 이미 지난 일과 체크한 일은 파일에 넣지 않습니다.</div>
+  <div class="note">창립총회 날짜나 설정을 바꿨다면 파일을 다시 받아 넣으세요. 이때 예전 일정은 달력에서 직접 지워야 겹치지 않습니다. 일정 제목이 모두 <b>[같이세움]</b>으로 시작해서 찾기 쉽습니다.</div>
+  <h3>방법 2. 일정 하나만 구글 캘린더에 넣기</h3>
+  <p>일정 줄 오른쪽의 <span class="btnlike">달력+</span>을 누르면 구글 캘린더가 열리고 제목과 날짜가 채워져 있습니다. <b>저장</b>만 누르면 됩니다. 알림 시간은 그 화면에서 바꿀 수 있습니다.</p>
+  <h3>방법 3. 브라우저 알림</h3>
+  <p><span class="btnlike">브라우저 알림 켜기</span>를 누르고, 뜨는 창에서 <b>허용</b>을 누르세요. 그 뒤로 사이트를 열 때마다 하루에 한 번 오늘·내일 할 일과 지난 일 건수를 알려 줍니다. 허용을 잘못 눌렀다면 주소창 왼쪽 자물쇠 모양 → 알림 → 허용으로 바꿀 수 있습니다.</p>
+  <div class="note red">Claude 대화창 안에서 같이세움을 볼 때는 보안 때문에 파일 받기와 브라우저 알림이 되지 않습니다. 알림 기능은 위 사이트 주소에서 쓰세요.</div>
+</section>
+
+<section id="pre">
+  <h2><span class="no">06</span>Ⅰ. 창립 전 — 장별 쓰는 법</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>장</th><th>여기서 하는 일</th><th>이렇게 조작하세요</th></tr></thead>
+    <tbody>
+      <tr><th>02 한눈에 비교</th><td>다섯 조직 유형의 근거법, 담당 기관, 처리 기간, 배당 여부 비교</td><td>유형 탭을 바꾸면 표에서 그 유형의 열이 초록색으로 강조됩니다.</td></tr>
+      <tr><th>03 창립 준비 점검</th><td>정관을 쓰기 전에 끝낼 일(비전 합의, 명칭 확인, 사무실, 인허가)</td><td>끝낸 항목에 체크합니다.</td></tr>
+      <tr><th>04 설립 로드맵</th><td>법에서 정한 설립 순서를 단계별로 확인</td><td>단계마다 '완료'를 체크하면 위쪽 막대가 채워집니다.</td></tr>
+      <tr><th>05 일정·정족수 계산</th><td>총회 날짜와 설립동의자 수로 필요한 출석·찬성 인원과 법정 기한 계산</td><td>날짜와 인원을 바꾸면 결과가 바로 바뀝니다.</td></tr>
+      <tr><th>06 출자 설계</th><td>1좌 금액, 조합원별 좌수, 총 출자금, 30% 상한, 지역주민 비율 확인</td><td>표에 이름·구분·좌수를 넣고 <span class="btnlike">+ 조합원 추가</span>로 줄을 늘립니다. 빨간 글씨는 요건 위반입니다.</td></tr>
+      <tr><th>07 정관·사업목적</th><td>정관 필수기재사항 14개, 사업목적 예시, 사회적협동조합 주사업 유형</td><td>읽고 정관 초안에 옮겨 씁니다.</td></tr>
+      <tr><th>08 창립총회 서류</th><td>공고문, 설립동의서, 진행 시나리오, 의사록, 출자좌수 명세 자동 작성</td><td>위쪽 빈칸(조직 이름, 날짜, 장소, 임원 후보)을 채우고 서류 버튼을 고른 뒤 <span class="btnlike fill">이 서류 복사하기</span>.</td></tr>
+      <tr><th>09 제출서류 점검</th><td>설립신고·인가·인증·지정에 내는 서류 체크</td><td>준비한 서류에 체크합니다.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note green">08장에 한 번 넣은 조직 이름·주소·임원과 06장의 조합원·출자 정보는 서식 자료실과 총회·이사회 서식에 자동으로 들어갑니다. 먼저 이 두 장을 채워 두면 편합니다.</div>
+</section>
+
+<section id="post">
+  <h2><span class="no">07</span>Ⅱ. 창립 이후 — 장별 쓰는 법</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>장</th><th>여기서 하는 일</th></tr></thead>
+    <tbody>
+      <tr><th>10 설립 직후 30일</th><td>법인 통장, 인감, 홈택스, 조합원 명부, 규정 제정 등 등기 직후 할 일 체크리스트</td></tr>
+      <tr><th>11 상시 운영 의무</th><td>의사결정·회계·공시·세무·노무·관리 분야별로 계속 지켜야 할 의무. 붉은 '법정' 표시가 붙은 것부터 챙기세요.</td></tr>
+      <tr><th>12 연간 운영 달력</th><td>12월 결산 조직의 1월~12월 할 일. 이번 달은 빨간 테두리로 표시됩니다.</td></tr>
+      <tr><th>13 총회·이사회 운영</th><td>정기·임시총회와 이사회의 시기, 통지, 의결 기준 비교. 소집 통지, 정기총회 의사록, 이사회 의사록, 감사보고서 자동 작성</td></tr>
+      <tr><th>14 변경신고·등기</th><td>임원, 정관, 주사무소가 바뀌었을 때 내부 결정과 대외 절차(신고·등기)</td></tr>
+      <tr><th>15 위반·취소 예방</th><td>과태료·인가 취소·보조금 환수로 이어지기 쉬운 실수와 예방법. 분기마다 이사장·회계 이사·감사가 함께 점검하세요.</td></tr>
+      <tr><th>16 2026 제도 변화</th><td>소관 부처 변경, 변경신고 규칙, 사회연대경제기본법 등 최근 변화와 공식 안내 링크</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="lib">
+  <h2><span class="no">08</span>Ⅲ. 서식 자료실 쓰는 법</h2>
+  <ol class="steps">
+    <li><span>목차 맨 아래 <b>17 협동조합 서식 자료실</b>을 누릅니다.</span></li>
+    <li><span>분류 버튼(설립 준비, 창립총회, 임원, 출자금, 조합원 관리, 총회·이사회, 회계·사업, 변경·신고)을 누르거나, 검색칸에 '위임장', '가입' 같은 낱말을 넣어 찾습니다.</span></li>
+    <li><span>목록에서 서식을 누르면 오른쪽(휴대폰은 아래쪽)에 완성된 서식이 나옵니다. '쓰는 때'에 언제 쓰는 서식인지 적혀 있습니다.</span></li>
+    <li><span><span class="btnlike fill">이 서식 복사하기</span>를 누릅니다. '복사되었습니다'가 뜨면 성공입니다.</span></li>
+    <li><span>한글이나 워드를 열고 <span class="key">Ctrl</span> + <span class="key">V</span>로 붙여 넣습니다. 휴대폰에서는 붙여 넣을 곳을 꾹 누르고 '붙여넣기'를 고릅니다. '글이 선택되었습니다'라고 나오면 <span class="key">Ctrl</span> + <span class="key">C</span>를 한 번 더 누르세요.</span></li>
+  </ol>
+  <div class="note">설립신고서, 인가 신청서, 등기 신청서 같은 <b>공식 서식</b>은 개정될 수 있어 자료실 아래쪽 '공식 서식' 표의 링크에서 최신본을 받아 쓰세요.</div>
+</section>
+
+<section id="data">
+  <h2><span class="no">09</span>저장과 공유 — 꼭 알아 두세요</h2>
+  <div class="card">
+    <ul style="margin:0;padding-left:20px">
+      <li><b>입력한 내용은 지금 쓰는 기기의 인터넷 창에만 저장됩니다.</b> 서버로 보내지지 않아서 다른 사람이 볼 수 없습니다.</li>
+      <li>그래서 <b>컴퓨터에서 넣은 일정은 휴대폰에서 보이지 않습니다.</b> 주로 쓸 기기 하나를 정해 두세요. 여러 기기에서 일정을 보려면 달력 파일을 휴대폰 달력에 넣는 방법을 쓰세요.</li>
+      <li>인터넷 창의 <b>방문 기록·쿠키를 지우거나 시크릿 창을 쓰면</b> 입력한 내용이 사라집니다.</li>
+      <li>여러 사람이 같은 주소를 써도 각자의 기기에 따로 저장되므로 <b>정보가 섞이지 않습니다.</b></li>
+      <li>도서관이나 센터의 <b>공용 컴퓨터</b>에서는 조합원 이름·주소 같은 개인정보를 넣지 마세요.</li>
+    </ul>
+  </div>
+  <h3>다른 사람에게 알려 주기</h3>
+  <ol class="steps">
+    <li><span>같이세움 화면 오른쪽 위 <span class="btnlike">링크 복사해서 공유하기</span>를 누릅니다.</span></li>
+    <li><span>휴대폰에서는 공유 창이 뜨니 카카오톡을 고르고 보낼 사람이나 단톡방을 고릅니다. 컴퓨터에서는 '주소가 복사되었습니다'가 뜨면 카톡이나 메일 입력칸에 <span class="key">Ctrl</span> + <span class="key">V</span>로 붙여 넣습니다.</span></li>
+  </ol>
+</section>
+
+<section id="faq">
+  <h2><span class="no">10</span>자주 묻는 질문</h2>
+  <details><summary>일정표에 날짜를 넣었는데 다음 날 열어 보니 비어 있어요.</summary><p>다른 기기나 다른 인터넷 앱(예: 카톡 안의 브라우저)으로 열었을 가능성이 큽니다. 처음 입력한 기기와 앱(크롬, 사파리 등)으로 다시 열어 보세요. 바탕화면에 아이콘을 만들어 두면 늘 같은 곳으로 열립니다.</p></details>
+  <details><summary>창립총회 날짜가 바뀌었어요.</summary><p>D-day 일정표에서 날짜만 바꾸면 모든 일정이 새 날짜에 맞춰 다시 계산됩니다. 이미 체크한 일도 그대로 남습니다. 휴대폰 달력에 넣어 둔 일정은 지우고 달력 파일을 다시 받아 넣으세요.</p></details>
+  <details><summary>우리 조합은 3월 결산인데 일정이 맞나요?</summary><p>D-day 일정표의 '회계연도 마지막 달'을 3월로 바꾸면 결산·정기총회·법인세·변경신고·경영공시 일정이 그에 맞춰 바뀝니다. 다만 '연간 운영 달력' 장은 12월 결산 기준 예시입니다.</p></details>
+  <details><summary>복사하기를 눌렀는데 붙여 넣기가 안 돼요.</summary><p>일부 화면은 자동 복사를 막습니다. 이때는 서식 글자가 파랗게 선택되니 <span class="key">Ctrl</span> + <span class="key">C</span>(휴대폰은 '복사')를 직접 눌러 주세요.</p></details>
+  <details><summary>달력 파일이 내려받아지지 않아요.</summary><p>Claude 대화창 안에서 열었다면 파일 받기가 막혀 있습니다. 사이트 주소(charlychae7-lang.github.io/sosaeng/coop-guide/)를 인터넷 창에서 직접 열어 주세요. 그래도 안 되면 일정마다 <span class="btnlike">달력+</span> 버튼을 쓰세요.</p></details>
+  <details><summary>여기 나온 내용대로 하면 법적으로 문제가 없나요?</summary><p>같이세움은 2026년 10월 기준 법령과 공고를 바탕으로 만든 실무 안내서이며 법률 자문이 아닙니다. 실제 제출 전에는 국가법령정보센터의 현행 조문, 관할 기관의 최신 서식과 지침, 우리 조직의 정관을 꼭 확인하세요. 세금 신고는 세무사와 함께 확인하길 권합니다.</p></details>
+  <details><summary>사회적기업이나 마을기업도 협동조합 서식을 쓰나요?</summary><p>사회적기업과 마을기업은 보통 협동조합이나 회사를 먼저 세운 뒤 인증·지정을 받습니다. 협동조합 형태로 세운다면 창립총회·운영 서식을 그대로 쓰고, 인증·지정 신청서는 각 기관의 공식 서식을 씁니다.</p></details>
+</section>
+
+<footer>같이세움 · 사회연대경제 창립·운영 내비게이터 사용 안내서 (2026년 10월). 기능이 바뀌면 이 안내서도 함께 고칩니다.</footer>
+</div>
+<script>
+(function(){var a=document.getElementById("go-app");if(!/github\.io$/.test(location.hostname)&&location.protocol!=="file:")a.href="https://charlychae7-lang.github.io/sosaeng/coop-guide/";})();
+</script>
+
+</body>
+</html>
