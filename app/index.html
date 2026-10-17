@@ -182,6 +182,25 @@ ul.plain{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
 .mapbox svg.loopsvg{max-width:780px}
 .lnode{cursor:pointer}.lnode:focus-visible rect{stroke:var(--accent);stroke-width:5}
 .lnode:hover rect{filter:brightness(.97)}
+.launch{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.launch .btn{width:min(100%,360px)}
+.qprog{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.dots5{display:flex;gap:6px}.dots5 i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.dots5 i.done{background:var(--accent);opacity:.55}.dots5 i.cur{background:var(--accent)}
+.qprog .btn{margin-left:auto}
+.scene .qh,.mycard .qh{font-size:clamp(24px,5.4vw,32px)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opts3{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:block;width:100%;text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--fg);font:inherit;font-size:17px;line-height:1.5;cursor:pointer;min-height:56px}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.pieces{display:flex;flex-direction:column;gap:10px}
+.piece{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:16px;line-height:1.5;cursor:pointer;min-height:56px}
+.piece .ptag{flex:none;min-width:3.2em;text-align:center;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.piece.fact{border-left:4px solid var(--accent)}.piece.fact .ptag{background:var(--soft);color:var(--accent)}
+.piece.interp{border-left:4px solid var(--pause)}.piece.interp .ptag{background:var(--pause-soft);color:var(--pause)}
+.mycard{border-color:var(--accent)}
+.fu{width:100%;max-width:560px;text-align:left}
 .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:12px 0}
 footer{margin-top:34px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media(prefers-reduced-motion:reduce){.flow .gap{animation:none}*{scroll-behavior:auto!important}}
@@ -673,11 +692,15 @@ function flowStrip(){return '<div class="flow" aria-label="생각의 흐름"><sp
 
 /* 메인 화면: 큰 “잠깐! 진짜?” */
 function vLanding(){
+ var fu=fuCandidate();
+ var resume=(Q.step>0&&!Q.done);
  return '<div class="pause"><div class="ring" aria-hidden="true"></div><div class="big">잠깐!<br>진짜?</div>'+
  '<div class="quote" style="max-width:34ch;text-align:left">생각을 바꾸기 전에, 생각을 바라보는 능력이 필요하다.</div>'+
  '<p class="lead" style="text-align:center;max-width:40ch">정답도 판단도 없습니다. 지금 머릿속을 사로잡은 생각을 한 걸음 떨어져 바라보는 연습을 시작해요.</p>'+
- '<button class="btn" data-d-act="start">사고 디버깅 시작하기</button>'+
- (D.source?'<p class="note">'+esc(D.source)+'</p>':'')+
+ '<div class="launch"><button class="btn" data-d-act="introStart">'+(resume?'3분 입문 이어서 하기':'3분 입문 시작하기')+'</button>'+
+ '<span class="note">거의 탭만으로 · 약 3분</span>'+
+ '<button class="btn ghost" data-d-act="deepStart">심화 6단계 · AI와 함께 15~20분</button><span class="note">문제 정의부터 재해석까지</span></div>'+
+ (fu?'<div class="box fu"><b>지난번 생각, 그 후 어땠나요?</b>“'+esc(fu.thought)+'”<div class="chips" style="margin-top:8px">'+['도움이 됐어요','그대로예요','새로운 생각이 들었어요'].map(function(v){return '<button type="button" class="chip" data-fu="'+fu.id+'|'+esc(v)+'">'+esc(v)+'</button>'}).join('')+'</div></div>':'')+
  '<div style="width:100%;max-width:560px">'+flowStrip()+'</div></div>';
 }
 /* 생각을 쓴 뒤 3초의 멈춤 */
@@ -781,6 +804,8 @@ function v5(){
 }
 var DVIEWS=[v0,v1,v2,v3,v4,v5];
 function vDebug(){
+ if(dm==='landing')return vLanding();
+ if(dm==='intro')return vIntro();
  if(!D.started)return vLanding();
  if(D.pause)return vPause();
  var steps='<nav class="steps" aria-label="진행 단계">'+DSTEPS.map(function(n,i){
@@ -788,6 +813,161 @@ function vDebug(){
   return '<button type="button" class="'+cls+'" data-d-go="'+i+'" aria-label="'+(i+1)+'단계 '+esc(n)+'"'+(i>D.step?' disabled':'')+'></button>';
  }).join('')+'</nav><div class="stepname note" style="margin-bottom:18px">'+(D.step+1)+' / '+DSTEPS.length+'  '+DSTEPS[D.step]+'</div>';
  return '<header class="sec" style="gap:14px;margin-bottom:26px"><div class="eyebrow">사고 디버깅 프로그램</div><h1>잠깐! 진짜?</h1><p class="quote">생각을 바꾸기 전에, 생각을 바라보는 능력이 필요하다.</p>'+flowStrip()+'</header>'+steps+DVIEWS[D.step]();
+}
+/* ===== 3분 입문 코스 (5장면) ===== */
+var QEX=[
+ {t:'팀장이 회의에서 또 내 의견을 무시했다.',e:'의견을 냈는데 반응이 없으면 서운하고 위축될 만해요.',
+  p:[['내가 회의에서 의견을 냈다','f'],['내 발언 직후 팀장은 다음 안건으로 넘어갔다','f'],['팀장이 나를 무시했다','i'],['이런 일이 “또” 반복된다','i']],
+  pr:['팀장은 모든 의견에 바로 반응해야 한다','반응이 없으면 무시한 것이다','팀장의 행동은 나에 대한 평가다'],
+  al:['급한 보고가 있어 시간을 맞추려 했을 수 있다','내 말을 못 들었을 수 있다','회의 뒤에 따로 이야기하려 했을 수 있다'],
+  ac:['회의 뒤 내 의견이 전달됐는지 한 줄로 물어본다','“또”라고 느낀 날짜와 상황을 세 줄로 적어 본다','다음 회의 전에 안건 순서를 먼저 물어본다']},
+ {t:'나는 시간이 없어서 운동을 못 한다.',e:'바쁜 하루 끝에 운동까지 떠올리면 지치기 쉬워요.',
+  p:[['이번 주 평일 퇴근이 밤 9시였다','f'],['지난주에 운동한 날은 0일이다','f'],['시간이 없다','i'],['운동은 한 시간 이상 해야 한다','i']],
+  pr:['운동은 따로 큰 시간을 내야 한다','시간은 지금 바꿀 수 없다','운동은 제대로 해야 의미가 있다'],
+  al:['10분짜리 운동이라면 지금도 가능할 수 있다','시간이 아니라 기운이 문제일 수 있다','점심시간이나 이동 시간에 틈이 있을 수 있다'],
+  ac:['오늘 계단으로 두 층 오른다','저녁에 스트레칭을 5분만 해 본다','하루에 쓰는 시간을 대략 적어 본다']},
+ {t:'사람은 쉽게 변하지 않는다.',e:'변화를 기대했다가 실망한 경험이 있었을지도 몰라요.',
+  p:[['내가 아는 한 사람은 5년째 같은 방식으로 일한다','f'],['지난 모임에서 내 제안이 받아들여지지 않았다','f'],['변하려는 마음이 없다','i'],['한 번 굳으면 끝이다','i']],
+  pr:['변화는 본인의 의지로만 일어난다','변화는 한 번에 눈에 띄게 일어난다','내 경험이 모든 사람을 대표한다'],
+  al:['변화를 도울 환경이나 절차가 없었을 수 있다','변화가 내게 안 보였을 뿐일 수 있다','나도 변한 경험이 이미 있다'],
+  ac:['최근 1년간 내가 바뀐 점 하나를 적어 본다','그 사람이 변하기 어려운 이유를 한 줄 적어 본다','작은 시도 하나를 제안해 본다']},
+ {t:'나는 원래 이런 사람이다.',e:'스스로를 설명하는 말로 오래 써 온 문장일 거예요.',
+  p:[['지난 두 번의 모임에서 먼저 말을 걸지 못했다','f'],['어릴 때 발표를 부담스러워했다','f'],['나는 변하지 않는다','i'],['이런 나는 부족하다','i']],
+  pr:['성격은 고정되어 있다','한두 번의 경험이 나 전체를 설명한다','“원래”는 따져 볼 필요가 없다'],
+  al:['상황에 따라 다르게 행동한 적도 있다','“원래”가 아니라 익숙해진 습관일 수 있다','가까운 사람 앞에서는 다른 모습이다'],
+  ac:['“원래” 대신 “지금까지는”이라고 바꿔 말해 본다','다르게 행동했던 순간 하나를 적어 본다','오늘 작은 새 행동 하나를 시도한다']},
+ {t:'다들 그렇게 생각한다.',e:'주변이 모두 같은 말을 하면 그게 정답처럼 느껴지기 쉬워요.',
+  p:[['내 주변 세 사람이 같은 말을 했다','f'],['뉴스 댓글에서 비슷한 의견을 많이 봤다','f'],['모두가 그렇게 생각한다','i'],['다수의 생각은 옳다','i']],
+  pr:['내가 본 범위가 전체를 대표한다','다수는 곧 정답이다','다른 의견은 겉으로 드러나 있을 것이다'],
+  al:['내 주변이 비슷한 사람들일 수 있다','말하지 않을 뿐 다르게 생각하는 사람이 있을 수 있다','다수라고 해서 사실이라는 뜻은 아니다'],
+  ac:['다르게 생각할 것 같은 사람 한 명에게 의견을 물어본다','“다들”이 정확히 누구인지 이름을 세어 본다','반대 근거를 하나만 찾아 읽어 본다']}
+];
+var QB=[['90','거의 확실해요'],['50','반반이에요'],['20','잘 모르겠어요']];
+var QLEFT=['약 3분','약 3분','약 2분','약 1분','약 30초','완료'];
+function blankQ(){return {step:0,sub:0,thought:'',source:'',b0:'',b1:'',pieces:[],premise:'',alt:'',altOwn:'',action:'',actOwn:'',own:'',data:null,src:'',prep:'',waiting:false,tok:0,done:false,saved:false}}
+var Q=Object.assign(blankQ(),DB.intro||{});Q.waiting=false;if(Q.prep==='loading')Q.prep='';
+var dm='landing';
+function saveQ(){DB.intro=Q;store.set(DB)}
+function staticQ(t){
+ var c=QEX.filter(function(x){return x.t===(t||'').trim()})[0];
+ if(c)return {e:c.e,pieces:c.p.map(function(a){return {t:a[0],k:a[1]}}),premises:c.pr,alts:c.al,actions:c.ac};
+ var cl=(t||'').split(/[.,!?;\n]+|\s(?:그리고|그래서|하지만|그런데)\s/).map(function(x){return x.trim()}).filter(function(x){return x.length>=4}).slice(0,4);
+ if(!cl.length)cl=[(t||'').trim()||'이 생각'];
+ return {e:'그런 생각이 들 만한 이유가 있었을 거예요.',pieces:cl.map(function(x){return {t:x,k:'i'}}),
+  premises:['이 상황은 언제나 이렇다','내가 본 것이 전체다','상대의 속마음을 내가 안다'],
+  alts:['내가 모르는 사정이 있을 수 있다','다른 사람은 다르게 볼 수 있다','이번 한 번의 일일 수 있다'],
+  actions:['사실 한 줄, 해석 한 줄로 나눠 적어 본다','믿을 만한 사람에게 질문 하나를 해 본다','오늘은 판단을 하루 미뤄 본다']};
+}
+function normQ(r){
+ if(!r||!Array.isArray(r.pieces)||r.pieces.length<2)return null;
+ var arr=function(a){return Array.isArray(a)?a.map(function(x){return String(x).slice(0,60)}).filter(Boolean).slice(0,3):[]};
+ var d={e:String(r.empathy||'그런 생각이 들 만한 이유가 있었을 거예요.').slice(0,80),
+  pieces:r.pieces.slice(0,5).map(function(p){return {t:String(p.t||'').slice(0,60),k:p.k==='f'?'f':'i'}}).filter(function(p){return p.t}),
+  premises:arr(r.premises),alts:arr(r.alts),actions:arr(r.actions)};
+ return (d.pieces.length>=2&&d.premises.length>=2&&d.alts.length>=2&&d.actions.length>=2)?d:null;
+}
+async function introPrepare(){
+ if(Q.prep==='loading')return;
+ var me=Q,tok=++Q.tok,t=Q.thought,d=null;Q.prep='loading';
+ try{
+  var r=await ask('사용자의 자동적인 생각: '+t+'\n\n이 생각을 처음 검토하는 초보자가 빈 칸 앞에서 막히지 않도록 JSON으로만 답하세요.\n{"empathy":"공감 한 문장(40자 이내)","pieces":[{"t":"이 생각을 이루는 문장 조각(30자 이내, 사용자의 말로)","k":"f 또는 i"}],"premises":["이 생각이 맞으려면 늘 참이어야 하는 숨은 전제 3개(각 30자 이내)"],"alts":["다른 가능성 3개(각 30자 이내)"],"actions":["하루 안에 10분 안팎으로 할 수 있는 작은 행동 3개(각 35자 이내)"]}\npieces는 4개: 카메라에 찍힐 수 있는 사실(f) 2개와 내가 덧붙인 해석(i) 2개를 섞어 주세요. 정답이 아니라 가설 표현으로 쓰고, 비난하거나 긍정을 강요하지 마세요.');
+  d=normQ(r);if(!d)throw {code:'bad'};me.src='ai';
+ }catch(e){d=null}
+ if(!d){d=staticQ(t);me.src='static'}
+ if(me!==Q||tok!==me.tok)return;
+ var was=Q.waiting;
+ Q.data=d;Q.pieces=d.pieces.map(function(p){return {t:p.t,k:p.k}});Q.prep='done';
+ if(was){Q.waiting=false;Q.step=2}
+ saveQ();
+ if(was&&ROUTE==='debug'&&dm==='intro')render();
+}
+function qFacts(k){return (Q.pieces||[]).filter(function(p){return p.k===k}).map(function(p){return p.t})}
+function qAction(){return Q.action||Q.actOwn.trim()}
+function qAlt(){return Q.alt||Q.altOwn.trim()}
+function qSummary(){
+ var b=function(v){return v?v+'%':''};
+ return ['[잠깐! 진짜?] 내 생각 카드 (3분 입문)','처음 생각: '+Q.thought,(Q.b0&&Q.b1)?'확신도: '+b(Q.b0)+' → '+b(Q.b1):'',
+  '사실로 확인된 것: '+qFacts('f').join(' / '),'내가 덧붙인 해석: '+qFacts('i').join(' / '),
+  Q.premise?'당연하게 믿고 있던 것: '+Q.premise:'',qAlt()?'다르게 볼 가능성: '+qAlt():'','오늘의 작은 선택: '+qAction()].filter(Boolean).join('\n');
+}
+function qRecord(){
+ return {id:Date.now().toString(36),date:today(),issue:'',thought:Q.thought,source:'3분 입문'+(Q.source?' · '+Q.source:''),mode:'intro',
+  f:{q1fact:qFacts('f').join('\n'),q1interp:qFacts('i').join('\n'),q2:Q.premise,gap:qAlt(),action:qAction(),belief0:Q.b0,belief1:Q.b1}};
+}
+function openIntro(thought,source){Q=blankQ();Q.thought=thought||'';Q.source=source||'';dm='intro';saveQ();setRoute('debug',true)}
+function fuCandidate(){var rs=DB.records.filter(function(r){return r.mode==='intro'&&!(r.f&&r.f.fu)&&r.date!==today()});return rs[rs.length-1]}
+/* 입문 코스 화면 */
+function qProg(){
+ var sc=Q.step===5?5:Q.step+1, dots='';
+ for(var i=1;i<=5;i++)dots+='<i class="'+(i<sc?'done':i===sc?'cur':'')+'"></i>';
+ return '<div class="qprog"><span class="dots5" aria-hidden="true">'+dots+'</span><span class="note">'+(Q.step===5?'완료':sc+'/5 · '+QLEFT[Q.step]+' 남음')+'</span><button class="btn ghost sm" data-q-act="home">처음으로</button></div>';
+}
+function qOpts(list,key,sel){
+ return '<div class="opts">'+list.map(function(x,i){return '<button type="button" class="opt" aria-pressed="'+(sel===x)+'" data-q-opt="'+key+'" data-i="'+i+'">'+esc(x)+'</button>'}).join('')+'</div>';
+}
+function qB(cur,key){
+ return '<div class="opts3">'+QB.map(function(b){return '<button type="button" class="chip" aria-pressed="'+(cur===b[0])+'" data-q-'+key+'="'+b[0]+'">'+esc(b[1])+'</button>'}).join('')+'</div>';
+}
+function introPause(){
+ return '<div class="pause" role="status"><div class="ring" aria-hidden="true"></div><div class="big">잠깐!<br>진짜?</div>'+
+  '<div class="quote" style="max-width:34ch">“'+esc(Q.thought)+'”</div>'+
+  '<p class="lead" style="text-align:center">판단도 정답도 없어요. 숨을 한 번 천천히 쉬고, 방금 쓴 생각을 바라보세요.</p>'+
+  '<button class="btn" id="pauseGo" data-q-act="pauseGo" disabled>숨을 쉬는 중…</button></div>';
+}
+function introWait(){return '<div class="pause" role="status"><div class="ring" aria-hidden="true"></div><p class="lead" style="text-align:center">거울을 준비하고 있어요…</p></div>'}
+function q1(){
+ var ok=Q.thought.trim().length>=2;
+ return '<div class="card scene"><div class="eyebrow">① 꺼내기</div><h2 class="qh">요즘 머릿속을 사로잡은 한 줄은?</h2>'+
+  '<p class="hint">정답은 없어요. 예시를 누르면 바로 시작해요. 한 줄이면 충분해요.</p>'+
+  '<div class="chips">'+QEX.map(function(x){return '<button type="button" class="chip" data-q-ex="'+esc(x.t)+'">'+esc(x.t)+'</button>'}).join('')+'</div>'+
+  '<textarea id="qThought" placeholder="또는 내 말로 한 줄 적어 보세요">'+esc(Q.thought)+'</textarea>'+
+  (Q.source?'<p class="note">가져온 곳: '+esc(Q.source)+'</p>':'')+
+  '<div class="row end"><span class="note">입력은 이 기기에만 저장돼요.</span><button class="btn" data-q-act="to2" id="qGo0"'+(ok?'':' disabled')+'>잠깐! 하러 가기</button></div></div>';
+}
+function q3(){
+ var d=Q.data||staticQ(Q.thought);
+ return '<div class="card scene"><div class="eyebrow">③ 거울</div><div class="quote">“'+esc(Q.thought)+'”</div><p class="lead">'+esc(d.e)+'</p>'+
+  '<div class="sec"><span class="label">지금 이 생각, 얼마나 사실처럼 느껴져요?</span>'+qB(Q.b0,'b0')+'</div>'+
+  '<h2 class="qh">이 생각을 둘로 나눠 볼게요</h2>'+
+  '<p class="hint"><b>사실</b>은 카메라에 찍히는 것, <b>해석</b>은 거기에 내가 붙인 의미예요. 문장을 누르면 서로 바뀌어요.</p>'+
+  '<div class="pieces">'+Q.pieces.map(function(pc,i){return '<button type="button" class="piece '+(pc.k==='f'?'fact':'interp')+'" data-q-flip="'+i+'"><span class="ptag">'+(pc.k==='f'?'사실':'해석')+'</span><span>'+esc(pc.t)+'</span></button>'}).join('')+'</div>'+
+  '<div class="row end"><span class="note">'+(Q.src==='static'?'AI 없이 기본 예시로 보여 드려요.':'AI의 구분은 참고용이에요. 내 기준으로 바꿔도 돼요.')+'</span><button class="btn" data-q-act="to4">다음</button></div></div>';
+}
+function q4(){
+ var d=Q.data||staticQ(Q.thought);
+ if(Q.sub===0)return '<div class="card scene"><div class="eyebrow">④ 틈 · 꼭 그래야 해?</div><h2 class="qh">이 생각이 맞으려면, 무엇이 늘 참이어야 할까요?</h2>'+
+  '<p class="hint">가장 “당연하게 믿고 있던 것”을 눌러 보세요. 누르면 바로 넘어가요.</p>'+qOpts(d.premises,'prem',Q.premise)+
+  '<div class="row end"><button class="btn ghost sm" data-q-act="premNone">해당되는 게 없어요</button><button class="btn ghost sm" data-q-act="back">이전</button></div></div>';
+ return '<div class="card scene"><div class="eyebrow">④ 틈 · 다르게 보면?</div><h2 class="qh">다르게 볼 수 있는 가능성은?</h2>'+
+  '<p class="hint">“그럴 수도 있겠네” 싶은 것을 눌러 보세요. 하나만 있어도 틈이 생겨요.</p>'+qOpts(d.alts,'alt',Q.alt)+
+  (Q.own==='alt'?'<textarea id="qAltOwn" placeholder="내 말로 적어 보세요">'+esc(Q.altOwn)+'</textarea><div class="row end"><span></span><button class="btn" data-q-act="altOwnGo" id="qAltGo"'+(Q.altOwn.trim()?'':' disabled')+'>다음</button></div>':'')+
+  '<div class="row end"><button class="btn ghost sm" data-q-act="ownAlt">내 말로 쓰기</button><button class="btn ghost sm" data-q-act="back">이전</button></div></div>';
+}
+function q5(){
+ var d=Q.data||staticQ(Q.thought),ok=!!qAction();
+ return '<div class="card scene"><div class="eyebrow">⑤ 나의 작은 선택</div><h2 class="qh">오늘 해 볼 가장 작은 행동 하나는?</h2>'+
+  '<p class="hint">하나만 골라도 충분해요. 10분이면 끝나는 일이에요.</p>'+qOpts(d.actions,'act',Q.action)+
+  (Q.own==='act'?'<textarea id="qActOwn" placeholder="내 말로 적어 보세요">'+esc(Q.actOwn)+'</textarea>':'')+
+  '<div class="row"><button class="btn ghost sm" data-q-act="ownAct">내 말로 쓰기</button></div>'+
+  '<div class="sec"><span class="label">지금은 이 생각이 얼마나 사실처럼 느껴져요? (선택)</span>'+qB(Q.b1,'b1')+'</div>'+
+  '<div class="row end"><button class="btn ghost" data-q-act="back">이전</button><button class="btn" data-q-act="makeCard" id="qCard"'+(ok?'':' disabled')+'>내 생각 카드 만들기</button></div></div>';
+}
+function q6(){
+ var f=qFacts('f'),i=qFacts('i'),li=function(a){return a.length?'<ul class="exl" style="color:var(--fg)">'+a.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>':'<p class="hint">—</p>'};
+ var sh=(Q.b0&&Q.b1)?'<div class="row"><span class="tag">확신 '+esc(Q.b0)+'% → '+esc(Q.b1)+'%</span><span class="note">내려가야 성공은 아니에요. 틈이 생겼는지가 중요해요.</span></div>':'';
+ return '<div class="card mycard"><div class="eyebrow">내 생각 카드</div><div class="quote">“'+esc(Q.thought)+'”</div>'+sh+
+  '<div class="grid2"><div class="sec"><span class="label">사실로 확인된 것</span>'+li(f)+'</div><div class="sec"><span class="label">내가 덧붙인 해석</span>'+li(i)+'</div></div>'+
+  (Q.premise?'<div class="sec"><span class="label">당연하게 믿고 있던 것</span><p>'+esc(Q.premise)+'</p></div>':'')+
+  (qAlt()?'<div class="sec"><span class="label">다르게 볼 가능성</span><p>'+esc(qAlt())+'</p></div>':'')+
+  '<div class="sec"><span class="label">오늘의 작은 선택</span><p><b>'+esc(qAction())+'</b></p></div>'+
+  '<div class="final">생각과 나 사이에<br>틈이 생겼어요.<small>멈추고 · 구분하고 · 다르게 보고 · 작게 선택했어요</small></div>'+
+  '<div class="row"><button class="btn" data-q-act="saveRec"'+(Q.saved?' disabled':'')+'>'+(Q.saved?'저장했어요':'내 기록에 저장')+'</button><button class="btn ghost" data-q-act="copy">복사</button><span class="note" id="qMsg" role="status"></span></div>'+
+  '<div class="box"><b>더 알고 싶다면</b>이 생각을 문제 정의, 의식구조, 사고의 뿌리, 재해석까지 AI와 함께 더 깊이 살펴볼 수 있어요. 지금 쓴 생각은 그대로 이어져요.</div>'+
+  '<div class="row end"><button class="btn ghost" data-q-act="again">한 번 더 해 보기</button><button class="btn ghost" data-q-act="deep">더 깊이 살펴보기</button></div></div>';
+}
+function vIntro(){
+ if(Q.step===1)return Q.waiting?introWait():introPause();
+ return qProg()+[q1,null,q3,q4,q5,q6][Q.step]();
 }
 function dSummary(){
  var r=D.rf||{},e=D.exp||{};
@@ -993,7 +1173,7 @@ function recText(r){
   f.q1?'사실·해석·가능성: '+f.q1:'',f.q3?'생각의 뿌리: '+f.q3:'',f.q1fact?'확인한 사실: '+f.q1fact:'',f.q1interp?'내 해석: '+f.q1interp:'',f.q2?'꼭 그래야 해?: '+f.q2:'',f.q4a?'다르게 보면: '+f.q4a:'',f.gap?'생각의 틈(다른 가능성): '+f.gap:'',
   f.before?'자동으로 작동하던 틀: '+f.before:'',f.after?'새로 열어 본 해석: '+f.after:'',f.q5?'나의 선택: '+f.q5:'',f.keep?'계속 품고 갈 질문: '+f.keep:'',
   f.action?'작은 선택/실험: '+f.action:'',f.signal?'3초 멈춤 신호: '+f.signal:'',f.pred?'예상: '+f.pred:'',f.real?'실제 경험: '+f.real:'',f.found?'새로운 발견: '+f.found:'',f.obs?'관찰 지표: '+f.obs:'',f.failLearn?'실패의 데이터화: '+f.failLearn:'',
-  has(b1)?'지금 확신도: '+b1+'%':'',has(f.dist)?'생각과 나 사이의 거리: '+f.dist+' / 5':''].filter(Boolean).join('\n');
+  has(b1)?'지금 확신도: '+b1+'%':'',has(f.dist)?'생각과 나 사이의 거리: '+f.dist+' / 5':'',f.fu?'그 후: '+f.fu:''].filter(Boolean).join('\n');
 }
 function vNotes(){
  var rs=DB.records.slice().reverse();
@@ -1009,7 +1189,7 @@ var ROUTES=['home','debug','map','methods','book','canvas','notes'],ROUTE='home'
 try{var h0=(location.hash||'').replace('#/','').replace('#','');if(ROUTES.indexOf(h0)>=0)ROUTE=h0}catch(e){}
 function route(){return ROUTE}
 function setRoute(r,keep){
- if(r==='debug'&&ROUTE!=='debug'&&!keep&&D.step===0&&!D.pause)D.started=false;
+ if(r==='debug'&&ROUTE!=='debug'&&!keep){if(!((dm==='intro'&&Q.step>0&&!Q.done)||(dm==='deep'&&D.step>0)))dm='landing'}
  ROUTE=r;render();window.scrollTo({top:0});
 }
 var pt=null;
@@ -1023,7 +1203,8 @@ function render(){
  var c0=$('#cf');if(c0){c0.hidden=true;pend=null}
  clearInterval(pt);
  $('#view').innerHTML={home:vHome,debug:vDebug,map:vMap,methods:vMethods,book:vBook,canvas:vCanvas,notes:vNotes}[r]();
- if(r==='debug'&&D.started&&D.pause&&!D.busy)startPause();
+ if(r==='debug'&&dm==='deep'&&D.started&&D.pause&&!D.busy)startPause();
+ if(r==='debug'&&dm==='intro'){if(Q.step===1&&!Q.waiting)startPause();if(Q.step>=1&&Q.step<=4&&!Q.data&&Q.prep!=='loading')introPrepare()}
 }
 function dGo(n){D.step=n;D.err='';save();render();window.scrollTo({top:0})}
 async function dl(name,text,type){
@@ -1046,6 +1227,9 @@ document.addEventListener('input',function(e){
  else if(t.id==='dIssue'){D.issue=t.value.trim();document.querySelectorAll('[data-d-issue]').forEach(function(b){b.setAttribute('aria-pressed','false')});save();dUpd()}
  else if(t.dataset&&t.dataset.dAns!==undefined){D.ans[t.dataset.dAns]=t.value;save()}
  else if(t.dataset&&t.dataset.dFx!==undefined){D.ex[t.dataset.dFx]=t.value;save()}
+ else if(t.id==='qThought'){Q.thought=t.value;saveQ();var g3=$('#qGo0');if(g3)g3.disabled=!(Q.thought.trim().length>=2)}
+ else if(t.id==='qAltOwn'){Q.altOwn=t.value;saveQ();var g4=$('#qAltGo');if(g4)g4.disabled=!Q.altOwn.trim()}
+ else if(t.id==='qActOwn'){Q.actOwn=t.value;saveQ();var g5=$('#qCard');if(g5)g5.disabled=!qAction()}
  else if(t.id==='bkWhere'){bk.w=t.value}
  else if(t.id==='bkQuote'){bk.q=t.value}
  else if(t.id==='bkIssue'){bk.i=t.value;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed','false')})}
@@ -1061,7 +1245,7 @@ document.addEventListener('change',function(e){
 document.addEventListener('keydown',function(e){var n=e.target.closest&&e.target.closest('[data-node]');if(n&&(e.key==='Enter'||e.key===' ')){e.preventDefault();mapSel=+n.dataset.node;render()}});
 function chGo(c){
  var g=c.go||'debug';
- if(g==='debug')openDebug(c.issue||'','','《'+CONFIG.bookTitle+'》 '+c.label);
+ if(g==='debug')openIntro('','《'+CONFIG.bookTitle+'》 '+c.label);
  else if(g==='canvas')setRoute('canvas');
  else if(g.indexOf('method:')===0){mtKind=g.slice(7);setRoute('methods')}
  else if(g.indexOf('map:')===0){mapKind=g.slice(4);mapSel=0;setRoute('map')}
@@ -1069,8 +1253,40 @@ function chGo(c){
 document.addEventListener('click',function(e){
  var lk=e.target.closest('a[href^="#/"]');if(lk){e.preventDefault();setRoute(lk.getAttribute('href').slice(2));return}
  var cf=e.target.closest('[data-cf]');if(cf){var fn=pend;pend=null;$('#cf').hidden=true;if(cf.dataset.cf==='y'&&fn)fn();return}
- var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl],[data-sc],[data-mt],[data-bkch]');
+ var el=e.target.closest('[data-d-issue],[data-d-ex],[data-d-pat],[data-d-go],[data-d-act],[data-node],[data-kind],[data-copy],[data-del],[data-resume],[data-ch],[data-bq],[data-bkissue],[data-act],[data-fl],[data-sc],[data-mt],[data-bkch],[data-q-act],[data-q-ex],[data-q-b0],[data-q-b1],[data-q-flip],[data-q-opt],[data-fu]');
  if(!el)return;var d=el.dataset;
+  /* 3분 입문 */
+ function qGo(n,sub){Q.step=n;Q.sub=sub||0;Q.own='';saveQ();render();window.scrollTo({top:0})}
+ function qStart(){if(Q.thought.trim().length<2)return;Q.prep='';Q.data=null;Q.pieces=[];Q.waiting=false;Q.b0='';Q.premise='';Q.alt='';Q.altOwn='';Q.action='';Q.actOwn='';Q.b1='';Q.tok++;Q.step=1;Q.sub=0;Q.saved=false;Q.done=false;saveQ();introPrepare();render();window.scrollTo({top:0})}
+ function qAdv(fn){render();setTimeout(function(){if(ROUTE==='debug'&&dm==='intro')fn()},320)}
+ if(d.fu){var fp=d.fu.split('|'),fr=DB.records.filter(function(r){return r.id===fp[0]})[0];if(fr){fr.f=fr.f||{};fr.f.fu=fp[1];save()}render();return}
+ if(d.qEx!==undefined){Q.thought=d.qEx;qStart();return}
+ if(d.qB0!==undefined){Q.b0=Q.b0===d.qB0?'':d.qB0;saveQ();render();return}
+ if(d.qB1!==undefined){Q.b1=Q.b1===d.qB1?'':d.qB1;saveQ();render();return}
+ if(d.qFlip!==undefined){var pc=Q.pieces[+d.qFlip];if(pc){pc.k=pc.k==='f'?'i':'f';saveQ();render()}return}
+ if(d.qOpt){
+  var dd=Q.data||staticQ(Q.thought),ix=+d.i;
+  if(d.qOpt==='prem'){Q.premise=dd.premises[ix];saveQ();qAdv(function(){qGo(3,1)})}
+  else if(d.qOpt==='alt'){Q.alt=dd.alts[ix];Q.altOwn='';saveQ();qAdv(function(){qGo(4)})}
+  else if(d.qOpt==='act'){Q.action=Q.action===dd.actions[ix]?'':dd.actions[ix];if(Q.action)Q.actOwn='';saveQ();render()}
+  return}
+ if(d.qAct){
+  var qa=d.qAct;
+  if(qa==='home'){dm='landing';render();window.scrollTo({top:0})}
+  else if(qa==='to2')qStart();
+  else if(qa==='pauseGo'){if(Q.prep==='done'){qGo(2)}else{Q.waiting=true;saveQ();render()}}
+  else if(qa==='to4')qGo(3,0);
+  else if(qa==='premNone'){Q.premise='';qGo(3,1)}
+  else if(qa==='ownAlt'){Q.own='alt';saveQ();render();var ta1=$('#qAltOwn');if(ta1)ta1.focus()}
+  else if(qa==='altOwnGo'){if(Q.altOwn.trim()){Q.alt='';qGo(4)}}
+  else if(qa==='ownAct'){Q.own='act';Q.action='';saveQ();render();var ta2=$('#qActOwn');if(ta2)ta2.focus()}
+  else if(qa==='back'){if(Q.step===4)qGo(3,1);else if(Q.step===3&&Q.sub===1)qGo(3,0);else if(Q.step===3)qGo(2);else qGo(Math.max(0,Q.step-1))}
+  else if(qa==='makeCard'){if(qAction()){Q.done=true;qGo(5)}}
+  else if(qa==='saveRec'){if(!Q.saved){DB.records.push(qRecord());Q.saved=true;saveQ();render();var m1=$('#qMsg');if(m1)m1.textContent='‘내 기록’ 탭에서 볼 수 있어요.'}}
+  else if(qa==='copy'){var mq=$('#qMsg');copy(qSummary(),function(m){if(mq)mq.textContent=m},mq)}
+  else if(qa==='again'){Q=blankQ();dm='intro';saveQ();render();window.scrollTo({top:0})}
+  else if(qa==='deep'){D=blankD();D.started=true;D.thought=Q.thought;D.source='3분 입문에서 이어짐';dm='deep';save();render();window.scrollTo({top:0})}
+  return}
  /* 사고 디버깅 */
  if(d.dIssue!==undefined){D.issue=d.dIssue;startIssue();return}
  if(d.dEx!==undefined){var tx=$('#dThought');if(tx){tx.value=d.dEx;D.thought=d.dEx;save();dUpd();tx.focus({preventScroll:true})}return}
@@ -1080,7 +1296,8 @@ document.addEventListener('click',function(e){
   var a=d.dAct;
   if(a==='issueNext'){startIssue()}
   else if(a==='think'){D.pause=true;save();render();window.scrollTo({top:0})}
-  else if(a==='start'){D.started=true;save();render();window.scrollTo({top:0})}
+  else if(a==='deepStart'){dm='deep';D.started=true;save();render();window.scrollTo({top:0})}
+  else if(a==='introStart'){if(Q.step===0||Q.done)Q=blankQ();dm='intro';saveQ();render();window.scrollTo({top:0})}
   else if(a==='back')dGo(Math.max(0,D.step-1));
   else if(a==='pauseGo'){D.pause=false;if(D.pats&&D.patsFor===D.thought&&!D.err){D.step=2;save();render();window.scrollTo({top:0})}else{D.dbg=null;D.rf=null;D.exp=null;D.step=2;doPatterns()}}
   else if(a==='define')doDefine();
@@ -1102,7 +1319,7 @@ document.addEventListener('click',function(e){
  if(d.kind){mapKind=d.kind;mapSel=0;render();return}
  if(d.copy){var r=DB.records.filter(function(r){return r.id===d.copy})[0];if(r)copy(recText(r),say);return}
  if(d.del){ask2('이 기록을 삭제할까요? 되돌릴 수 없습니다.',function(){DB.records=DB.records.filter(function(r){return r.id!==d.del});save();render()});return}
- if(d.resume){var rr=DB.records.filter(function(r){return r.id===d.resume})[0];if(rr)openDebug(rr.issue,rr.thought,rr.source);return}
+ if(d.resume){var rr=DB.records.filter(function(r){return r.id===d.resume})[0];if(rr)openIntro(rr.thought,rr.source);return}
  if(d.ch!==undefined){curCh=+d.ch;bk.w=CHAPTERS[curCh].label;render();return}
  if(d.bq!==undefined){var c2=CHAPTERS[curCh],q=c2.qs[+d.bq];bk.q=q;var qt=$('#bkQuote');if(qt){qt.value=q;qt.focus()}if(c2.issue&&!bk.i){bk.i=c2.issue;var bi=$('#bkIssue');if(bi)bi.value=c2.issue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.bkissue===c2.issue))})}return}
  if(d.bkissue){bk.i=d.bkissue;var bi2=$('#bkIssue');if(bi2)bi2.value=d.bkissue;document.querySelectorAll('[data-bkissue]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});return}
@@ -1111,9 +1328,9 @@ document.addEventListener('click',function(e){
  if(act==='mwCopy'){copy(mwText(mm),function(m2){var e3=$('#mwMsg');if(e3)e3.textContent=m2},$('#mwMsg'))}
  else if(act==='mwSave'){dl('사고법_'+mm.name+'_'+today()+'.txt',mwText(mm),'text/plain').then(function(ok){if(!ok)showText($('#mwMsg'),mwText(mm))})}
  else if(act==='mwCanvas'){var lastv=DB.methods[mm.k+'_'+(mm.ws.length-1)],firstv=DB.methods[mm.k+'_0'];if(lastv&&!DB.canvas.e1)DB.canvas.e1=lastv;if(firstv&&mm.k!=='back'&&!DB.canvas.e0)DB.canvas.e0=firstv;save();setRoute('canvas')}
- else if(act==='mtDebug'){openDebug('','','사고법 · '+mm.name)}
- else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];openDebug('','','지도 · '+nd.n+' — 잠깐! '+nd.q)}
- else if(act==='bookGo'){var q2v=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q2v){$('#bkQuote').focus();return}openDebug(iss,q2v,'《'+CONFIG.bookTitle+'》'+(w?' '+w:''));bk={q:'',w:'',i:''}}
+ else if(act==='mtDebug'){openIntro('','사고법 · '+mm.name)}
+ else if(act==='mapDebug'){var nd=MAP[mapKind].nodes[mapSel];openIntro('','지도 · '+nd.n+' — 잠깐! '+nd.q)}
+ else if(act==='bookGo'){var q2v=$('#bkQuote').value.trim(),iss=$('#bkIssue').value.trim(),w=$('#bkWhere').value.trim();if(!q2v){$('#bkQuote').focus();return}openIntro(q2v,'《'+CONFIG.bookTitle+'》'+(w?' '+w:''));bk={q:'',w:'',i:''}}
  else if(act==='chGo'){chGo(CHAPTERS[curCh])}
  else if(act==='copyCanvas'){copy(canvasText(),function(m){var e2=$('#cvMsg');if(e2)e2.textContent=m},$('#cvMsg'))}
  else if(act==='saveCanvas'){dl('미래설계_'+today()+'.txt',canvasText(),'text/plain').then(function(ok){if(!ok)showText($('#cvMsg'),canvasText())})}
