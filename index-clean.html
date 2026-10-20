@@ -279,6 +279,16 @@ select.fc{appearance:none;background-image:linear-gradient(45deg,transparent 50%
 .person ul{list-style:none;margin-top:.5rem;font-size:.93rem;color:var(--muted)}
 .person li::before{content:'→ ';color:var(--lime-deep);font-weight:900}
 
+/* ---------- Home feature / help ---------- */
+.feature{display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;background:var(--ink);color:var(--paper);padding:clamp(1.8rem,4vw,3rem);border-radius:var(--r,0)}
+.feature .eyebrow{color:var(--lime)}.feature .eyebrow::before{background:var(--lime)}
+.feature h3{font-size:clamp(1.5rem,3.2vw,2.3rem);font-weight:900}
+.feature p{margin-top:1rem;color:var(--muted-on-ink);max-width:52ch}
+.feature-act{display:flex;justify-content:flex-end}
+.steps-list{max-width:760px;margin-top:2rem}
+@media (max-width:860px){.feature{grid-template-columns:1fr}.feature-act{justify-content:flex-start}}
+@media (max-width:1120px){.nav-links a{padding:.5rem .55rem;font-size:.86rem}.nav-cta.desk{display:none}}
+
 /* ---------- Footer ---------- */
 footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5rem) 0 2rem;position:relative;overflow:hidden}
 .foot-big{font-size:clamp(3rem,13vw,10rem);font-weight:900;line-height:.95;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px rgba(227,199,123,.5);margin-bottom:2.5rem}
@@ -530,6 +540,7 @@ footer{padding-top:3rem}
         <li><a href="#about" class="nav-item" data-page="about">소생 이야기</a></li>
         <li><a href="#edu" class="nav-item" data-page="edu">교육</a></li>
         <li><a href="#economy" class="nav-item" data-page="economy">지역순환경제</a></li>
+        <li><a href="#help" class="nav-item" data-page="help">일손덜기</a></li>
         <li><a href="#books" class="nav-item" data-page="books">출간도서</a></li>
         <li><a href="#join" class="nav-item" data-page="join">함께하기</a></li>
       </ul>
@@ -627,6 +638,21 @@ footer{padding-top:3rem}
         <button class="pcard big reveal" data-prog="p-senior-meta"><span class="chip">12주 대표 과정</span><h4>AI 기반 시니어 메타인지·심리회복</h4><p>“AI와 함께 다시 나를 발견하다” — Senior Mind OS 앱과 결합된 디지털 심리 방역 및 생애사 자산화 프로그램</p><span class="more">전단지 보기 →</span></button>
         <button class="pcard reveal" data-prog="p-senior-meta2" style="--d:.1s"><span class="chip alt">단기 특강·연계</span><h4>시니어 메타인지 교육</h4><p>엄마, 아빠가 아닌 ‘당신 자신’으로 살아갈 내일! 주체적 자아와 내면의 욕구를 발굴합니다.</p><span class="more">전단지 보기 →</span></button>
         <button class="pcard reveal" data-prog="p-ai-life" style="--d:.2s"><span class="chip sig">6주 영상 제작</span><h4>AI로 만드는 나의 인생이야기</h4><p>당신의 삶이 한 편의 영화가 됩니다. AI 이미지·성우로 인생 회고 영상을 만들고 상영회까지!</p><span class="more">전단지 보기 →</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="feature reveal">
+        <div>
+          <div class="eyebrow">// 일손덜기 앱 지원사업</div>
+          <h3>반복되는 일은 앱이 덜고,<br>사람은 사람의 일에 집중합니다.</h3>
+          <p>소상공인과 시니어 경제공동체, 기관이 일손덜기 앱을 쉽게 도입하고 오래 쓰도록 상담부터 교육까지 함께합니다.</p>
+        </div>
+        <div class="feature-act">
+          <button class="btn btn-lime" data-goto="help">지원사업 알아보기 <span class="arr">→</span></button>
+        </div>
       </div>
     </div>
   </div>
@@ -803,6 +829,67 @@ footer{padding-top:3rem}
   </div>
 </section>
 
+<!-- ================= HELP (일손덜기) ================= -->
+<section id="help" class="page">
+  <div class="phero">
+    <div class="ghost" aria-hidden="true">手</div>
+    <div class="wrap">
+      <div class="eyebrow">// Support program</div>
+      <h2>일손덜기 앱 지원사업</h2>
+      <p class="lead">반복되는 일은 앱이 덜고, 사람은 사람이 잘하는 일에 집중하도록 돕습니다. 도입 상담부터 사용 교육, 사용 후 개선까지 소생커뮤니티가 곁에서 함께합니다.</p>
+      <div class="hero-actions" style="margin-top:2rem">
+        <button class="btn btn-lime" data-goto="join" data-type="help" data-msg="[일손덜기 앱 지원사업] 지원사업에 대해 문의드립니다.">지원 문의하기 <span class="arr">→</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow reveal">// What we support</div>
+      <h2 class="h-lg reveal">앱을 깔아 드리는 데서 끝나지 않습니다.</h2>
+      <p class="lead reveal">앱은 도입보다 익숙해지는 과정이 어렵습니다. 소생커뮤니티는 쓰는 분의 일과 속도에 맞춰 세 가지를 지원합니다.</p>
+      <div class="pgrid" style="margin-top:2.5rem">
+        <div class="pcard reveal" style="cursor:default"><span class="chip">도입 상담</span><h4>내 일에 맞는 쓰임 찾기</h4><p>지금 하고 있는 일을 함께 살펴보고, 앱으로 덜 수 있는 반복 업무가 무엇인지 정리합니다.</p></div>
+        <div class="pcard reveal" style="--d:.1s;cursor:default"><span class="chip alt">맞춤 설정</span><h4>우리 현장에 맞게 세팅</h4><p>사업 기획과 컨설팅 경험을 바탕으로, 복잡한 기능은 덜어 내고 꼭 필요한 흐름만 남겨 설정합니다.</p></div>
+        <div class="pcard reveal" style="--d:.2s;cursor:default"><span class="chip sig">사용 교육·동행</span><h4>익숙해질 때까지 곁에서</h4><p>큰 글씨와 쉬운 설명으로 교육하고, 쓰다가 막히는 부분은 사용 후에도 함께 풀어 갑니다.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section dark" style="padding-top:clamp(3rem,6vw,5rem)">
+    <div class="wrap">
+      <div class="eyebrow reveal">// Who it is for</div>
+      <h2 class="h-lg reveal">이런 분들과 함께합니다.</h2>
+      <div class="engines">
+        <div class="engine reveal"><div class="k">TARGET</div><h4>소상공인</h4><p>주문·예약·고객 응대처럼 매일 반복되는 일에 시간을 빼앗기는 사장님</p></div>
+        <div class="engine reveal" style="--d:.08s"><div class="k">TARGET</div><h4>시니어 경제공동체</h4><p>활동과 사업을 직접 꾸려 가며 디지털 도구가 필요한 어르신 모임</p></div>
+        <div class="engine reveal" style="--d:.16s"><div class="k">TARGET</div><h4>복지관·시니어클럽</h4><p>프로그램 운영과 기록 업무를 줄이고 싶은 현장의 실무자</p></div>
+        <div class="engine reveal" style="--d:.24s"><div class="k">TARGET</div><h4>지자체·기관</h4><p>지역 안에서 앱 도입과 활용을 함께 확산하고 싶은 담당 부서</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow reveal">// How it works</div>
+      <h2 class="h-lg reveal">지원은 이렇게 진행됩니다.</h2>
+      <ol class="flow-list steps-list">
+        <li class="reveal"><span class="num">01</span><div><b>문의 접수</b><span>온라인 문의로 어떤 일이 가장 부담인지 알려 주세요.</span></div></li>
+        <li class="reveal" style="--d:.08s"><span class="num">02</span><div><b>상담과 진단</b><span>담당자가 현재 업무를 함께 살펴보고 덜 수 있는 일을 정리합니다.</span></div></li>
+        <li class="reveal" style="--d:.16s"><span class="num">03</span><div><b>맞춤 도입과 교육</b><span>현장에 맞게 설정하고, 쓰는 분 눈높이에 맞춰 사용법을 교육합니다.</span></div></li>
+        <li class="reveal" style="--d:.24s"><span class="num">04</span><div><b>사용 후 동행</b><span>쓰면서 생긴 어려움을 함께 풀고, 더 나은 쓰임으로 다듬어 갑니다.</span></div></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap band-in">
+      <div><div class="eyebrow">// Contact</div><h3>일손을 덜고 싶은 일이 있나요?</h3><p style="margin-top:.8rem;max-width:52ch">지원 대상과 일정은 문의해 주시면 담당자가 안내해 드립니다.</p></div>
+      <button class="btn" data-goto="join" data-type="help" data-msg="[일손덜기 앱 지원사업] 지원사업에 대해 문의드립니다.">지원 문의하기 <span class="arr">→</span></button>
+    </div>
+  </div>
+</section>
+
 <!-- ================= BOOKS ================= -->
 <section id="books" class="page">
   <div class="phero">
@@ -843,6 +930,7 @@ footer{padding-top:3rem}
                 <option value="edu">교육 의뢰 (기관/지자체)</option>
                 <option value="member">조합원 가입 신청 (첫 5인 모집)</option>
                 <option value="consulting">사업 기획 및 컨설팅 문의</option>
+                <option value="help">일손덜기 앱 지원사업 문의</option>
                 <option value="book">도서 구매 문의</option>
               </select></div>
             <div class="fg"><label for="name">성함 / 기관명</label><input type="text" id="name" class="fc" placeholder="홍길동 / ○○복지관" required></div>
@@ -948,6 +1036,7 @@ footer{padding-top:3rem}
   $$('[data-goto]').forEach(function(el){el.addEventListener('click',function(){
     showPage(el.dataset.goto);
     if(el.dataset.type){ $('#type').value=el.dataset.type; }
+    if(el.dataset.msg){ $('#message').value=el.dataset.msg; }
   })});
   window.addEventListener('popstate',function(){showPage((location.hash||'#home').slice(1),false)});
 
