@@ -289,6 +289,13 @@ select.fc{appearance:none;background-image:linear-gradient(45deg,transparent 50%
 @media (max-width:860px){.feature{grid-template-columns:1fr}.feature-act{justify-content:flex-start}}
 @media (max-width:1120px){.nav-links a{padding:.5rem .55rem;font-size:.86rem}.nav-cta.desk{display:none}}
 
+.appcard{cursor:default}
+.appcard .appact{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;align-items:center}
+.applink{display:inline-flex;align-items:center;gap:.4rem;font-weight:900;font-size:.9rem;padding:.55rem 1rem;background:var(--ink);color:var(--lime);border:2px solid var(--ink);transition:transform .15s}
+.applink:hover{transform:translateY(-2px)}
+.applink.ghost{background:transparent;color:var(--ink)}
+.pcard.big .applink{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+.note{margin-top:1.6rem;font-size:.86rem;color:var(--muted)}
 /* ---------- Footer ---------- */
 footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5rem) 0 2rem;position:relative;overflow:hidden}
 .foot-big{font-size:clamp(3rem,13vw,10rem);font-weight:900;line-height:.95;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px rgba(200,255,60,.5);margin-bottom:2.5rem}
@@ -495,10 +502,10 @@ footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5r
         <div>
           <div class="eyebrow">// 일손덜기 앱 지원사업</div>
           <h3>반복되는 일은 앱이 덜고,<br>사람은 사람의 일에 집중합니다.</h3>
-          <p>소상공인과 시니어 경제공동체, 기관이 일손덜기 앱을 쉽게 도입하고 오래 쓰도록 상담부터 교육까지 함께합니다.</p>
+          <p>함께 만든 앱 9종을 소개하고, 소상공인과 시니어 경제공동체, 기관이 앱을 쉽게 도입하고 오래 쓰도록 상담부터 교육까지 함께합니다.</p>
         </div>
         <div class="feature-act">
-          <button class="btn btn-lime" data-goto="help">지원사업 알아보기 <span class="arr">→</span></button>
+          <button class="btn btn-lime" data-goto="help">앱과 지원사업 보기 <span class="arr">→</span></button>
         </div>
       </div>
     </div>
@@ -683,10 +690,32 @@ footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5r
     <div class="wrap">
       <div class="eyebrow">// Support program</div>
       <h2>일손덜기 앱 지원사업</h2>
-      <p class="lead">반복되는 일은 앱이 덜고, 사람은 사람이 잘하는 일에 집중하도록 돕습니다. 도입 상담부터 사용 교육, 사용 후 개선까지 소생커뮤니티가 곁에서 함께합니다.</p>
+      <p class="lead">반복되는 일은 앱이 덜고, 사람은 사람이 잘하는 일에 집중하도록 돕습니다. 소생커뮤니티가 함께 만든 앱을 소개하고, 도입 상담부터 사용 교육, 사용 후 개선까지 곁에서 함께합니다.</p>
       <div class="hero-actions" style="margin-top:2rem">
-        <button class="btn btn-lime" data-goto="join" data-type="help" data-msg="[일손덜기 앱 지원사업] 지원사업에 대해 문의드립니다.">지원 문의하기 <span class="arr">→</span></button>
+        <button class="btn btn-lime" data-scroll="help-apps">만든 앱 보기 <span class="arr">↓</span></button>
+        <button class="btn btn-ghost" data-goto="join" data-type="help" data-msg="[일손덜기 앱 지원사업] 지원사업에 대해 문의드립니다.">지원 문의하기</button>
       </div>
+    </div>
+  </div>
+
+  <div class="section" id="help-apps">
+    <div class="wrap">
+      <div class="eyebrow reveal">// 앱 제작 현황</div>
+      <h2 class="h-lg reveal">함께 만든 앱 9종</h2>
+      <p class="lead reveal">소생커뮤니티가 교육·돌봄·조직 현장과 함께 만들고 시범 운영 중인 앱입니다. 각 카드의 ‘앱 열어 보기’를 눌러 직접 써 볼 수 있습니다. 새 앱이 나오면 이곳에 계속 추가합니다.</p>
+      <div class="filter" role="group" aria-label="앱 분야 필터"><button class="fbtn appf active" data-cat="all">전체 9종</button><button class="fbtn appf" data-cat="edu">교육·사고</button><button class="fbtn appf" data-cat="care">돌봄·상담</button><button class="fbtn appf" data-cat="org">조직·사역</button></div>
+      <div class="pgrid" id="app-grid">
+<article class="pcard appcard reveal" data-cat="edu" style="--d:0.0s"><span class="chip ">시범 공개</span><h4>잠깐! 진짜?</h4><p><b>《연결할 용기》와 함께 쓰는 사고 연습 앱</b></p><p>생각과 반응 사이에 “생각의 틈”을 만드는 사고 디버깅, 순환 지도, 사고법, 미래 설계 캔버스를 담았습니다.</p><span class="meta">대상 · 책 독자 · 시민 · 학습자</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/UpETwum9KuHiDUhwTJc8iC" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="edu" style="--d:0.08s"><span class="chip ">시범 공개</span><h4>뿌리숲</h4><p><b>수업과 개인 학습을 위한 사고법 길잡이</b></p><p>잇다·캐다·되짚다·남기다 네 갈래 길로 90분 수업과 1주 관찰을 이어 가고, 레버리지·디폴트·피드백 렌즈로 되돌아봅니다.</p><span class="meta">대상 · 교육 진행자 · 학습자</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/Dv3QW69FYxGAU4WFCmxRLH" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="edu" style="--d:0.16s"><span class="chip ">시범 공개</span><h4>시니어 마음온도</h4><p><b>어르신의 마음 온도를 살피는 8강 동행 앱</b></p><p>매일의 마음 온도 체크인, AI 대화, 오늘의 감사와 질문, 경험 아카이브를 진행자 화면과 함께 운영합니다.</p><span class="meta">대상 · 시니어 참여자 · 진행자</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/L9GZCZnftQ3Ax3doeCSSTk" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="edu" style="--d:0.0s"><span class="chip ">시범 공개</span><h4>역사속에 새겨진 나의 인생이야기</h4><p><b>내 삶을 역사 연표 위에 기록하는 앱</b></p><p>태어난 해를 넣으면 해마다의 역사 사건이 나열되고, 그 옆에 내 기억을 적어 이야기 초안과 영상 원고, 추억 사진첩으로 잇습니다.</p><span class="meta">대상 · 시니어 · 가족</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/6J3XZWxQweM381rQgfgzua" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="care" style="--d:0.08s"><span class="chip alt">프로토타입 제작 중</span><h4>느린걸음</h4><p><b>아이·보호자·센터를 잇는 케어 앱</b></p><p>아이는 놀이로, 보호자는 리포트로, 센터는 출결·관찰일지·교육 프로그램으로 한 흐름에 연결합니다.</p><span class="meta">대상 · 아동 · 보호자 · 센터</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/GRJ82xqynw9YvXM5yZWomg" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="care" style="--d:0.16s"><span class="chip alt">시제품 · 가상 사례로 시험 중</span><h4>웩슬러 결과 길잡이</h4><p><b>검사 결과를 쉬운 말로 풀고 지원계획으로 잇는 앱</b></p><p>보고서의 점수를 쉬운 설명으로 보고, 가정·학교·센터에서 해 볼 지원계획을 만듭니다. 진단이나 판정은 하지 않습니다.</p><span class="meta">대상 · 부모 · 지원센터 실무자</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/D6otmLvWuMqGJ94ZiCWYKx" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="care" style="--d:0.0s"><span class="chip ">시범 공개</span><h4>의료통역 브릿지</h4><p><b>의료통역 코디네이터를 위한 실전 가이드</b></p><p>병원·진료 용어사전, 상황별 실전 문장, 현장 체크리스트, 퀴즈로 일본인 환자 통역을 돕습니다.</p><span class="meta">대상 · 의료통역 코디네이터</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/1MnG2ShE4DEzW44pXkWTSH" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+<article class="pcard appcard reveal" data-cat="org" style="--d:0.08s"><span class="chip ">시범 공개</span><h4>같이세움 사회연대경제 길잡이</h4><p><b>협동조합·사회적기업 창립과 운영 내비게이터</b></p><p>협동조합, 사회적협동조합, 사회적기업, 마을기업, 자활기업의 설립 로드맵과 창립총회 서류, 연간 운영 달력을 안내합니다.</p><span class="meta">대상 · 설립 준비 모임 · 운영 실무자</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/FWfwk4o2EtwJcDMXHW1RRS" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a><a class="applink ghost" href="https://charlychae7-lang.github.io/sosaeng/coop-guide/guide.html" target="_blank" rel="noopener">사용 안내</a></div></article>
+<article class="pcard appcard reveal" data-cat="org" style="--d:0.16s"><span class="chip ">시범 공개</span><h4>교회 목회비서</h4><p><b>목회자의 하루를 돕는 일정·기록·설교 비서</b></p><p>일정 다이어리, 주보·공지, 심방·상담 기록, 설교·예화 서재와 설교 연구실을 한 앱에 모았습니다.</p><span class="meta">대상 · 목회자 · 교역자</span><div class="appact"><a class="applink" href="https://claude.ai/artifact/ESDGzU8mUnfN6zhzwPeGhr" target="_blank" rel="noopener">앱 열어 보기 <span class="arr">↗</span></a></div></article>
+      </div>
+      <p class="note">각 앱의 입력 내용은 사용하는 기기 안에서만 쓰이는 시범 버전입니다. 사용설명서는 앱별로 준비되는 대로 이 카드에 연결합니다.</p>
     </div>
   </div>
 
@@ -1062,6 +1091,14 @@ footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5r
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(bOv.classList.contains('open')) closeOv(bOv); if(pOv.classList.contains('open')) closeOv(pOv); setMenu(false); } });
 
   setTimeout(function(){ $$('.page.active .reveal').forEach(function(el){el.classList.add('in')}); },2200);
+  $$('.appf').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      $$('.appf').forEach(function(b){b.classList.remove('active')}); btn.classList.add('active');
+      var c=btn.dataset.cat;
+      $$('.appcard').forEach(function(a){ a.style.display=(c==='all'||a.dataset.cat===c)?'':'none'; });
+    });
+  });
+  $$('[data-scroll]').forEach(function(b){ b.addEventListener('click',function(){ var t=document.getElementById(b.dataset.scroll); if(t) t.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'}); }); });
   /* ---------- Init ---------- */
   showPage((location.hash||'#home').slice(1),false);
 })();
