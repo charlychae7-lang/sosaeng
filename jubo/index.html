@@ -1,0 +1,1136 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>주보 자동화</title>
+<style>
+:root{
+  --navy:#1F4E5F; --gold:#B8892B; --lgold:#E3C77F; --ink:#222B30;
+  --soft:#EEF3F5; --line:#C9D5DA; --mute:#5A6870; --bg:#E4E9EC; --warn:#B3261E;
+  --font:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+/* ===== 화면 구성 ===== */
+#app{display:grid;grid-template-columns:var(--pw,620px) 10px minmax(0,1fr);height:100%}
+#panel{background:#fff;border-right:1px solid var(--line);overflow-y:auto;padding:0 0 40px}
+#stage{overflow:auto;padding:20px;min-width:0}
+#split{cursor:col-resize;background:var(--line);position:relative;touch-action:none}
+#split::after{content:"";position:absolute;left:3px;right:3px;top:50%;height:48px;margin-top:-24px;border-radius:3px;background:var(--mute);opacity:.55}
+#split:hover,#split.on{background:#9fb4bc}
+#split:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+#pages{transform-origin:top left}
+
+.bar{position:sticky;top:0;background:#fff;z-index:5;padding:14px 18px;border-bottom:1px solid var(--line)}
+.bar h1{font-size:20px;margin:0 0 10px;color:var(--navy)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font-family:var(--font);font-size:15px;padding:10px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button:hover{background:var(--soft)}
+button.main{background:var(--navy);color:#fff;font-weight:700}
+button.main:hover{background:#163a47}
+button.small{font-size:13px;padding:5px 9px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.saved{font-size:12px;color:var(--mute);margin-top:8px}
+
+section.f{padding:16px 18px;border-bottom:1px solid var(--line)}
+section.f h2{font-size:16px;margin:0 0 10px;color:var(--navy)}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+input[type=text],input[type=date],textarea,select{width:100%;font-family:var(--font);font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink)}
+textarea{min-height:130px;line-height:1.5;resize:vertical}
+.hint{font-size:12px;color:var(--mute);margin:4px 0 0}
+.row{display:grid;gap:5px;margin-bottom:6px;align-items:center}
+.row.r3{grid-template-columns:90px 1fr 120px 62px}
+.row.r2{grid-template-columns:100px 1fr 62px}
+.row input{padding:8px 9px;font-size:15px}
+.rb{display:flex;gap:2px}
+.rb button{padding:4px 6px;font-size:12px;border-color:var(--line);color:var(--mute)}
+.colhead{display:grid;gap:5px;font-size:12px;color:var(--mute);margin-bottom:3px}
+.colhead.r3{grid-template-columns:90px 1fr 120px 62px}
+.colhead.r2{grid-template-columns:100px 1fr 62px}
+.range{display:flex;align-items:center;gap:10px}
+.range input{flex:1}
+details{margin-top:10px}
+summary{cursor:pointer;color:var(--navy);font-size:14px}
+.guide{background:var(--soft);padding:12px 14px;border-radius:6px;font-size:13px;line-height:1.6}
+.guide b{color:var(--navy)}
+#warn{display:none;background:#FDECEA;color:var(--warn);border:1px solid #F3B8B3;border-radius:6px;padding:10px 14px;margin:0 0 14px;font-size:14px;max-width:297mm}
+
+/* ===== 주보 용지 (A4 가로) ===== */
+.page{width:297mm;height:210mm;background:#fff;overflow:hidden;position:relative;margin:0 0 20px;box-shadow:0 2px 10px rgba(0,0,0,.18);font-family:var(--font);color:var(--ink)}
+.page{word-break:keep-all;overflow-wrap:break-word}
+.front{display:grid;grid-template-columns:107mm 1fr}
+.cover{background:var(--navy);color:#fff;padding:17mm 15mm;display:flex;flex-direction:column}
+.cover .sub{font-size:calc(14pt*var(--s,1));color:var(--lgold)}
+.cover .church{font-size:calc(34pt*var(--s,1));font-weight:700;margin-top:3mm;line-height:1.2}
+.cover .date{font-size:calc(15pt*var(--s,1));margin-top:7mm}
+.cover .word{margin-top:auto;margin-bottom:38mm}
+.cover .lbl{font-size:calc(13pt*var(--s,1));color:var(--lgold)}
+.cover .stitle{font-size:calc(24pt*var(--s,1));font-weight:700;margin-top:3mm;line-height:1.3}
+.cover .stext{font-size:calc(15pt*var(--s,1));margin-top:6mm}
+.cover .spre{font-size:calc(14pt*var(--s,1));margin-top:2mm;color:#D6E2E6}
+.order{padding:15mm 15mm 13mm 13mm;display:flex;flex-direction:column;min-height:0}
+.order h2{font-size:calc(22pt*var(--s,1));color:var(--navy);margin:0 0 4mm}
+.fit{flex:1;min-height:0;overflow:hidden}
+table.ord{width:calc(100% - 1pt);border-collapse:collapse;font-size:calc(14pt*var(--s,1))}
+table.ord th{background:var(--navy);color:#fff;padding:3mm 2mm;font-weight:700;border:.5pt solid var(--navy)}
+table.ord td{border:.5pt solid var(--line);padding:2.4mm 3mm;vertical-align:middle}
+table.ord tr:nth-child(odd) td{background:var(--soft)}
+table.ord td.k{font-weight:700;color:var(--navy);text-align:center;width:27mm;white-space:nowrap}
+table.ord td.w{text-align:center;width:42mm}
+
+.back{padding:12.5mm 15mm 9mm;display:flex;flex-direction:column}
+.head{display:flex;justify-content:space-between;align-items:baseline}
+.head h1{font-size:calc(26pt*var(--s,1));color:var(--navy);margin:0}
+.head .d{font-size:calc(14pt*var(--s,1));color:var(--gold)}
+.cols{display:grid;grid-template-columns:4.1fr 2.8fr 3.1fr;gap:6mm;margin-top:7mm;flex:1;min-height:0}
+.col{display:flex;flex-direction:column;gap:6mm;min-height:0;overflow:hidden}
+.box{background:var(--soft);padding:5mm 6mm;display:flex;flex-direction:column;min-height:0;flex:1 1 0}
+.box.g2{flex-grow:3.55}.box.g3{flex-grow:2.2}
+.box h3,.sv h3{font-size:calc(16pt*var(--s,1));color:var(--navy);margin:0 0 4mm}
+.box .body{flex:1;min-height:0;overflow:hidden;line-height:1.5}
+.box ul{margin:0;padding-left:5mm}
+.box li{margin-bottom:2mm}
+.sv table{width:calc(100% - 1pt);border-collapse:collapse;font-size:calc(13pt*var(--s,1))}
+.sv td{border:.5pt solid var(--line);padding:2.6mm 3mm}
+.sv td.k{background:var(--soft);color:var(--navy);font-weight:700;text-align:center;width:29mm;white-space:nowrap}
+.sv{margin-bottom:2mm}
+.foot{text-align:center;font-size:calc(12pt*var(--s,1));color:var(--mute);margin-top:4mm;white-space:pre-wrap}
+
+
+/* ===== 디자인 4종 ===== */
+/* 절기·행사: 포도주색 + 금색, 표지가 오른쪽, 금색 테두리 */
+.dz[data-design="formal"]{--navy:#6B1F2E;--gold:#A8801F;--lgold:#EBD28F;--soft:#F7EEEF;--line:#DCC8CB;--mute:#6A5A5C}
+.dz[data-design="formal"] .front{grid-template-columns:1fr 107mm}
+.dz[data-design="formal"] .cover{order:2;align-items:center;text-align:center}
+.dz[data-design="formal"] .cover .word{margin-top:auto}
+.dz[data-design="formal"] .page::after{content:"";position:absolute;inset:5mm;border:.9pt solid var(--gold);pointer-events:none}
+.dz[data-design="formal"] .order{padding:17mm 13mm 15mm 17mm}
+.dz[data-design="formal"] .back{padding:15mm 18mm 12mm}
+.dz[data-design="formal"] .head{justify-content:center;flex-direction:column;align-items:center;gap:1.5mm}
+
+/* 디자인 고르기 카드 */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.dcard{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;padding:9px;border:2px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-size:13px}
+.dcard b{font-size:14px;color:var(--navy)}
+.dcard span.d{color:var(--mute);font-size:12px;line-height:1.35}
+.dcard[aria-pressed="true"]{border-color:var(--navy);background:var(--soft)}
+.th{position:relative;display:block;width:78px;height:55px;border:1px solid #9aa;background:#fff;overflow:hidden}
+.th i{position:absolute;left:0;top:0;bottom:0;width:36%;background:#1F4E5F}
+.th u{position:absolute;right:6px;left:44%;top:8px;height:3px;background:#1F4E5F;box-shadow:0 8px 0 #9fb4bc,0 16px 0 #9fb4bc,0 24px 0 #9fb4bc,0 32px 0 #9fb4bc}
+.th-formal i{left:auto;right:0;background:#6B1F2E}
+.th-formal{box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 4px #A8801F}
+.th-formal u{left:6px;right:44%;background:#6B1F2E;box-shadow:0 8px 0 #d9bfc3,0 16px 0 #d9bfc3,0 24px 0 #d9bfc3,0 32px 0 #d9bfc3}
+
+/* ===== 내 디자인 ===== */
+.th-custom{background:#fff;border-style:dashed}
+.th-custom i{left:6px;right:6px;top:6px;bottom:6px;width:auto;background:#e6edf0;border:1px dashed #7d98a6}
+.th-custom u{left:14px;right:14px;top:14px;height:8px;background:#7d98a6;box-shadow:0 14px 0 #b5c6cd,0 24px 0 #b5c6cd}
+.cpage{background-color:#fff;background-size:cover;background-position:center;background-repeat:no-repeat}
+.cb{position:absolute}
+.cin{width:100%;height:100%;overflow:hidden;line-height:1.3;word-break:keep-all;overflow-wrap:break-word}
+.cin.pre{white-space:pre-wrap}
+.cin .li{margin:0}
+.cin .li.bu{padding-left:1.1em;text-indent:-1.1em}
+.cin table{width:100%;table-layout:fixed;border-collapse:collapse}
+.cin td{padding:0 1.5mm;vertical-align:middle;overflow:hidden}
+.chip,.rh{display:none}
+.editing .cb{outline:1.2pt dashed #2b7a9b;background:rgba(43,122,155,.10);cursor:move;touch-action:none}
+.editing .cb.sel{outline:1.8pt solid #d9480f;background:rgba(217,72,15,.12);z-index:10}
+.editing .chip{display:block;position:absolute;left:0;top:-4.8mm;font-size:8pt;line-height:1;padding:.9mm 1.5mm;background:#2b7a9b;color:#fff;white-space:nowrap;pointer-events:none;font-family:var(--font)}
+.editing .sel .chip{background:#d9480f}
+.editing .rh{display:block;position:absolute;right:-1.8mm;bottom:-1.8mm;width:4.2mm;height:4.2mm;background:#d9480f;border:1pt solid #fff;cursor:nwse-resize;touch-action:none}
+.imgrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.imgrow img{height:44px;border:1px solid var(--line);border-radius:3px}
+.imgmsg{font-size:12px;color:var(--mute)}
+.ceditor{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fafcfc}
+.ceditor h4{margin:0 0 6px;font-size:15px;color:var(--navy)}
+.cg4{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.cg2{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.cg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px}
+.ceditor label{margin:6px 0 3px}
+.ceditor input[type=number],.ceditor select{padding:7px 8px;font-size:15px;width:100%;min-width:0}
+.cg2>div,.cg3>div,.cg4>div{min-width:0}
+.ceditor input[type=color]{width:100%;height:36px;padding:2px;border:1px solid var(--line);border-radius:5px;background:#fff}
+label.chk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink);margin:10px 0 4px}
+label.chk input{width:18px;height:18px}
+
+/* 확인 창 */
+.pdfhost{position:fixed;left:0;top:0;z-index:-1;pointer-events:none;width:297mm}
+.ask{position:fixed;inset:0;background:rgba(20,30,35,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.askbox{background:#fff;color:var(--ink);border-radius:10px;padding:20px;max-width:460px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.askbox p{margin:0 0 16px;line-height:1.6;white-space:pre-wrap;font-size:15px}
+.notice{background:#FFF6DD;border:1px solid #E5C36A;color:#4a3a05;border-radius:6px;padding:10px 12px;font-size:13px;line-height:1.55;margin-top:10px}
+
+/* ===== 인쇄 ===== */
+@page{size:A4 landscape;margin:0}
+@media print{
+  html,body{height:auto;background:#fff}
+  #app{display:block;height:auto}
+  #panel,#warn,#split,.ask,.pdfhost{display:none!important}
+  #stage{padding:0;overflow:visible}
+  #pages{transform:none!important;width:auto!important;height:auto!important}
+  .page{margin:0;box-shadow:none;page-break-after:always;break-after:page}
+  .page:last-child{page-break-after:auto;break-after:auto}
+  .chip,.rh{display:none!important}
+  .cb{outline:none!important;background:none!important}
+}
+@media (max-width:900px){
+  #app{grid-template-columns:1fr;height:auto}
+  #split{display:none}
+  #panel{border-right:0}
+}
+</style>
+<div id="app">
+  <aside id="panel">
+    <div class="bar">
+      <h1>주보 만들기</h1>
+      <div class="btns">
+        <button class="main" id="btnPrint">인쇄하기</button>
+        <button class="main" id="btnPdf">PDF로 저장</button>
+        <button id="btnNew">새 주보 시작</button>
+        <button id="btnKeep">이 주보 보관</button>
+      </div>
+      <div class="saved" id="savedMsg">입력하면 자동으로 저장됩니다.</div>
+      <div class="notice" id="shareNote" hidden>이 공유 화면에서는 [인쇄하기]가 동작하지 않습니다. 대신 <b>[PDF로 저장]</b>을 누르고, 저장된 PDF를 열어 인쇄하세요(A4 가로, 양면 인쇄). 컴퓨터의 <b>주보 자동화</b> 파일에서는 [인쇄하기]가 바로 됩니다.</div>
+    </div>
+
+    <section class="f">
+      <div class="guide">
+        <b>사용 순서</b><br>
+        1) 아래 칸에 이번 주 내용을 적습니다. 주보 미리보기(컴퓨터는 오른쪽, 폰은 맨 아래)에 바로 나타납니다.<br>
+        2) 주보 미리보기를 훑어보고 잘못된 곳을 고칩니다.<br>
+        3) [인쇄하기]를 누르고, 용지 <b>A4</b>, 방향 <b>가로</b>, <b>양면 인쇄(짧은 가장자리)</b>, <b>배경 그래픽 체크</b>로 설정합니다.
+      </div>
+    </section>
+
+    <section class="f">
+      <h2>주보 디자인 고르기</h2>
+      <div class="dgrid" id="designBox"></div>
+      <label style="margin-top:16px">내 디자인 (직접 올린 주보 그림, 4칸)</label>
+      <div class="dgrid" id="designBox2"></div>
+      <p class="hint">디자인을 바꿔도 적어 둔 내용은 그대로입니다. 오른쪽 주보에서 바로 확인하세요.</p>
+    </section>
+
+    <section class="f" id="customBox" hidden>
+      <h2>내 디자인 만들기 (<span id="slotNo">1</span>번 칸)</h2>
+      <div class="guide">
+        <b>순서</b><br>
+        1) 파워포인트 등에서 우리 교회 주보를 열고, <b>매주 바뀌는 글자를 지운 빈 주보</b>를 만듭니다. 교회 이름처럼 안 바뀌는 글자는 남겨 두어도 됩니다.<br>
+        2) 앞면과 뒷면을 <b>그림 파일(PNG 또는 JPG)</b>로 저장합니다. 파워포인트는 [파일] → [내보내기] → [파일 형식 변경] → PNG → [모든 슬라이드]입니다.<br>
+        3) 아래에서 앞면과 뒷면 그림을 올립니다.<br>
+        4) <b>[자리 맞추기 켜기]</b>를 누르고, 주보 위의 점선 칸을 끌어서 그림의 빈 자리에 맞춥니다. 칸 오른쪽 아래 주황 네모를 끌면 크기가 바뀝니다.<br>
+        5) 맞추고 나면 <b>[자리 맞추기 끄기]</b>를 누르고 인쇄합니다.
+      </div>
+      <label for="slotName">이 칸의 이름 (예: 평소 주일, 성탄절)</label>
+      <input type="text" id="slotName" maxlength="12">
+      <label>앞면 그림</label>
+      <div class="imgrow"><button type="button" class="small" data-pick="front">그림 고르기</button><button type="button" class="small" data-clear="front">지우기</button><span id="thumbFront"></span><span class="imgmsg" id="msgFront">아직 없습니다</span></div>
+      <label>뒷면 그림</label>
+      <div class="imgrow"><button type="button" class="small" data-pick="back">그림 고르기</button><button type="button" class="small" data-clear="back">지우기</button><span id="thumbBack"></span><span class="imgmsg" id="msgBack">아직 없습니다</span></div>
+      <input type="file" id="fileFront" accept="image/*" hidden>
+      <input type="file" id="fileBack" accept="image/*" hidden>
+      <p class="hint">그림은 A4 가로 비율(297 x 210)로 저장해야 인쇄할 때 어긋나지 않습니다.</p>
+      <div class="btns" style="margin-top:12px"><button type="button" class="main" id="btnEdit" aria-pressed="false">자리 맞추기 켜기</button></div>
+      <label for="cSel" style="margin-top:14px">고칠 칸 고르기 (주보 위의 점선 칸을 눌러도 됩니다)</label>
+      <select id="cSel"></select>
+      <div id="cEditor"></div>
+      <label for="copyFrom" style="margin-top:14px">자리 설정을 다른 내 디자인에서 복사하기</label>
+      <div class="imgrow"><select id="copyFrom" style="width:auto;flex:1"></select><button type="button" class="small" id="btnCopy">복사하기</button></div>
+      <p class="hint">비슷한 모양의 디자인이면 자리를 다시 맞추지 않아도 됩니다. 이 칸의 자리 설정이 복사한 내용으로 바뀝니다.</p>
+      <div class="btns" style="margin-top:12px">
+        <button type="button" class="small" id="btnCReset">모든 글자 칸을 처음 자리로 되돌리기</button>
+        <button type="button" class="small" id="btnSlotClear">이 내 디자인 칸 비우기</button>
+      </div>
+    </section>
+
+    <section class="f">
+      <h2>기본 정보</h2>
+      <label for="church">교회 이름</label>
+      <input type="text" id="church" data-k="church">
+      <label for="subtitle">주보 이름 (표지 위쪽 작은 글씨)</label>
+      <input type="text" id="subtitle" data-k="subtitle">
+      <label for="date">예배 날짜</label>
+      <input type="date" id="date" data-k="date">
+      <p class="hint" id="dateShown"></p>
+    </section>
+
+    <section class="f">
+      <h2>오늘의 말씀 (앞면 왼쪽)</h2>
+      <label for="sermonTitle">설교 제목</label>
+      <input type="text" id="sermonTitle" data-k="sermonTitle">
+      <label for="sermonText">설교 본문</label>
+      <input type="text" id="sermonText" data-k="sermonText">
+      <label for="preacher">설교자</label>
+      <input type="text" id="preacher" data-k="preacher">
+    </section>
+
+    <section class="f">
+      <h2>예배 순서 (앞면 오른쪽)</h2>
+      <div class="colhead r3"><span>순서</span><span>내용</span><span>맡은이</span><span></span></div>
+      <div id="worshipRows"></div>
+      <button class="small" data-add="worship">줄 추가</button>
+      <p class="hint">▲▼ 로 순서를 바꾸고, × 로 줄을 지웁니다. 칸은 비워도 됩니다.</p>
+    </section>
+
+    <section class="f">
+      <h2>광고 (뒷면)</h2>
+      <label for="news">한 줄에 광고 하나씩 적습니다</label>
+      <textarea id="news" data-k="news" style="min-height:170px"></textarea>
+    </section>
+
+    <section class="f">
+      <h2>기도 제목 (뒷면)</h2>
+      <label for="prayers">한 줄에 기도 제목 하나씩 적습니다</label>
+      <textarea id="prayers" data-k="prayers"></textarea>
+    </section>
+
+    <section class="f">
+      <h2>새가족 안내 (뒷면)</h2>
+      <textarea id="newcomers" data-k="newcomers" style="min-height:80px"></textarea>
+    </section>
+
+    <section class="f">
+      <h2>이번 주 섬김 (뒷면)</h2>
+      <div class="colhead r2"><span>항목</span><span>맡은이</span><span></span></div>
+      <div id="serviceRows"></div>
+      <button class="small" data-add="service">줄 추가</button>
+    </section>
+
+    <section class="f">
+      <h2>다음 주 안내 (뒷면)</h2>
+      <div class="colhead r2"><span>항목</span><span>내용</span><span></span></div>
+      <div id="nextRows"></div>
+      <button class="small" data-add="nextWeek">줄 추가</button>
+    </section>
+
+    <section class="f">
+      <h2>맨 아래 교회 정보 (뒷면)</h2>
+      <input type="text" id="info" data-k="info">
+      <p class="hint">예배 시간, 주소, 전화번호 등을 적습니다.</p>
+    </section>
+
+    <section class="f">
+      <h2>글씨 크기 (뒷면 광고·기도 제목·새가족)</h2>
+      <div class="range"><span>작게</span><input type="range" id="pt" min="10" max="16" step="0.5" data-k="pt"><span>크게</span></div>
+      <p class="hint">내용이 많아 넘칠 때는 글씨를 조금 줄이세요. 넘치면 오른쪽 위에 빨간 알림이 뜹니다.</p>
+    </section>
+
+    <section class="f">
+      <h2>보관함</h2>
+      <label for="keepList">지난 주보 불러오기</label>
+      <select id="keepList"></select>
+      <div class="btns" style="margin-top:8px">
+        <button class="small" id="btnLoad">불러오기</button>
+        <button class="small" id="btnDel">보관함에서 지우기</button>
+      </div>
+      <details>
+        <summary>백업과 다른 컴퓨터로 옮기기</summary>
+        <p class="hint">[백업 파일 저장]을 누르면 지금까지의 내용이 파일 하나로 저장됩니다. 다른 컴퓨터에서는 이 앱을 열고 [백업 파일 불러오기]를 누르세요.</p>
+        <div class="btns">
+          <button class="small" id="btnBackup">백업 파일 저장</button>
+          <button class="small" id="btnRestore">백업 파일 불러오기</button>
+        </div>
+        <input type="file" id="fileRestore" accept=".json,application/json" hidden>
+      </details>
+    </section>
+  </aside>
+  <div id="split" role="separator" aria-orientation="vertical" tabindex="0" title="끌어서 작업 공간 너비 조절 (두 번 누르면 처음 크기)"></div>
+
+  <main id="stage">
+    <div id="warn" role="alert"></div>
+    <div id="pages" class="dz"></div>
+  </main>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var CUR_KEY='jubo_current_v1', HIS_KEY='jubo_history_v1';
+
+var SAMPLE={
+  church:'누리보듬교회', subtitle:'일반 주보', date:'2026-10-25',
+  sermonTitle:'서로 보듬는 공동체', sermonText:'로마서 12:9-13', preacher:'담임목사 김은혜',
+  worship:[
+    {a:'묵도',b:'다 같이',c:''},
+    {a:'찬송',b:'21장 · 만유의 주재',c:'다 같이'},
+    {a:'신앙고백',b:'사도신경',c:'다 같이'},
+    {a:'대표기도',b:'',c:'이정민 장로'},
+    {a:'성경봉독',b:'로마서 12:9-13',c:'박서연 집사'},
+    {a:'찬양',b:'주의 사랑 안에서',c:'누리찬양대'},
+    {a:'말씀',b:'서로 보듬는 공동체',c:'김은혜 목사'},
+    {a:'봉헌',b:'찬송 50장 · 내 모든 소유',c:'다 같이'},
+    {a:'광고',b:'',c:'최민호 집사'},
+    {a:'축도',b:'',c:'김은혜 목사'}
+  ],
+  news:'오늘 예배 후 1층 친교실에서 점심 나눔이 있습니다. 함께해 주세요.\n11월 1일(주일)은 성찬식으로 예배드립니다.\n수요 저녁예배는 19시 30분, 금요 기도회는 20시에 모입니다.\n청년부 가을 걷기 모임이 11월 8일(토) 오전 9시 교회 앞에서 출발합니다.\n겨울 김장 나눔 봉사자를 모집합니다. 11월 15일까지 안내데스크에 신청해 주세요.\n다음 주 임직 예정자 교육이 예배 후 2층 소예배실에서 있습니다.',
+  prayers:'우리 교회가 지역을 따뜻하게 보듬는 공동체가 되게 하소서.\n병상에 있는 성도들에게 회복과 평안을 주소서.\n다음 세대 아이들이 믿음 안에서 자라게 하소서.',
+  newcomers:'처음 오신 분들을 환영합니다. 예배 후 안내데스크에서 따뜻한 차 한잔과 함께 인사 나누어요.',
+  service:[{a:'안내',b:'한지우 · 오세훈'},{a:'헌금',b:'윤재석 · 송미라'},{a:'차량',b:'조성호'},{a:'식당',b:'2구역'}],
+  nextWeek:[{a:'말씀',b:'로마서 12:14-21'},{a:'대표기도',b:'강민수 집사'},{a:'성경봉독',b:'정다은 집사'}],
+  info:'주일예배 11:00  ·  수요예배 19:30  ·  금요기도회 20:00        광명시 ○○로 123  ·  02-000-0000',
+  pt:13,
+  design:'basic'
+};
+
+var LISTS={
+  worship:{box:'worshipRows',keys:['a','b','c'],ph:['순서','내용','맡은이'],cls:'r3'},
+  service:{box:'serviceRows',keys:['a','b'],ph:['항목','맡은이'],cls:'r2'},
+  nextWeek:{box:'nextRows',keys:['a','b'],ph:['항목','내용'],cls:'r2'}
+};
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function lines(t){return String(t||'').split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);}
+
+function load(key,fallback){
+  try{var v=localStorage.getItem(key);if(v)return JSON.parse(v);}catch(e){}
+  return fallback;
+}
+var storageOK=true;
+function save(key,val){
+  try{localStorage.setItem(key,JSON.stringify(val));return true;}catch(e){storageOK=false;return false;}
+}
+
+var state=load(CUR_KEY,null)||clone(SAMPLE);
+var history_=load(HIS_KEY,{});
+Object.keys(SAMPLE).forEach(function(k){if(state[k]===undefined)state[k]=clone(SAMPLE[k]);});
+
+/* ---------- 날짜 ---------- */
+var WD=['일','월','화','수','목','금','토'];
+function parseDate(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+function dateText(s){
+  var d=parseDate(s); if(!d) return '';
+  var w=d.getDay()===0?'주일':WD[d.getDay()]+'요일';
+  return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+w;
+}
+function ymd(d){
+  function p(n){return (n<10?'0':'')+n;}
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function nextSunday(s){
+  var d=parseDate(s)||new Date();
+  var add=(7-d.getDay())%7; if(add===0) add=7;
+  d.setDate(d.getDate()+add); return ymd(d);
+}
+
+/* ---------- 주보 그리기 ---------- */
+function render(){
+  var s=state, pt=Number(s.pt)||13;
+  var ds=dateText(s.date);
+  $('dateShown').textContent=ds?('주보에는 "'+ds+'" 로 나옵니다.'):'날짜를 고르면 요일이 자동으로 들어갑니다.';
+
+  if(s.design==='custom') s.design='custom1';
+  if(s.design==='mono'||s.design==='big') s.design='basic';
+  if(isCustomDesign(s.design)){
+    useSlot(+s.design.slice(6)-1);
+    var pg0=$('pages');
+    pg0.setAttribute('data-design','custom');
+    pg0.classList.toggle('editing',editing);
+    pg0.innerHTML=customHTML(s,ds);
+    markDesign(); fitZoom(); checkOverflow();
+    return;
+  }
+  $('pages').classList.remove('editing');
+  var wr=s.worship.map(function(r){
+    return '<tr><td class="k">'+esc(r.a)+'</td><td>'+esc(r.b)+'</td><td class="w">'+esc(r.c)+'</td></tr>';
+  }).join('');
+
+  var news=lines(s.news).map(function(t){return '<li>'+esc(t)+'</li>';}).join('');
+  var pr=lines(s.prayers).map(function(t){return '<li>'+esc(t)+'</li>';}).join('');
+  function tbl(arr){return '<table>'+arr.map(function(r){return '<tr><td class="k">'+esc(r.a)+'</td><td>'+esc(r.b)+'</td></tr>';}).join('')+'</table>';}
+
+  var front=
+   '<section class="page front">'+
+     '<div class="cover">'+
+       '<div class="sub">'+esc(s.subtitle)+'</div>'+
+       '<div class="church">'+esc(s.church)+'</div>'+
+       '<div class="date">'+esc(ds)+'</div>'+
+       '<div class="word"><div class="lbl">오늘의 말씀</div>'+
+         '<div class="stitle">'+esc(s.sermonTitle)+'</div>'+
+         '<div class="stext">'+esc(s.sermonText)+'</div>'+
+         '<div class="spre">'+esc(s.preacher)+'</div></div>'+
+     '</div>'+
+     '<div class="order"><h2>예배 순서</h2>'+
+       '<div class="fit" data-name="예배 순서"><table class="ord"><thead><tr><th>순서</th><th>내용</th><th>맡은이</th></tr></thead><tbody>'+wr+'</tbody></table></div>'+
+     '</div>'+
+   '</section>';
+
+  var back=
+   '<section class="page back">'+
+     '<div class="head"><h1>'+esc(s.church)+' 교회 소식</h1><div class="d">'+esc(ds)+'</div></div>'+
+     '<div class="cols">'+
+       '<div class="col"><div class="box"><h3>광고</h3><div class="body" data-name="광고" style="font-size:calc('+pt+'pt*var(--s,1))"><ul>'+news+'</ul></div></div></div>'+
+       '<div class="col">'+
+         '<div class="box g2"><h3>기도 제목</h3><div class="body" data-name="기도 제목" style="font-size:calc('+pt+'pt*var(--s,1))"><ul>'+pr+'</ul></div></div>'+
+         '<div class="box g3"><h3>새가족 안내</h3><div class="body" data-name="새가족 안내" style="font-size:calc('+pt+'pt*var(--s,1))">'+esc(s.newcomers)+'</div></div>'+
+       '</div>'+
+       '<div class="col" data-name="이번 주 섬김 / 다음 주 안내">'+
+         '<div class="sv"><h3>이번 주 섬김</h3>'+tbl(s.service)+'</div>'+
+         '<div class="sv"><h3>다음 주 안내</h3>'+tbl(s.nextWeek)+'</div>'+
+       '</div>'+
+     '</div>'+
+     '<div class="foot">'+esc(s.info)+'</div>'+
+   '</section>';
+
+  $('pages').setAttribute('data-design',s.design||'basic');
+  $('pages').innerHTML=front+back;
+  markDesign();
+  fitZoom();
+  checkOverflow();
+}
+
+function checkOverflow(){
+  var bad=[];
+  var els=$('pages').querySelectorAll('[data-name]');
+  for(var i=0;i<els.length;i++){
+    var e=els[i];
+    if(e.scrollHeight>e.clientHeight+1) bad.push(e.getAttribute('data-name'));
+  }
+  var w=$('warn');
+  if(bad.length){
+    w.style.display='block';
+    w.textContent='내용이 넘쳐서 인쇄하면 잘립니다: '+bad.join(', ')+'. 글자 수를 줄이거나 [글씨 크기]를 작게 해 주세요.';
+  }else{
+    w.style.display='none'; w.textContent='';
+  }
+}
+
+function fitZoom(){
+  var stage=$('stage'), pages=$('pages');
+  var pageW=297/25.4*96;
+  var avail=stage.clientWidth-40;
+  var z=Math.min(1,avail/pageW);
+  if(z<0.3) z=0.3;
+  zoomNow=z;
+  pages.style.transform='scale('+z+')';
+  pages.style.width=pageW+'px';
+  var h=pages.scrollHeight; // 변환 전 높이
+  pages.style.marginBottom=(-(1-z)*h)+'px';
+}
+
+/* ---------- 입력 칸 ---------- */
+function fillInputs(){
+  var els=document.querySelectorAll('[data-k]');
+  for(var i=0;i<els.length;i++){var k=els[i].getAttribute('data-k');els[i].value=state[k]==null?'':state[k];}
+  Object.keys(LISTS).forEach(buildList);
+  refreshKeep();
+}
+
+function buildList(name){
+  var L=LISTS[name], rows=state[name];
+  $(L.box).innerHTML=rows.map(function(r,i){
+    var inputs=L.keys.map(function(k,j){
+      return '<input type="text" aria-label="'+L.ph[j]+' '+(i+1)+'번째 줄" data-l="'+name+'" data-i="'+i+'" data-c="'+k+'" placeholder="'+L.ph[j]+'" value="'+esc(r[k])+'">';
+    }).join('');
+    return '<div class="row '+L.cls+'">'+inputs+
+      '<div class="rb"><button data-act="up" data-l="'+name+'" data-i="'+i+'" title="위로">▲</button>'+
+      '<button data-act="down" data-l="'+name+'" data-i="'+i+'" title="아래로">▼</button>'+
+      '<button data-act="del" data-l="'+name+'" data-i="'+i+'" title="이 줄 지우기">×</button></div></div>';
+  }).join('');
+}
+
+var timer=null;
+function changed(){
+  render();
+  var ok=save(CUR_KEY,state);
+  $('savedMsg').textContent=ok?'자동 저장됨':'이 브라우저에서는 자동 저장이 되지 않습니다. 작업이 끝나면 [백업 파일 저장]을 눌러 주세요.';
+}
+
+document.addEventListener('input',function(ev){
+  var t=ev.target;
+  if(t.hasAttribute('data-k')){
+    var k=t.getAttribute('data-k');
+    state[k]=(k==='pt')?Number(t.value):t.value;
+    changed();
+  }else if(t.hasAttribute('data-l')){
+    state[t.getAttribute('data-l')][+t.getAttribute('data-i')][t.getAttribute('data-c')]=t.value;
+    changed();
+  }
+});
+
+document.addEventListener('click',function(ev){
+  var t=ev.target.closest('button'); if(!t) return;
+  var add=t.getAttribute('data-add');
+  if(add){
+    var L=LISTS[add], row={}; L.keys.forEach(function(k){row[k]='';});
+    state[add].push(row); buildList(add); changed();
+    var ins=$(L.box).querySelectorAll('input'); if(ins.length) ins[ins.length-L.keys.length].focus();
+    return;
+  }
+  var act=t.getAttribute('data-act');
+  if(act){
+    var name=t.getAttribute('data-l'), i=+t.getAttribute('data-i'), arr=state[name];
+    if(act==='del') arr.splice(i,1);
+    if(act==='up'&&i>0){var x=arr[i];arr[i]=arr[i-1];arr[i-1]=x;}
+    if(act==='down'&&i<arr.length-1){var y=arr[i];arr[i]=arr[i+1];arr[i+1]=y;}
+    buildList(name); changed();
+  }
+});
+
+
+/* ---------- 디자인 고르기 ---------- */
+var DESIGNS=[
+  {id:'basic',name:'기본 (청록)',desc:'평소 주일 예배용'},
+  {id:'formal',name:'절기·행사',desc:'성탄절, 부활절, 추수감사절 등 특별한 날'}
+];
+function buildDesigns(){
+  $('designBox').innerHTML=DESIGNS.map(function(d){
+    return '<button type="button" class="dcard" data-design="'+d.id+'" aria-pressed="false">'+
+      '<span class="th th-'+d.id+'"><i></i><u></u></span><b>'+d.name+'</b><span class="d">'+d.desc+'</span></button>';
+  }).join('');
+  var o='';
+  for(var i=0;i<SLOT_N;i++){
+    var sl=customAll.slots[i], u=imgUrls[i].front, has=!!(sl.front||sl.back);
+    o+='<button type="button" class="dcard" data-design="custom'+(i+1)+'" aria-pressed="false">'+
+      (u?'<span class="th" style="background:#fff url(&quot;'+u+'&quot;) center/cover no-repeat"></span>':'<span class="th th-custom"><i></i><u></u></span>')+
+      '<b>'+esc(slotName(i))+'</b><span class="d">'+(has?(i+1)+'번 칸 · 올린 그림 사용':(i+1)+'번 칸 · 비어 있음')+'</span></button>';
+  }
+  $('designBox2').innerHTML=o;
+}
+function markDesign(){
+  var cur=state.design||'basic', cs=document.querySelectorAll('.dcard');
+  $('customBox').hidden=!isCustomDesign(cur==='custom'?'custom1':cur);
+  for(var i=0;i<cs.length;i++) cs[i].setAttribute('aria-pressed',cs[i].getAttribute('data-design')===cur?'true':'false');
+}
+document.addEventListener('click',function(ev){
+  var c=ev.target.closest('.dcard'); if(!c) return;
+  state.design=c.getAttribute('data-design'); changed();
+});
+
+
+/* ---------- 확인 창 (브라우저 기본 창 대신 화면 안에서 묻기) ---------- */
+function askOK(msg,onYes){
+  var ov=document.createElement('div'); ov.className='ask';
+  ov.innerHTML='<div class="askbox" role="alertdialog" aria-modal="true"><p></p><div class="btns"><button type="button" class="main" data-ok="1">확인</button><button type="button" data-ok="0">취소</button></div></div>';
+  ov.querySelector('p').textContent=msg;
+  function close(){ov.remove();document.removeEventListener('keydown',onKey,true);}
+  function onKey(e){if(e.key==='Escape'){e.stopPropagation();close();}}
+  ov.addEventListener('click',function(e){
+    var b=e.target.closest('button');
+    if(b){var ok=b.getAttribute('data-ok')==='1';close();if(ok)onYes();}
+    else if(e.target===ov) close();
+  });
+  document.addEventListener('keydown',onKey,true);
+  document.body.appendChild(ov);
+  ov.querySelector('button').focus();
+}
+
+/* ---------- 내 디자인 ---------- */
+var CUSTOM_KEY='jubo_custom_v1';
+var editing=false, selId=null, zoomNow=1, drag=null;
+var CB=[
+ ['subtitle','front','주보 이름','text'],
+ ['church','front','교회 이름','text'],
+ ['date','front','날짜','text'],
+ ['sermonTitle','front','설교 제목','text'],
+ ['sermonText','front','설교 본문','text'],
+ ['preacher','front','설교자','text'],
+ ['worship','front','예배 순서 표','table'],
+ ['backTitle','back','뒷면 제목','text'],
+ ['date2','back','뒷면 날짜','text'],
+ ['news','back','광고','list'],
+ ['prayers','back','기도 제목','list'],
+ ['newcomers','back','새가족 안내','text'],
+ ['service','back','이번 주 섬김 표','table'],
+ ['nextWeek','back','다음 주 안내 표','table'],
+ ['info','back','맨 아래 교회 정보','text']
+];
+var CBMAP={}; CB.forEach(function(d){CBMAP[d[0]]=d;});
+var CDEF={
+ subtitle:{x:15,y:15,w:85,h:8,s:14},
+ church:{x:15,y:25,w:85,h:16,s:30,b:1},
+ date:{x:15,y:45,w:85,h:8,s:15},
+ sermonTitle:{x:15,y:105,w:85,h:24,s:22,b:1},
+ sermonText:{x:15,y:132,w:85,h:8,s:15},
+ preacher:{x:15,y:142,w:85,h:8,s:14},
+ worship:{x:122,y:33,w:160,h:120,s:14,rowH:12,cw:[24,92,44],als:['center','left','center']},
+ backTitle:{x:15,y:12,w:190,h:14,s:26,b:1},
+ date2:{x:200,y:15,w:82,h:8,s:14,al:'right'},
+ news:{x:20,y:48,w:95,h:140,s:13,gap:2.5,bul:1},
+ prayers:{x:124,y:48,w:66,h:70,s:13,gap:2.5,bul:1},
+ newcomers:{x:124,y:138,w:66,h:48,s:13},
+ service:{x:200,y:46,w:82,h:40,s:13,rowH:10,cw:[28,54],als:['center','left']},
+ nextWeek:{x:200,y:112,w:82,h:33,s:13,rowH:11,cw:[28,54],als:['center','left']},
+ info:{x:15,y:197,w:267,h:8,s:12,al:'center'}
+};
+var SLOT_N=4, slotIdx=0;
+function slotKey(i){return 'jubo_custom_v2_'+i;}
+function newSlot(i){return {name:'',front:null,back:null,blocks:{}};}
+function fixSlot(sl,i){
+  if(!sl||typeof sl!=='object') sl=newSlot(i);
+  if(!sl.blocks) sl.blocks={};
+  if(sl.name===undefined) sl.name='';
+  if(sl.front===undefined) sl.front=null;
+  if(sl.back===undefined) sl.back=null;
+  return sl;
+}
+var customAll={slots:[]};
+(function(){
+  var legacy=load(CUSTOM_KEY,null);
+  for(var i=0;i<SLOT_N;i++){
+    var sl=load(slotKey(i),null);
+    if(!sl&&i===0&&legacy) sl={name:'',front:legacy.front||null,back:legacy.back||null,blocks:legacy.blocks||{}};
+    customAll.slots.push(fixSlot(sl,i));
+  }
+})();
+var custom=customAll.slots[0];
+var imgUrls=[{},{},{},{}];
+function slotName(i){return customAll.slots[i].name||('내 디자인 '+(i+1));}
+function isCustomDesign(d){return /^custom[1-4]$/.test(d||'');}
+
+function cfg(id){
+  var c=custom.blocks[id]||{}, o={b:0,c:'#111111',al:'left',show:1};
+  var d=CDEF[id], k;
+  for(k in d) o[k]=d[k];
+  for(k in c) o[k]=c[k];
+  return o;
+}
+function setCf(id,key,val){var c=custom.blocks[id]||(custom.blocks[id]={});c[key]=val;}
+function saveCustom(){try{localStorage.setItem(slotKey(slotIdx),JSON.stringify(custom));return true;}catch(e){return false;}}
+function saveAllCustom(){var ok=true;for(var i=0;i<SLOT_N;i++){try{localStorage.setItem(slotKey(i),JSON.stringify(customAll.slots[i]));}catch(e){ok=false;}}return ok;}
+
+function dataToBlob(u){
+  var m=/^data:([^;]+);base64,(.*)$/.exec(u); if(!m) return null;
+  var bin=atob(m[2]), n=bin.length, a=new Uint8Array(n);
+  for(var i=0;i<n;i++) a[i]=bin.charCodeAt(i);
+  return new Blob([a],{type:m[1]});
+}
+function setImgSlot(i,side,dataUrl){
+  var o=imgUrls[i];
+  o[side]=null;
+  if(dataUrl) o[side]=dataUrl;
+}
+function setImg(side,dataUrl){setImgSlot(slotIdx,side,dataUrl);}
+for(var si=0;si<SLOT_N;si++){setImgSlot(si,'front',customAll.slots[si].front);setImgSlot(si,'back',customAll.slots[si].back);}
+function useSlot(i){
+  if(i===slotIdx) return;
+  slotIdx=i; custom=customAll.slots[i]; selId=null;
+  buildEditor(); $('cSel').value=''; refreshSlotUI();
+}
+function refreshSlotUI(){
+  $('slotNo').textContent=String(slotIdx+1);
+  $('slotName').value=custom.name||'';
+  $('slotName').placeholder='내 디자인 '+(slotIdx+1);
+  updateImgMsgs();
+  var o='<option value="">다른 칸에서 가져오기</option>';
+  for(var i=0;i<SLOT_N;i++) if(i!==slotIdx) o+='<option value="'+i+'">'+esc(slotName(i))+' ('+(i+1)+'번 칸)</option>';
+  $('copyFrom').innerHTML=o;
+}
+
+function cText(id,s,ds){
+  switch(id){
+    case 'subtitle':return s.subtitle;
+    case 'church':return s.church;
+    case 'date':case 'date2':return ds;
+    case 'sermonTitle':return s.sermonTitle;
+    case 'sermonText':return s.sermonText;
+    case 'preacher':return s.preacher;
+    case 'backTitle':return s.church+' 교회 소식';
+    case 'newcomers':return s.newcomers;
+    case 'info':return s.info;
+  }
+  return '';
+}
+function customHTML(s,ds){
+  var pages={front:'',back:''};
+  CB.forEach(function(d){
+    var id=d[0],pg=d[1],type=d[3],c=cfg(id);
+    if(!c.show) return;
+    var st='left:'+c.x+'mm;top:'+c.y+'mm;width:'+c.w+'mm;height:'+c.h+'mm;font-size:'+c.s+'pt;color:'+esc(c.c)+';font-weight:'+(c.b?700:400)+';text-align:'+c.al;
+    var inner,cls='cin';
+    if(type==='text'){inner=esc(cText(id,s,ds));cls+=' pre';}
+    else if(type==='list'){
+      var ls=lines(s[id]);
+      inner=ls.map(function(t){return '<div class="li'+(c.bul?' bu':'')+'" style="margin-bottom:'+c.gap+'mm">'+(c.bul?'• ':'')+esc(t)+'</div>';}).join('');
+    }else{
+      var rows=s[id], tot=0; c.cw.forEach(function(v){tot+=Number(v)||0;}); if(!tot) tot=1;
+      inner='<table><colgroup>'+c.cw.map(function(v){return '<col style="width:'+((Number(v)||0)/tot*100)+'%">';}).join('')+'</colgroup>'+
+        rows.map(function(r){
+          var cells=(id==='worship')?[r.a,r.b,r.c]:[r.a,r.b];
+          return '<tr style="height:'+c.rowH+'mm">'+cells.map(function(t,i){return '<td style="text-align:'+(c.als[i]||'left')+'">'+esc(t)+'</td>';}).join('')+'</tr>';
+        }).join('')+'</table>';
+    }
+    var cl='cb'+(selId===id?' sel':'');
+    pages[pg]+='<div class="'+cl+'" data-b="'+id+'" style="'+st+'"><div class="'+cls+'" data-name="'+esc(d[2])+'">'+inner+'</div>'+
+      '<span class="chip">'+esc(d[2])+'</span><span class="rh"></span></div>';
+  });
+  function bg(side){var u=imgUrls[slotIdx][side];return u?'background-image:url(&quot;'+u+'&quot;)':'';}
+  return '<section class="page cpage" style="'+bg('front')+'">'+pages.front+'</section>'+
+         '<section class="page cpage" style="'+bg('back')+'">'+pages.back+'</section>';
+}
+
+/* 고칠 칸 설정 */
+function numIn(key,label,val,step,ci){
+  return '<div><label>'+label+'</label><input type="number" step="'+(step||0.5)+'" data-cf="'+key+'"'+(ci!==undefined?' data-ci="'+ci+'"':'')+' value="'+val+'"></div>';
+}
+function alignSel(key,val,ci,label){
+  var o=[['left','왼쪽'],['center','가운데'],['right','오른쪽']].map(function(a){return '<option value="'+a[0]+'"'+(a[0]===val?' selected':'')+'>'+a[1]+'</option>';}).join('');
+  return '<div><label>'+label+'</label><select data-cf="'+key+'"'+(ci!==undefined?' data-ci="'+ci+'"':'')+'>'+o+'</select></div>';
+}
+function buildEditor(){
+  var box=$('cEditor');
+  if(!selId){box.innerHTML='<p class="hint">칸을 고르면 이곳에서 크기와 글자 모양을 고칠 수 있습니다.</p>';return;}
+  var d=CBMAP[selId], c=cfg(selId), type=d[3];
+  var h='<div class="ceditor"><h4>'+esc(d[2])+'</h4>';
+  h+='<label class="chk"><input type="checkbox" data-cf="show"'+(c.show?' checked':'')+'> 이 칸을 주보에 넣기</label>';
+  h+='<div class="cg4">'+numIn('x','왼쪽에서 (mm)',c.x)+numIn('y','위에서 (mm)',c.y)+numIn('w','가로 (mm)',c.w)+numIn('h','세로 (mm)',c.h)+'</div>';
+  h+='<div class="cg2">'+numIn('s','글자 크기 (pt)',c.s,0.5)+'<div><label>글자 색</label><input type="color" data-cf="c" value="'+esc(c.c)+'"></div></div>';
+  h+='<label class="chk"><input type="checkbox" data-cf="b"'+(c.b?' checked':'')+'> 굵게</label>';
+  if(type!=='table') h+='<div class="cg2">'+alignSel('al',c.al,undefined,'글자 위치')+'</div>';
+  if(type==='list'){
+    h+='<label class="chk"><input type="checkbox" data-cf="bul"'+(c.bul?' checked':'')+'> 앞에 점(•) 붙이기</label>';
+    h+='<div class="cg2">'+numIn('gap','줄 사이 간격 (mm)',c.gap,0.5)+'</div>';
+  }
+  if(type==='table'){
+    h+='<div class="cg2">'+numIn('rowH','줄 높이 (mm)',c.rowH,0.5)+'</div>';
+    h+='<label>칸 너비 (왼쪽부터, 숫자 비율)</label><div class="cg3">'+c.cw.map(function(v,i){return numIn('cw',(i+1)+'번째',v,1,i);}).join('')+'</div>';
+    h+='<div class="cg3">'+c.als.map(function(v,i){return alignSel('als',v,i,(i+1)+'번째 글자 위치');}).join('')+'</div>';
+  }
+  h+='<div style="margin-top:12px"><button type="button" class="small" data-act3="resetOne">이 칸만 처음 자리로</button></div></div>';
+  box.innerHTML=h;
+}
+function buildSelect(){
+  $('cSel').innerHTML='<option value="">칸을 고르세요</option>'+CB.map(function(d){
+    return '<option value="'+d[0]+'">'+(d[1]==='front'?'[앞면] ':'[뒷면] ')+esc(d[2])+'</option>';
+  }).join('');
+  $('cSel').value=selId||'';
+}
+function selectBlock(id,doRender){
+  selId=id||null;
+  $('cSel').value=selId||'';
+  var els=document.querySelectorAll('.cb');
+  for(var i=0;i<els.length;i++) els[i].classList.toggle('sel',els[i].getAttribute('data-b')===selId);
+  buildEditor();
+  if(doRender) render();
+}
+function syncNums(c){
+  ['x','y','w','h'].forEach(function(k){
+    var e=document.querySelector('#cEditor [data-cf="'+k+'"]'); if(e) e.value=c[k];
+  });
+}
+function updateImgMsgs(){
+  [['front','Front'],['back','Back']].forEach(function(a){
+    var side=a[0], u=custom[side];
+    $('thumb'+a[1]).innerHTML=u?'<img alt="" src="'+u+'">':'';
+    $('msg'+a[1]).textContent=u?'올려진 그림이 있습니다':'아직 없습니다';
+  });
+}
+function loadImage(file,side){
+  var fr=new FileReader();
+  fr.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var sc=Math.min(1,1754/img.width), w=Math.round(img.width*sc), h=Math.round(img.height*sc);
+      var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      var cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,w,h); cx.drawImage(img,0,0,w,h);
+      var old=custom[side];
+      custom[side]=cv.toDataURL('image/jpeg',0.86);
+      if(!saveCustom()){
+        custom[side]=cv.toDataURL('image/jpeg',0.68);
+        if(!saveCustom()){
+          custom[side]=old;
+          $('msg'+(side==='front'?'Front':'Back')).textContent='저장 공간이 부족합니다. 다른 칸의 그림을 지우거나 더 작은 그림을 올려 주세요.';
+          return;
+        }
+      }
+      setImg(side,custom[side]); updateImgMsgs(); buildDesigns(); markDesign();
+      var ratio=w/h, ok=Math.abs(ratio-297/210)<0.06;
+      $('msg'+(side==='front'?'Front':'Back')).textContent='올렸습니다 ('+img.width+' x '+img.height+')'+(ok?'':' · A4 가로 비율이 아니라 일부가 잘릴 수 있습니다');
+      render();
+    };
+    img.onerror=function(){$('msg'+(side==='front'?'Front':'Back')).textContent='이 파일은 그림으로 읽을 수 없습니다. PNG나 JPG 파일을 올려 주세요.';};
+    img.src=fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+function initCustomUI(){
+  buildSelect(); buildEditor(); refreshSlotUI();
+}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('button'); if(!b) return;
+  var pick=b.getAttribute('data-pick');
+  if(pick){$(pick==='front'?'fileFront':'fileBack').click();return;}
+  var clr=b.getAttribute('data-clear');
+  if(clr){custom[clr]=null;saveCustom();setImg(clr,null);updateImgMsgs();buildDesigns();markDesign();render();return;}
+  if(b.id==='btnEdit'){
+    editing=!editing;
+    b.setAttribute('aria-pressed',editing?'true':'false');
+    b.textContent=editing?'자리 맞추기 끄기':'자리 맞추기 켜기';
+    render(); return;
+  }
+  if(b.id==='btnCopy'){
+    var from=$('copyFrom').value; if(from==='') return;
+    custom.blocks=JSON.parse(JSON.stringify(customAll.slots[+from].blocks)); saveCustom(); buildEditor(); render();
+    $('savedMsg').textContent=slotName(+from)+'의 자리 설정을 복사했습니다.'; return;
+  }
+  if(b.id==='btnSlotClear'){
+    askOK((slotIdx+1)+'번 칸의 그림, 이름, 자리 설정을 모두 지웁니다. 계속할까요?',function(){
+      custom.front=null; custom.back=null; custom.blocks={}; custom.name='';
+      saveCustom(); setImg('front',null); setImg('back',null); selId=null; buildEditor(); refreshSlotUI(); buildDesigns(); markDesign(); render();
+    });
+    return;
+  }
+  if(b.id==='btnCReset'){
+    askOK('내 디자인의 모든 칸 위치와 모양을 처음 상태로 되돌립니다. 올린 그림은 그대로 둡니다. 계속할까요?',function(){
+      custom.blocks={}; saveCustom(); buildEditor(); render();
+    });
+    return;
+  }
+  if(b.getAttribute('data-act3')==='resetOne'&&selId){
+    delete custom.blocks[selId]; saveCustom(); buildEditor(); render();
+  }
+});
+$('fileFront').addEventListener('change',function(e){if(e.target.files[0])loadImage(e.target.files[0],'front');e.target.value='';});
+$('fileBack').addEventListener('change',function(e){if(e.target.files[0])loadImage(e.target.files[0],'back');e.target.value='';});
+$('cSel').addEventListener('change',function(e){selectBlock(e.target.value,true);});
+$('slotName').addEventListener('input',function(e){
+  custom.name=e.target.value; saveCustom(); buildDesigns(); markDesign(); refreshCopyList();
+});
+function refreshCopyList(){
+  var o='<option value="">다른 칸에서 가져오기</option>';
+  for(var i=0;i<SLOT_N;i++) if(i!==slotIdx) o+='<option value="'+i+'">'+esc(slotName(i))+' ('+(i+1)+'번 칸)</option>';
+  $('copyFrom').innerHTML=o;
+}
+document.addEventListener('input',function(ev){
+  var t=ev.target; if(!t.hasAttribute||!t.hasAttribute('data-cf')||!selId) return;
+  var key=t.getAttribute('data-cf'), v;
+  if(t.type==='checkbox') v=t.checked?1:0;
+  else if(t.type==='number'){v=parseFloat(t.value); if(isNaN(v)) return;}
+  else v=t.value;
+  if(t.hasAttribute('data-ci')){var arr=cfg(selId)[key].slice(); arr[+t.getAttribute('data-ci')]=v; v=arr;}
+  setCf(selId,key,v); saveCustom(); render();
+});
+$('pages').addEventListener('pointerdown',function(ev){
+  if(!isCustomDesign(state.design)||!editing) return;
+  var cb=ev.target.closest('.cb'); if(!cb) return;
+  ev.preventDefault();
+  var id=cb.getAttribute('data-b'); selectBlock(id,false);
+  var c=cfg(id);
+  drag={id:id,mode:ev.target.closest('.rh')?'resize':'move',sx:ev.clientX,sy:ev.clientY,x:c.x,y:c.y,w:c.w,h:c.h,el:cb};
+});
+document.addEventListener('pointermove',function(ev){
+  if(!drag) return;
+  var k=25.4/96/zoomNow, dx=(ev.clientX-drag.sx)*k, dy=(ev.clientY-drag.sy)*k;
+  function r(v){return Math.round(v*2)/2;}
+  if(drag.mode==='move'){setCf(drag.id,'x',r(drag.x+dx));setCf(drag.id,'y',r(drag.y+dy));}
+  else{setCf(drag.id,'w',Math.max(5,r(drag.w+dx)));setCf(drag.id,'h',Math.max(5,r(drag.h+dy)));}
+  var c=cfg(drag.id), st=drag.el.style;
+  st.left=c.x+'mm'; st.top=c.y+'mm'; st.width=c.w+'mm'; st.height=c.h+'mm';
+  syncNums(c);
+});
+document.addEventListener('pointerup',function(){
+  if(!drag) return; drag=null; saveCustom(); checkOverflow();
+});
+document.addEventListener('keydown',function(ev){
+  if(!isCustomDesign(state.design)||!editing||!selId) return;
+  var tg=ev.target.tagName; if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT') return;
+  var st=ev.shiftKey?2:0.5, c=cfg(selId), m={ArrowLeft:['x',-st],ArrowRight:['x',st],ArrowUp:['y',-st],ArrowDown:['y',st]}[ev.key];
+  if(!m) return;
+  ev.preventDefault(); setCf(selId,m[0],c[m[0]]+m[1]); saveCustom(); buildEditor(); render();
+});
+
+/* ---------- 버튼 ---------- */
+var SHARED=!!window.claude;
+if(SHARED) $('shareNote').hidden=false;
+$('btnPrint').addEventListener('click',function(){
+  if(SHARED){$('shareNote').hidden=false;$('shareNote').scrollIntoView({block:'nearest'});return;}
+  window.print();
+});
+
+function keepCurrent(){
+  if(!state.date){return false;}
+  history_[state.date]=clone(state);
+  save(HIS_KEY,history_);
+  refreshKeep();
+  return true;
+}
+$('btnKeep').addEventListener('click',function(){
+  if(!keepCurrent()){$('savedMsg').textContent='보관하려면 먼저 예배 날짜를 골라 주세요.';return;}
+  $('savedMsg').textContent=dateText(state.date)+' 주보를 보관함에 넣었습니다.';
+});
+
+$('btnNew').addEventListener('click',function(){
+  askOK('지금 주보를 보관함에 넣고, 다음 주 주보를 새로 시작합니다.\n교회 이름, 예배 순서의 항목 이름, 섬김 항목, 교회 정보는 그대로 남고 이번 주 내용만 비워집니다.\n계속할까요?',function(){
+  keepCurrent();
+  var n=clone(state);
+  n.date=nextSunday(state.date);
+  n.sermonTitle='';n.sermonText='';n.preacher='';
+  n.news='';n.prayers='';n.newcomers='';
+  n.worship.forEach(function(r){r.b='';r.c='';});
+  n.service.forEach(function(r){r.b='';});
+  n.nextWeek.forEach(function(r){r.b='';});
+  state=n; fillInputs(); changed();
+  $('savedMsg').textContent='새 주보를 시작했습니다. 지난 주보는 보관함에 있습니다.';
+  $('panel').scrollTop=0;
+  });
+});
+
+function refreshKeep(){
+  var sel=$('keepList'), keys=Object.keys(history_).sort().reverse();
+  sel.innerHTML=keys.length?keys.map(function(k){return '<option value="'+esc(k)+'">'+esc(dateText(k)+' · '+(history_[k].sermonTitle||'제목 없음'))+'</option>';}).join(''):'<option value="">보관한 주보가 없습니다</option>';
+}
+$('btnLoad').addEventListener('click',function(){
+  var k=$('keepList').value; if(!k||!history_[k]) return;
+  state=clone(history_[k]);
+  Object.keys(SAMPLE).forEach(function(x){if(state[x]===undefined)state[x]=clone(SAMPLE[x]);});
+  fillInputs(); changed();
+  $('savedMsg').textContent=dateText(k)+' 주보를 불러왔습니다.';
+});
+$('btnDel').addEventListener('click',function(){
+  var k=$('keepList').value; if(!k||!history_[k]) return;
+  askOK(dateText(k)+' 주보를 보관함에서 지울까요?',function(){
+    delete history_[k]; save(HIS_KEY,history_); refreshKeep();
+  });
+});
+
+$('btnBackup').addEventListener('click',function(){
+  var data=JSON.stringify({version:2,current:state,history:history_,custom:customAll},null,1);
+  var fname='주보백업_'+ymd(new Date())+'.json';
+  function viaLink(){
+    var blob=new Blob([data],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=fname;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+  }
+  if(SHARED&&window.claude&&window.claude.use){
+    window.claude.use('downloads').then(function(dl){
+      if(!dl){$('savedMsg').textContent='이 화면에서는 백업 파일을 저장할 수 없습니다. 컴퓨터의 주보 자동화 파일에서 저장해 주세요.';return;}
+      dl.save({filename:fname,data:data}).then(function(){$('savedMsg').textContent='백업 파일을 저장했습니다.';},function(e){
+        $('savedMsg').textContent=(e&&e.code==='declined')?'저장을 취소했습니다.':'백업 파일을 저장하지 못했습니다.';
+      });
+    },function(){$('savedMsg').textContent='이 화면에서는 백업 파일을 저장할 수 없습니다.';});
+    return;
+  }
+  viaLink();
+});
+$('btnRestore').addEventListener('click',function(){$('fileRestore').click();});
+$('fileRestore').addEventListener('change',function(ev){
+  var f=ev.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      if(!d.current) throw new Error('x');
+      state=d.current; history_=d.history||{};
+      Object.keys(SAMPLE).forEach(function(x){if(state[x]===undefined)state[x]=clone(SAMPLE[x]);});
+      if(d.custom){
+        var src=d.custom.slots?d.custom.slots:[{front:d.custom.front,back:d.custom.back,blocks:d.custom.blocks}];
+        for(var i=0;i<SLOT_N;i++){
+          customAll.slots[i]=fixSlot(src[i],i);
+          setImgSlot(i,'front',customAll.slots[i].front); setImgSlot(i,'back',customAll.slots[i].back);
+        }
+        custom=customAll.slots[slotIdx]; saveAllCustom(); selId=null; buildEditor(); refreshSlotUI(); buildDesigns();
+      }
+      save(HIS_KEY,history_); fillInputs(); changed();
+      $('savedMsg').textContent='백업 파일을 불러왔습니다.';
+    }catch(e){$('savedMsg').textContent='백업 파일을 읽지 못했습니다. 이 앱에서 저장한 파일인지 확인해 주세요.';}
+    ev.target.value='';
+  };
+  r.readAsText(f);
+});
+
+window.addEventListener('resize',function(){fitZoom();});
+window.addEventListener('beforeprint',function(){var p=$('pages');p.style.transform='none';});
+window.addEventListener('afterprint',function(){fitZoom();});
+
+
+
+/* ---------- PDF로 저장 (폰에서도 사용, 인터넷 필요) ---------- */
+var LIB_H2C='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+var LIB_PDF='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+function loadScript(src,ready){
+  return new Promise(function(res,rej){
+    if(ready()){res();return;}
+    var s=document.createElement('script'); s.src=src; s.async=true;
+    s.onload=function(){ready()?res():rej(new Error('lib'));};
+    s.onerror=function(){rej(new Error('net'));};
+    document.head.appendChild(s);
+  });
+}
+function pdfMsg(t){$('savedMsg').textContent=t;}
+function savePdfBlob(blob,fname){
+  if(SHARED&&window.claude&&window.claude.use){
+    return window.claude.use('downloads').then(function(dl){
+      if(!dl){pdfMsg('이 화면에서는 파일을 저장할 수 없습니다.');return;}
+      return dl.save({filename:fname,data:blob}).then(function(){pdfMsg('PDF를 저장했습니다. 저장한 파일을 열어 인쇄하거나 공유하세요.');},function(e){
+        pdfMsg((e&&e.code==='declined')?'저장을 취소했습니다.':'PDF를 저장하지 못했습니다.');
+      });
+    });
+  }
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+  pdfMsg('PDF를 저장했습니다. 다운로드 폴더를 확인하세요.');
+}
+$('btnPdf').addEventListener('click',function(){
+  var btn=$('btnPdf'); if(btn.disabled) return;
+  btn.disabled=true; pdfMsg('PDF를 만드는 중입니다. 잠시만 기다려 주세요...');
+  var host=null;
+  loadScript(LIB_H2C,function(){return !!window.html2canvas;})
+  .then(function(){return loadScript(LIB_PDF,function(){return !!(window.jspdf&&window.jspdf.jsPDF);});})
+  .then(function(){return (document.fonts&&document.fonts.ready)?document.fonts.ready:null;})
+  .then(function(){
+    host=document.createElement('div'); host.className='dz pdfhost';
+    host.setAttribute('data-design',$('pages').getAttribute('data-design')||'basic');
+    host.innerHTML=$('pages').innerHTML;
+    document.body.appendChild(host);
+    var pgs=host.querySelectorAll('.page'), pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true});
+    var chain=Promise.resolve();
+    Array.prototype.forEach.call(pgs,function(el,i){
+      chain=chain.then(function(){
+        pdfMsg('PDF를 만드는 중입니다 ('+(i+1)+'/'+pgs.length+')...');
+        return window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false}).then(function(cv){
+          if(i>0) pdf.addPage('a4','landscape');
+          pdf.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',0,0,297,210);
+          cv.width=1; cv.height=1;
+        });
+      });
+    });
+    return chain.then(function(){return pdf.output('blob');});
+  })
+  .then(function(blob){return savePdfBlob(blob,'주보_'+(state.date||ymd(new Date()))+'.pdf');})
+  .catch(function(e){
+    pdfMsg((e&&e.message==='net'||e&&e.message==='lib')?'PDF 만드는 도구를 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.':'PDF를 만들지 못했습니다. 다시 눌러 주세요.');
+  })
+  .then(function(){if(host&&host.parentNode)host.parentNode.removeChild(host);btn.disabled=false;});
+});
+
+/* ---------- 작업 공간 너비 조절 ---------- */
+(function(){
+  var KEY='jubo_panelw_v1', DEF=620, MIN=380;
+  var root=document.getElementById('app'), sp=$('split'), w=DEF;
+  function maxW(){return Math.max(MIN,Math.min(1000,window.innerWidth-420));}
+  function apply(v,save){
+    w=Math.max(MIN,Math.min(maxW(),Math.round(v)));
+    root.style.setProperty('--pw',w+'px');
+    if(save){try{localStorage.setItem(KEY,String(w));}catch(e){}}
+    fitZoom();
+  }
+  try{var s=parseFloat(localStorage.getItem(KEY)); if(s>0) w=s;}catch(e){}
+  apply(w,false);
+  var on=false;
+  sp.addEventListener('pointerdown',function(ev){on=true;sp.classList.add('on');try{sp.setPointerCapture(ev.pointerId);}catch(e){} ev.preventDefault();});
+  sp.addEventListener('pointermove',function(ev){if(on) apply(ev.clientX-root.getBoundingClientRect().left,false);});
+  function end(){if(!on) return; on=false; sp.classList.remove('on'); apply(w,true);}
+  sp.addEventListener('pointerup',end); sp.addEventListener('pointercancel',end);
+  sp.addEventListener('dblclick',function(){apply(DEF,true);});
+  sp.addEventListener('keydown',function(ev){
+    if(ev.key==='ArrowLeft'){apply(w-30,true);ev.preventDefault();}
+    if(ev.key==='ArrowRight'){apply(w+30,true);ev.preventDefault();}
+  });
+  window.addEventListener('resize',function(){apply(w,false);});
+})();
+
+buildDesigns();
+initCustomUI();
+fillInputs();
+render();
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){fitZoom();checkOverflow();});}
+if(!storageOK) $('savedMsg').textContent='이 브라우저에서는 자동 저장이 되지 않습니다.';
+})();
+</script>
+
+</body></html>
