@@ -1,15 +1,1 @@
-{
-  "name": "주보 자동화",
-  "short_name": "주보",
-  "description": "교회 주보를 쉽게 만들고 인쇄하는 앱",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#1F4E5F",
-  "theme_color": "#1F4E5F",
-  "lang": "ko",
-  "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
-  ]
-}
+{"name": "주보 자동화", "short_name": "주보", "description": "교회 주보를 쉽게 만들고 인쇄하는 앱", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#1F3F7A", "theme_color": "#1F3F7A", "lang": "ko", "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"}, {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}]}
