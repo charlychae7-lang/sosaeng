@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>일손덜기 업무진단도구 — 소생커뮤니티</title>
+<meta name="description" content="우리 단체의 반복 업무를 체크하면 줄일 수 있는 시간과 먼저 손볼 업무, 추천 앱을 알려 드립니다. 소생커뮤니티 일손덜기.">
+<meta property="og:title" content="일손덜기 업무진단도구">
+<meta property="og:description" content="반복 업무를 체크하면 우선순위와 간소화 제안이 나옵니다. 소생커뮤니티 일손덜기.">
+<meta property="og:type" content="website">
+<style>body{margin:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+</head><body>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: sticky header with five-step rail, one working column, live summary bar. Tool opened in an example state. */
+:root{
+  --bg:#F2F3F0; --surface:#FFFFFF; --ink:#15171A; --muted:#5B6068; --line:#D8DBD5;
+  --accent:#CDFF3C; --accent-ink:#15171A; --accent-text:#3F5A00;
+  --warn:#8A5200; --warn-bg:#FFF0D2; --danger:#A12222; --danger-bg:#FBE3E3; --ok:#1E6B3A; --ok-bg:#E1F4E7;
+  --font-body:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1012; --surface:#171A1E; --ink:#EDEEEA; --muted:#9AA0A8; --line:#2B2F35;
+  --accent:#CDFF3C; --accent-ink:#15171A; --accent-text:#CDFF3C;
+  --warn:#F0B44C; --warn-bg:#2B2110; --danger:#FF9088; --danger-bg:#2E1717; --ok:#7FD99B; --ok-bg:#12261A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1012; --surface:#171A1E; --ink:#EDEEEA; --muted:#9AA0A8; --line:#2B2F35;
+  --accent:#CDFF3C; --accent-ink:#15171A; --accent-text:#CDFF3C;
+  --warn:#F0B44C; --warn-bg:#2B2110; --danger:#FF9088; --danger-bg:#2E1717; --ok:#7FD99B; --ok-bg:#12261A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+.wrap{max-width:900px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:20px;font-weight:900;letter-spacing:-.5px}
+.brand .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;color:var(--muted)}
+.rail{display:flex;gap:6px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.rail button{flex:0 0 auto;font:inherit;font-size:13px;font-weight:700;padding:7px 12px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:6px;cursor:pointer}
+.rail button[aria-current="step"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rail button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
+.sumbar{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
+.sumbar b{color:var(--ink);font-variant-numeric:tabular-nums}
+main{padding-block:22px 80px}
+h2{font-size:24px;line-height:1.25;letter-spacing:-.8px;font-weight:900;margin:0 0 6px;text-wrap:balance}
+h3{font-size:16px;margin:0 0 8px;font-weight:700}
+.lead{color:var(--muted);margin:0 0 20px;max-width:62ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:620px){.grid2{grid-template-columns:minmax(0,1fr)}}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;min-width:0}
+input[type=text],input[type=date],input[type=number],select,textarea{font:inherit;font-weight:400;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 10px;min-width:0;width:100%}
+textarea{min-height:110px;resize:vertical}
+.btn{font:inherit;font-weight:700;font-size:14px;padding:10px 16px;border-radius:6px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.sec{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.acc{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+.group{margin-bottom:18px}
+.group>h3{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:0}
+.group>h3 small{font-family:var(--font-mono);font-size:11px;color:var(--muted);font-weight:500}
+.task{border-bottom:1px solid var(--line);padding:10px 0;background:transparent}
+.task.on{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%)}
+.tk{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.tk input{margin-top:4px;width:18px;height:18px;accent-color:var(--ink);flex:0 0 auto}
+.tk .nm{font-weight:500;min-width:0}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.lev{background:var(--bg);border:1px solid var(--line);color:var(--ink)}
+.det{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0 2px 28px}
+@media (max-width:620px){.det{grid-template-columns:repeat(2,minmax(0,1fr));margin-left:0}}
+.det label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+.det select,.det input{padding:7px 8px;font-size:13px}
+.addrow{display:flex;gap:8px;flex-wrap:wrap}
+.addrow input{flex:1 1 220px}
+.q{margin-bottom:18px}
+.q h3{margin-bottom:6px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:flex;gap:7px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:7px 11px;background:var(--bg);cursor:pointer;font-size:14px}
+.opts input{accent-color:var(--ink)}
+.opts label:has(input:checked){border-color:var(--ink);background:var(--surface);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:620px){.tiles{grid-template-columns:minmax(0,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tile .v{font-size:30px;font-weight:900;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.tile .u{font-size:13px;color:var(--muted)}
+.tile.hl{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tile.hl .u{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-align:left;color:var(--muted);font-weight:500;padding:6px 8px;border-bottom:2px solid var(--ink)}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+th.n{text-align:right}
+.bar{height:6px;background:var(--line);border-radius:3px;min-width:60px}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
+.note{display:flex;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:8px;font-size:14px}
+.note.warn{background:var(--warn-bg);color:var(--warn)}
+.note.danger{background:var(--danger-bg);color:var(--danger)}
+.note.ok{background:var(--ok-bg);color:var(--ok)}
+.note b{flex:0 0 auto}
+.tip{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.cards{grid-template-columns:minmax(0,1fr)}}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--surface);min-width:0}
+.card .k{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--muted)}
+.card .pr{font-weight:900;font-size:18px;margin:2px 0 4px;font-variant-numeric:tabular-nums}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+pre.rep{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:16px;font:inherit;font-size:14px;line-height:1.75;margin:0 0 12px;max-height:520px;overflow:auto}
+.saved{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ex{font-size:12px;font-weight:700;background:var(--warn-bg);color:var(--warn);padding:2px 8px;border-radius:99px}
+.small{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:14px;z-index:20}
+@media (prefers-reduced-motion:no-preference){.task{transition:background .15s}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand"><h1>일손덜기 업무진단도구</h1><span class="tag">REPEAT-WORK AUDIT</span></div>
+  <nav class="rail" id="rail" aria-label="진단 단계"></nav>
+  <div class="sumbar" id="sum" aria-live="polite"></div>
+</header>
+<main id="view"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- 기준표 ---------- */
+var FREQ=[['daily','매일',22],['multi','주 3회 이상',13],['weekly','주 1~2회',4.3],['monthly','월 1~2회',1.5],['quarterly','분기별',0.33],['yearly','연 1~2회',0.1],['adhoc','수시(월 4회 가정)',4]];
+var METHOD=[['paper','종이·수기'],['sheet','엑셀·시트'],['chat','카톡·문자'],['doc','문서(한글·워드)'],['memory','기억·구두'],['etc','기타']];
+var PAIN={1:1,2:1.5,3:2};
+var LEVER={cut:'없애기',merge:'합치기',std:'표준화',auto:'자동화'};
+var APPS={
+  apply:{name:'신청·예약 관리 앱',price:99000,desc:'신청서 입력·저장, 신청자 목록·상태, 내보내기'},
+  member:{name:'회원·출석 관리 앱',price:199000,desc:'명단, 출석·활동 기록, 기간별 현황·통계'},
+  report:{name:'자료 정리·보고서 자동화',price:299000,desc:'정해진 항목 입력, 자동 집계, 보고서 초안·요약'},
+  auto:{name:'업무 자동화 앱(알림·연결)',price:399000,desc:'복수 기능 연결, 알림, 결과 집계'},
+  content:{name:'홍보 콘텐츠(카드뉴스 세트부터)',price:49000,desc:'카드뉴스·상세페이지·숏폼 영상'}
+};
+var GROUPS={recv:'접수·신청',member:'명단·회원',attend:'출석·참여',comm:'공지·소통',money:'회비·회계',event:'행사·일정',record:'기록·보고',doc:'문서·자료',church:'교회·종교단체 전용',shop:'소상공인 전용'};
+var TYPES=[['shop','소상공인·1인 사업자'],['coop','협동조합·사회적경제'],['np','비영리·마을공동체'],['edu','교육기관·강사'],['church','교회·종교단체'],['etc','기타']];
+/* id, 그룹, 업무, 앱, 간소화단계, 쉬움(0.6~1), 절감률, 제안, 주의(p개인정보 f금전 r종교·상담), 세트 */
+var LIB=[
+ ['a1','recv','교육·행사·상담 신청 접수','apply','merge',1,.6,'접수 창구를 폼·QR 하나로 모으고, 응답이 신청자 목록에 자동으로 쌓이게 합니다.','p'],
+ ['a2','recv','예약·일정 조율 문의 응대','apply','std',.9,.5,'가능한 시간대를 미리 고정해 보여 주면 주고받는 문의가 줄어듭니다.','p'],
+ ['a3','recv','문의·민원 접수 기록','apply','merge',.9,.4,'채널별 문의를 한 목록으로 모으고 처리 상태만 표시합니다.','p'],
+ ['b1','member','회원·참여자 명단 관리(등록·변경)','member','merge',.9,.5,'명단 원본을 하나로 정하고 나머지 파일은 모두 그 원본에서 가져옵니다.','p'],
+ ['b2','member','연락처 정리·단체 문자 대상 선별','member','std',.8,.4,'그룹·태그를 정해 두고 발송 대상은 조건으로 뽑습니다.','p'],
+ ['b3','member','가입·탈퇴·자격 확인','member','std',.8,.4,'확인 기준을 체크 항목으로 고정해 담당자가 바뀌어도 같은 결과가 나오게 합니다.','p'],
+ ['c1','attend','출석 체크와 기록','member','auto',1,.7,'현장에서 한 번 체크하면 월별 현황까지 자동으로 이어지게 합니다.','p'],
+ ['c2','attend','활동·참여 이력 집계','member','auto',.9,.7,'입력은 한 번, 기간별 집계는 자동으로 만듭니다.',''],
+ ['c3','attend','만족도 조사 수집·정리','report','std',.9,.6,'설문 항목을 표준화하고 결과를 자동 요약합니다.',''],
+ ['d1','comm','공지문 작성과 여러 채널 옮겨 게시','report','std',.8,.5,'원문 하나를 쓰면 채널별 형식(문자·게시판·단톡)으로 변환되게 합니다.',''],
+ ['d2','comm','일정 안내·리마인드 알림','auto','auto',.7,.6,'일정 입력만 하면 알림 시점에 자동으로 안내되게 합니다(발송료 별도).','p'],
+ ['d3','comm','소식지·홍보물 제작','content','std',.8,.4,'기본 틀(카드뉴스·상세페이지)을 정해 두고 내용만 바꿔 끼웁니다.',''],
+ ['e1','money','회비·후원·납부 현황 정리','member','std',.7,.4,'입금 내역 기록 양식을 고정합니다. 결제·이체 기능은 앱에 넣지 않습니다.','f'],
+ ['e2','money','지출 증빙 정리·장부 작성','report','std',.7,.4,'증빙 종류별 입력 양식을 정하고 합계는 자동 계산합니다.','f'],
+ ['e3','money','영수증·확인서 발급','report','std',.8,.6,'양식을 고정하고 항목만 입력해 문서가 나오게 합니다.','pf'],
+ ['f1','event','행사·모임 일정 관리','apply','merge',.9,.4,'흩어진 일정을 한 달력으로 모으고 담당자·장소를 함께 기록합니다.',''],
+ ['f2','event','장소·물품·인력 배정','auto','std',.7,.4,'배정 기준을 정해 두고 겹침만 점검하게 합니다.',''],
+ ['f3','event','담당자 변경 시 인수인계','report','std',.8,.5,'반복 업무를 체크리스트로 남기면 인수인계 시간이 줄어듭니다.',''],
+ ['g1','record','회의록 작성·보관','report','std',.9,.5,'회의록 틀을 고정하고 결정 사항·담당·기한만 입력하게 합니다.',''],
+ ['g2','record','활동 실적 집계','report','auto',.9,.7,'일일 기록을 모으면 실적표가 자동으로 만들어지게 합니다.',''],
+ ['g3','record','월·분기·연간 보고서 작성','report','auto',.9,.65,'입력된 자료로 보고서 초안을 만들고 사람이 다듬습니다.',''],
+ ['g4','record','지원사업·공모 결과보고','report','std',.7,.5,'제출 양식별 항목을 미리 모아 두고 재사용합니다.',''],
+ ['h1','doc','공문·계약서·서식 반복 작성','report','std',.9,.6,'틀을 고정하고 바뀌는 항목만 입력하게 합니다.','p'],
+ ['h2','doc','자료·파일 찾기(흩어진 폴더)','auto','std',.7,.4,'폴더 이름 규칙을 정하고 목록(색인) 한 장으로 찾게 합니다.',''],
+ ['h3','doc','종이 문서를 다시 타이핑','auto','cut',.8,.7,'종이를 없애고 처음부터 화면에 입력받는 방식으로 바꿉니다.','p'],
+ ['k1','church','주보·공지 편집과 채널별 변환','report','std',.9,.6,'주보 원문 하나에서 문자·게시판·단톡용 문구로 변환합니다.','','church'],
+ ['k2','church','심방·상담 기록과 후속 알림','auto','auto',.6,.5,'기록 양식을 고정하고 후속 일정만 알림으로 연결합니다. 상담 내용은 접근 권한을 엄격히 설계합니다.','pr','church'],
+ ['k3','church','새가족 등록·정착 관리','member','std',.8,.5,'등록 단계를 체크 항목으로 정하고 진행 상황을 한 화면에서 봅니다.','p','church'],
+ ['k4','church','소그룹·구역 출석과 보고','member','auto',.9,.7,'모임에서 출석을 한 번 체크하면 구역별 보고가 자동으로 모입니다.','p','church'],
+ ['k5','church','예배·행사 봉사자 배정','auto','std',.7,.5,'봉사 가능 시간을 입력받아 배정표를 만들고 겹침만 확인합니다.','p','church'],
+ ['k6','church','설교·예화 자료 정리','auto','std',.6,.4,'자료에 주제·성경 본문 태그를 붙여 검색할 수 있게 합니다.','','church'],
+ ['k7','church','헌금·재정 보고','report','std',.6,.4,'입력 양식을 고정하고 합계·보고서만 자동으로 만듭니다.','f','church'],
+ ['s1','shop','고객 예약·방문 기록','apply','merge',1,.5,'예약 접수와 방문 기록을 한 목록으로 합칩니다.','p','shop'],
+ ['s2','shop','주문·재고 확인','member','std',.8,.5,'품목별 입출고를 한 번 기록하고 재고는 자동 계산합니다.','','shop'],
+ ['s3','shop','매출 정리','report','auto',.8,.6,'일일 입력을 월별 집계로 자동 연결합니다.','f','shop']
+];
+function lib(){return LIB.map(function(a){return {id:a[0],g:a[1],name:a[2],app:a[3],lever:a[4],easy:a[5],eff:a[6],tip:a[7],flag:a[8]||'',set:a[9]||''};});}
+var METHOD_TIP={chat:'카톡·문자로 흩어진 요청은 접수 창구(폼·QR)를 하나로 모으는 것이 첫 단계입니다.',sheet:'엑셀에 다시 옮겨 적는 단계가 있다면 입력을 한 번으로 줄이고 집계는 자동화합니다.',paper:'종이 기록은 처음부터 화면에 입력받는 방식으로 바꾸는 것이 우선입니다.',memory:'담당자 기억에 의존하는 일은 체크리스트와 양식으로 먼저 기록합니다.',doc:'매번 새로 쓰는 문서는 틀을 고정하고 바뀌는 항목만 입력받습니다.',etc:''};
+
+/* ---------- 상태 ---------- */
+var KEY='ilson-diag-v1';
+function blank(){return {step:0,example:false,org:{name:'',type:'coop',people:'',date:today(),owner:''},tasks:{},custom:[],req:{q1:'',q2:'',q3:'',q4:[],q5:'',q6:'',q7:[],q8:''},note:''};}
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function sampleState(){
+  var s=blank(); s.example=true; s.step=0;
+  s.org={name:'예시 협동조합 (가상)',type:'coop',people:'12',date:today(),owner:''};
+  function t(id,f,m,me,p){s.tasks[id]={on:true,freq:f,min:m,method:me,pain:p};}
+  t('a1','monthly',90,'chat',3); t('b1','weekly',30,'sheet',2); t('c1','weekly',20,'paper',3); t('c2','monthly',120,'sheet',3);
+  t('d1','weekly',40,'doc',2); t('e1','monthly',90,'sheet',2); t('g3','monthly',240,'doc',3); t('f3','yearly',180,'memory',2);
+  s.req={q1:'2~5명',q2:'신청·입력만',q3:'휴대폰 중심',q4:['name','attend','pay'],q5:'엑셀·시트 있음',q6:'문자·카톡 발송',q7:['xls','rep'],q8:'있음(제공 가능)'};
+  return s;
+}
+var S;
+function load(){try{var r=localStorage.getItem(KEY+'-draft');if(r){var o=JSON.parse(r);if(o&&o.org)return o;}}catch(e){}return sampleState();}
+function saveDraft(){try{localStorage.setItem(KEY+'-draft',JSON.stringify(S));}catch(e){}}
+function getSaved(){try{return JSON.parse(localStorage.getItem(KEY+'-list')||'[]');}catch(e){return [];}}
+function putSaved(a){try{localStorage.setItem(KEY+'-list',JSON.stringify(a));return true;}catch(e){return false;}}
+
+/* ---------- 계산 ---------- */
+function visibleTasks(){
+  var set=S.org.type;
+  var a=lib().filter(function(x){return !x.set||x.set===set;});
+  S.custom.forEach(function(c){a.push({id:c.id,g:'doc',name:c.name,app:'auto',lever:'auto',easy:.7,eff:.4,tip:'이 업무가 무엇을 입력받고 무엇을 내보내는지 먼저 한 줄로 정리한 뒤, 양식을 고정하고 자동화 범위를 정합니다.',flag:'',set:'',custom:true});});
+  return a;
+}
+function fm(k){for(var i=0;i<FREQ.length;i++)if(FREQ[i][0]===k)return FREQ[i][2];return 1;}
+function calc(){
+  var rows=[];
+  visibleTasks().forEach(function(t){
+    var st=S.tasks[t.id]; if(!st||!st.on)return;
+    var hours=(+st.min||0)*fm(st.freq)/60;
+    rows.push({t:t,st:st,hours:hours,score:hours*(PAIN[st.pain]||1)*t.easy,save:hours*t.eff});
+  });
+  rows.sort(function(a,b){return b.score-a.score;});
+  var total=0,save=0;rows.forEach(function(r){total+=r.hours;save+=r.save;});
+  var by={};
+  rows.forEach(function(r){var k=r.t.app;by[k]=by[k]||{app:k,hours:0,score:0,n:0};by[k].hours+=r.hours;by[k].score+=r.score;by[k].n++;});
+  var groups=Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return b.score-a.score;});
+  return {rows:rows,total:total,save:save,groups:groups};
+}
+function flags(){
+  var q=S.req,out=[];
+  function add(l,x){out.push({lv:l,tx:x});}
+  if(q.q1==='6~20명'||q.q1==='21명 이상')add('warn','담당자 수에 따라 도구 월 사용료가 늘 수 있습니다. 사용료를 누가 부담하는지와 사용자당 단가를 견적 전에 확정하세요.');
+  if(q.q2==='로그인해 본인 정보 조회')add('warn','외부 사용자가 로그인해 조회하는 구조는 회원 포털형 검토와 접근 권한 설계가 필요합니다. 업무 자동화 앱 이상 범위로 견적하세요.');
+  if(q.q2==='신청·입력만')add('ok','폼·QR 입력 중심이라 저가형 표준 앱으로 시작하기에 적합합니다.');
+  var d=q.q4||[];
+  if(d.indexOf('rrn')>=0||d.indexOf('health')>=0||d.indexOf('bank')>=0)add('danger','주민등록번호·건강정보·금융계좌는 초기 저가 상품 범위에서 제외하고 별도로 검토하세요.');
+  if(d.indexOf('rel')>=0)add('warn','상담·종교 관련 기록은 민감할 수 있습니다. 최소 수집, 접근 권한, 보관·삭제 절차를 먼저 설계하세요.');
+  if(d.indexOf('pay')>=0)add('warn','회비·납부 내역은 기록과 집계만 다루고 실제 결제·이체 기능은 범위에 넣지 마세요.');
+  if(d.indexOf('addr')>=0||d.indexOf('name')>=0)add('warn','이름·연락처·주소는 개인정보입니다. 수집 항목을 줄이고 동의 문구와 삭제 절차를 마련하세요.');
+  if(q.q5==='종이·문서 있음(입력 필요)')add('warn','종이 자료를 옮겨 입력하는 작업은 제작비와 별도로 견적하세요.');
+  if(q.q5==='엑셀·시트 있음')add('ok','기존 엑셀·시트가 있으면 구조를 먼저 점검해 가져올 수 있는지 확인합니다.');
+  if(q.q6==='문자·카톡 발송')add('warn','문자 발송료와 외부 서비스 이용료는 고객 부담으로 별도 합의하세요. 카톡 알림은 방식 제약을 먼저 확인합니다.');
+  if(q.q8==='있음(변경 필요)')add('warn','양식 변경 요청이 반복되면 수정 범위(1회)를 넘을 수 있습니다. 변경 범위를 사전에 확정하세요.');
+  return out;
+}
+function won(n){return n.toLocaleString('ko-KR')+'원';}
+function fh(h){return (Math.round(h*10)/10).toFixed(1);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function typeName(k){for(var i=0;i<TYPES.length;i++)if(TYPES[i][0]===k)return TYPES[i][1];return '';}
+function methodName(k){for(var i=0;i<METHOD.length;i++)if(METHOD[i][0]===k)return METHOD[i][1];return '';}
+
+/* ---------- 제안 ---------- */
+function plan(c){
+  var out={items:[],expand:[]};
+  var apps=c.groups.filter(function(g){return g.app!=='content';});
+  var q2login=S.req.q2==='로그인해 본인 정보 조회';
+  if(apps.length){
+    var first=apps[0], a=APPS[q2login?'auto':first.app];
+    out.items.push({k:'1순위 · 첫 제작',name:a.name,price:a.price,desc:'우선순위 상위 업무 '+first.n+'건, 월 '+fh(first.hours)+'시간 규모에 해당합니다. '+a.desc+'.'});
+    apps.slice(1,3).forEach(function(g,i){var b=APPS[g.app];out.items.push({k:(i+2)+'순위 · 연결 확장',name:b.name,price:b.price,desc:'관련 업무 '+g.n+'건, 월 '+fh(g.hours)+'시간. 첫 앱 사용 후 효과를 보고 이어서 제작합니다.'});});
+  }
+  var hasComm=c.rows.some(function(r){return r.t.g==='comm'||r.t.app==='content';});
+  out.expand.push({k:'홍보 콘텐츠',price:'49,000원~',desc:hasComm?'공지·홍보 업무가 확인됐습니다. 카드뉴스 세트나 상세페이지로 모집·안내 자료를 함께 제작합니다.':'앱을 만든 뒤 알리는 자료가 필요하면 카드뉴스, 상세페이지, 숏폼 영상을 추가합니다.'});
+  if(apps.length)out.expand.push({k:'유지관리',price:'월 1만~5만원',desc:'오류 점검, 소규모 수정, 사용 안내를 합의한 범위에서 제공합니다. 무제한 수정과 24시간 대응은 포함하지 않습니다.'});
+  var big=S.req.q1==='6~20명'||S.req.q1==='21명 이상';
+  if(big||apps.length>1)out.expand.push({k:'활용 교육·업무 진단',price:'별도 견적',desc:'담당자가 여럿이거나 앱이 둘 이상이면 사용법 교육과 정기 업무 점검을 묶어 제안합니다.'});
+  out.expand.push({k:'반복 업무 정기 점검',price:'분기 1회 제안',desc:'3개월 뒤 같은 도구로 다시 점검해 줄어든 시간과 새로 생긴 반복 업무를 확인합니다.'});
+  var sum=0;out.items.forEach(function(i){sum+=i.price;});
+  out.sum=sum;
+  return out;
+}
+function reportText(){
+  var c=calc(),p=plan(c),f=flags(),L=[];
+  L.push('[업무 진단 결과] '+(S.org.name||'(기관명 미입력)'));
+  L.push('유형: '+typeName(S.org.type)+(S.org.people?' · 인원 '+S.org.people+'명':'')+' · 진단일 '+S.org.date+(S.org.owner?' · 담당 '+S.org.owner:''));
+  if(S.example)L.push('※ 예시 데이터입니다. 실제 고객 상담 값으로 바꿔 사용하세요.');
+  L.push('');
+  L.push('1. 진단 요약');
+  L.push('- 반복 업무 '+c.rows.length+'건, 월 약 '+fh(c.total)+'시간');
+  L.push('- 자동화·간소화로 줄일 수 있는 시간(가정 효과율 기준): 월 약 '+fh(c.save)+'시간. 실제 효과는 시범 사용 후 측정해 확정합니다.');
+  L.push('');
+  L.push('2. 우선순위 업무');
+  c.rows.slice(0,6).forEach(function(r,i){L.push((i+1)+') '+r.t.name+' — 월 '+fh(r.hours)+'시간 · 현재 '+methodName(r.st.method)+' · 간소화: '+LEVER[r.t.lever]);L.push('   제안: '+r.t.tip);});
+  L.push('');
+  L.push('3. 추천 제작(시범가 기준, 부가세·외부 서비스 이용료 별도)');
+  p.items.forEach(function(i){L.push('- '+i.k+': '+i.name+' '+won(i.price)+' / '+i.desc);});
+  if(p.items.length>1)L.push('- 위 항목을 모두 제작할 경우 합계 '+won(p.sum)+' (단계별로 나누어 진행 가능)');
+  L.push('');
+  L.push('4. 확장 제안');
+  p.expand.forEach(function(e){L.push('- '+e.k+' ('+e.price+'): '+e.desc);});
+  if(f.length){L.push('');L.push('5. 요구사항 점검에서 확인된 주의·범위');f.forEach(function(x){L.push('- '+x.tx);});}
+  L.push('');
+  L.push('6. 공통 계약 조건');
+  L.push('- 포함 기능과 수정 횟수(1회)를 계약서에 명시합니다.');
+  L.push('- 앱·데이터·계정은 고객이 소유하고, 종료 시 데이터 이전을 지원합니다.');
+  L.push('- 개인정보는 최소 수집하고 접근 권한·보관·삭제 절차를 점검한 뒤 납품합니다.');
+  L.push('- 가격은 초기 시범가이며 제작시간 측정 후 조정될 수 있고, 매출·참여 증가는 보장하지 않습니다.');
+  if(S.note){L.push('');L.push('상담 메모: '+S.note);}
+  return L.join('\n');
+}
+
+/* ---------- 화면 ---------- */
+var STEPS=['1 기관 정보','2 반복 업무 체크','3 요구사항 점검','4 진단 결과','5 제안서'];
+var view=document.getElementById('view'),rail=document.getElementById('rail'),sumEl=document.getElementById('sum'),toastEl=document.getElementById('toast');
+function toast(m){toastEl.textContent=m;toastEl.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){toastEl.hidden=true;},2200);}
+function renderRail(){rail.innerHTML=STEPS.map(function(s,i){return '<button type="button" data-step="'+i+'"'+(i===S.step?' aria-current="step"':'')+'>'+s+'</button>';}).join('');}
+function renderSum(){var c=calc();sumEl.innerHTML='<span>선택 <b>'+c.rows.length+'</b>건</span><span>월 반복 <b>'+fh(c.total)+'</b>시간</span><span>절감 가정 <b>'+fh(c.save)+'</b>시간</span>'+(S.example?'<span class="ex">예시 데이터</span>':'');}
+function navBtns(){return '<div class="nav"><button type="button" class="btn sec" data-go="-1"'+(S.step===0?' disabled style="visibility:hidden"':'')+'>이전</button>'+(S.step<4?'<button type="button" class="btn" data-go="1">다음 단계</button>':'')+'</div>';}
+
+function step0(){
+  var o=S.org,saved=getSaved();
+  var opts=TYPES.map(function(t){return '<option value="'+t[0]+'"'+(o.type===t[0]?' selected':'')+'>'+t[1]+'</option>';}).join('');
+  var sv=saved.length?saved.map(function(s){return '<div class="saved"><span><b>'+esc(s.name||'이름 없음')+'</b> <span class="small">'+esc(s.date)+'</span></span><span class="row"><button type="button" class="btn sec" data-load="'+s.id+'">불러오기</button><button type="button" class="btn sec" data-del="'+s.id+'">삭제</button></span></div>';}).join(''):'<p class="small">저장한 상담이 아직 없습니다. 이 기기의 브라우저에만 저장됩니다.</p>';
+  return '<h2>어떤 곳의 업무를 점검할까요</h2><p class="lead">상담 전후에 채우는 진단지입니다. 아래 값은 예시이며 새 상담을 시작하면 비워집니다.</p>'+
+  '<div class="panel"><div class="grid2">'+
+  '<label class="f">기관·사업장 이름<input type="text" id="o-name" value="'+esc(o.name)+'" autocomplete="off"></label>'+
+  '<label class="f">유형<select id="o-type">'+opts+'</select></label>'+
+  '<label class="f">운영·참여 인원(명)<input type="number" id="o-people" min="0" value="'+esc(o.people)+'"></label>'+
+  '<label class="f">진단일<input type="date" id="o-date" value="'+esc(o.date)+'"></label>'+
+  '<label class="f">담당자 이름<input type="text" id="o-owner" value="'+esc(o.owner)+'" autocomplete="off"></label></div>'+
+  '<div class="row" style="margin-top:14px"><button type="button" class="btn acc" data-act="new">새 상담 시작(비우기)</button><button type="button" class="btn sec" data-act="sample">예시 다시 불러오기</button></div></div>'+
+  '<div class="panel"><div class="eyebrow">간소화 4단계</div><p style="margin:0 0 6px">업무를 바로 자동화하지 않고 <b>없애기 → 합치기 → 표준화 → 자동화</b> 순서로 봅니다. 없앨 수 있거나 합칠 수 있는 일을 먼저 걷어 내야 앱이 작고 싸집니다.</p><p class="tip">유형을 고르면 해당 유형의 전용 업무 목록(교회·종교단체, 소상공인)이 2단계에 추가됩니다.</p></div>'+
+  '<div class="panel"><h3>저장한 상담</h3>'+sv+'<div class="row" style="margin-top:10px"><button type="button" class="btn sec" data-act="save">지금 상담 저장</button></div></div>'+navBtns();
+}
+function step1(){
+  var list=visibleTasks(),h='<h2>반복해서 하는 업무를 체크하세요</h2><p class="lead">하고 있는 일에 체크한 뒤 횟수, 한 번에 걸리는 시간, 지금 쓰는 방식, 불편한 정도를 고릅니다. 값이 모일수록 우선순위가 정확해집니다.</p>';
+  var order=['recv','member','attend','comm','money','event','record','doc','church','shop'];
+  order.forEach(function(g){
+    var items=list.filter(function(t){return t.g===g&&!t.custom;});if(g==='doc')items=list.filter(function(t){return t.g==='doc';});
+    if(!items.length)return;
+    h+='<section class="group"><h3>'+GROUPS[g]+'<small>'+items.length+'개 항목</small></h3>';
+    items.forEach(function(t){
+      var st=S.tasks[t.id]||{on:false,freq:'monthly',min:60,method:'sheet',pain:2};
+      var fo=FREQ.map(function(f){return '<option value="'+f[0]+'"'+(st.freq===f[0]?' selected':'')+'>'+f[1]+'</option>';}).join('');
+      var mo=METHOD.map(function(m){return '<option value="'+m[0]+'"'+(st.method===m[0]?' selected':'')+'>'+m[1]+'</option>';}).join('');
+      var po=[[1,'가끔 불편'],[2,'꽤 불편'],[3,'매우 불편']].map(function(p){return '<option value="'+p[0]+'"'+(+st.pain===p[0]?' selected':'')+'>'+p[1]+'</option>';}).join('');
+      var fl=(t.flag.indexOf('p')>=0?'<span class="pill warn">개인정보</span>':'')+(t.flag.indexOf('f')>=0?'<span class="pill warn">금전 기록</span>':'')+(t.flag.indexOf('r')>=0?'<span class="pill warn">상담·종교</span>':'');
+      h+='<div class="task'+(st.on?' on':'')+'" data-id="'+t.id+'"><label class="tk"><input type="checkbox" data-f="on"'+(st.on?' checked':'')+'><span class="nm">'+esc(t.name)+fl+'</span></label>'+
+      '<div class="det"'+(st.on?'':' hidden')+'><label>횟수<select data-f="freq">'+fo+'</select></label><label>1회 소요(분)<input type="number" data-f="min" min="0" step="5" value="'+(+st.min||0)+'"></label><label>지금 방식<select data-f="method">'+mo+'</select></label><label>불편한 정도<select data-f="pain">'+po+'</select></label></div></div>';
+    });
+    h+='</section>';
+  });
+  var cu=S.custom.map(function(c){var st=S.tasks[c.id]||{on:true,freq:'monthly',min:60,method:'sheet',pain:2};
+    var fo=FREQ.map(function(f){return '<option value="'+f[0]+'"'+(st.freq===f[0]?' selected':'')+'>'+f[1]+'</option>';}).join('');
+    var mo=METHOD.map(function(m){return '<option value="'+m[0]+'"'+(st.method===m[0]?' selected':'')+'>'+m[1]+'</option>';}).join('');
+    var po=[[1,'가끔 불편'],[2,'꽤 불편'],[3,'매우 불편']].map(function(p){return '<option value="'+p[0]+'"'+(+st.pain===p[0]?' selected':'')+'>'+p[1]+'</option>';}).join('');
+    return '<div class="task on" data-id="'+c.id+'"><label class="tk"><input type="checkbox" data-f="on"'+(st.on?' checked':'')+'><span class="nm">'+esc(c.name)+'<span class="pill lev">직접 추가</span></span></label><div class="det"><label>횟수<select data-f="freq">'+fo+'</select></label><label>1회 소요(분)<input type="number" data-f="min" min="0" step="5" value="'+(+st.min||0)+'"></label><label>지금 방식<select data-f="method">'+mo+'</select></label><label>불편한 정도<select data-f="pain">'+po+'</select></label></div></div>';}).join('');
+  h+='<section class="group"><h3>직접 추가한 업무<small>'+S.custom.length+'개</small></h3>'+cu+'<div class="addrow" style="margin-top:10px"><input type="text" id="cu-name" placeholder="목록에 없는 반복 업무를 적어 주세요" autocomplete="off"><button type="button" class="btn sec" data-act="addcustom">추가</button></div></section>';
+  return h+navBtns();
+}
+var Q=[
+ {k:'q1',t:'앱을 입력·관리하는 담당자는 몇 명인가요',o:['1명','2~5명','6~20명','21명 이상']},
+ {k:'q2',t:'회원·고객이 직접 사용하나요',o:['없음(내부만)','신청·입력만','로그인해 본인 정보 조회']},
+ {k:'q3',t:'주로 어떤 기기로 쓰나요',o:['휴대폰 중심','PC 중심','둘 다']},
+ {k:'q4',t:'다루는 정보를 모두 골라 주세요',multi:true,o:[['name','이름·연락처'],['addr','주소'],['attend','출결·활동 기록'],['pay','회비·납부 내역'],['rel','상담·종교 관련 기록'],['health','건강정보'],['rrn','주민등록번호'],['bank','금융계좌']]},
+ {k:'q5',t:'기존 자료는 어떤 상태인가요',o:['없음','엑셀·시트 있음','종이·문서 있음(입력 필요)']},
+ {k:'q6',t:'알림이 필요한가요',o:['불필요','이메일','문자·카톡 발송']},
+ {k:'q7',t:'필요한 결과물을 모두 골라 주세요',multi:true,o:[['xls','엑셀 내보내기'],['pdf','PDF·인쇄 양식'],['rep','보고서 초안'],['chart','통계·현황표']]},
+ {k:'q8',t:'정해진 양식(보고서·서식)이 있나요',o:['없음','있음(제공 가능)','있음(변경 필요)']}
+];
+function step2(){
+  var h='<h2>앱을 만들기 전에 확인할 것</h2><p class="lead">답에 따라 견적과 계약 조건에서 주의할 점이 아래 진단 결과에 자동으로 붙습니다.</p><div class="panel">';
+  Q.forEach(function(q,qi){
+    h+='<div class="q"><h3>'+(qi+1)+'. '+q.t+'</h3><div class="opts">';
+    q.o.forEach(function(o){
+      var v=q.multi?o[0]:o,lab=q.multi?o[1]:o,ch=q.multi?(S.req[q.k]||[]).indexOf(v)>=0:S.req[q.k]===v;
+      h+='<label><input type="'+(q.multi?'checkbox':'radio')+'" name="'+q.k+'" data-q="'+q.k+'" value="'+esc(v)+'"'+(ch?' checked':'')+'>'+esc(lab)+'</label>';
+    });
+    h+='</div></div>';
+  });
+  h+='<label class="f">상담 메모<textarea id="note">'+esc(S.note)+'</textarea></label></div>';
+  return h+navBtns();
+}
+function step3(){
+  var c=calc(),p=plan(c),f=flags(),h='<h2>진단 결과</h2><p class="lead">체크한 업무를 시간·불편도·표준화 난이도로 점수화했습니다. 절감 시간은 가정 효과율로 계산한 추정이며 시범 사용 후 측정으로 확정합니다.</p>';
+  if(!c.rows.length)return h+'<div class="panel">2단계에서 반복 업무를 하나 이상 체크하면 결과가 표시됩니다.</div>'+navBtns();
+  h+='<div class="tiles"><div class="tile"><div class="v">'+fh(c.total)+'<span class="u"> 시간/월</span></div><div class="u">반복 업무 '+c.rows.length+'건 합계</div></div><div class="tile hl"><div class="v">'+fh(c.save)+'<span class="u"> 시간/월</span></div><div class="u">줄일 수 있는 시간(가정)</div></div><div class="tile"><div class="v">'+Math.min(c.rows.length,3)+'<span class="u"> 건</span></div><div class="u">먼저 손볼 업무</div></div></div>';
+  var mx=c.rows[0].score||1;
+  h+='<div class="panel"><div class="eyebrow">우선순위</div><div class="tblwrap"><table><thead><tr><th>순위</th><th>업무</th><th class="n">월 시간</th><th>점수</th><th>간소화</th><th>추천 앱</th></tr></thead><tbody>'+
+  c.rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(r.t.name)+'<div class="tip">'+esc(methodName(r.st.method))+' · '+['','가끔 불편','꽤 불편','매우 불편'][r.st.pain]+'</div></td><td class="n">'+fh(r.hours)+'</td><td><div class="bar"><i style="width:'+Math.round(r.score/mx*100)+'%"></i></div></td><td><span class="pill lev" style="margin:0">'+LEVER[r.t.lever]+'</span></td><td>'+APPS[r.t.app].name+'</td></tr>';}).join('')+'</tbody></table></div></div>';
+  h+='<div class="panel"><div class="eyebrow">업무별 간소화 제안</div>'+c.rows.slice(0,8).map(function(r){var mt=METHOD_TIP[r.st.method];return '<div style="margin-bottom:12px"><b>'+esc(r.t.name)+'</b><span class="pill lev">'+LEVER[r.t.lever]+'</span><p class="tip" style="color:var(--ink)">'+esc(r.t.tip)+'</p>'+(mt?'<p class="tip">'+esc(mt)+'</p>':'')+'</div>';}).join('')+'</div>';
+  h+='<div class="panel"><div class="eyebrow">추천 제작과 견적(시범가)</div><div class="cards">'+p.items.map(function(i){return '<div class="card"><div class="k">'+i.k+'</div><div class="pr">'+i.name+'</div><div class="pr" style="font-size:15px;color:var(--accent-text)">'+won(i.price)+'</div><p>'+esc(i.desc)+'</p></div>';}).join('')+'</div>'+(p.items.length>1?'<p class="tip">모두 제작하면 합계 '+won(p.sum)+'. 단계별로 나누어 진행할 수 있습니다. 부가세와 외부 서비스 이용료는 별도입니다.</p>':'<p class="tip">부가세와 외부 서비스 이용료는 별도입니다.</p>')+'</div>';
+  h+='<div class="panel"><div class="eyebrow">오더 확장 제안</div><div class="cards">'+p.expand.map(function(e){return '<div class="card"><div class="k">'+e.k+'</div><div class="pr" style="font-size:16px">'+e.price+'</div><p>'+esc(e.desc)+'</p></div>';}).join('')+'</div></div>';
+  if(f.length)h+='<div class="panel"><div class="eyebrow">주의와 범위 메모</div>'+f.map(function(x){return '<div class="note '+x.lv+'"><b>'+(x.lv==='danger'?'제외 검토':x.lv==='warn'?'주의':'확인')+'</b><span>'+esc(x.tx)+'</span></div>';}).join('')+'</div>';
+  var sens=c.rows.filter(function(r){return r.t.flag;});
+  if(sens.length)h+='<div class="note warn"><b>개인정보</b><span>개인정보·금전·상담 기록이 포함된 업무가 '+sens.length+'건 있습니다. 최소 수집, 접근 권한, 보관·삭제 절차를 설계한 뒤 제작하세요.</span></div>';
+  return h+navBtns();
+}
+function step4(){
+  var t=reportText();
+  return '<h2>제안서 초안</h2><p class="lead">진단 결과를 고객에게 보낼 글로 정리했습니다. 복사해서 메신저나 문서에 붙여 넣고 가격과 일정은 확정 후 고치세요.</p><div class="panel"><pre class="rep" id="rep" tabindex="0">'+esc(t)+'</pre><div class="row"><button type="button" class="btn acc" data-act="copy">제안서 복사</button><button type="button" class="btn sec" data-act="save">상담 저장</button></div></div>'+navBtns();
+}
+function render(){
+  renderRail();renderSum();
+  var f=[step0,step1,step2,step3,step4][S.step];
+  view.innerHTML=f();
+  window.scrollTo(0,0);
+}
+
+/* ---------- 이벤트 ---------- */
+rail.addEventListener('click',function(e){var b=e.target.closest('button[data-step]');if(!b)return;S.step=+b.dataset.step;saveDraft();render();});
+view.addEventListener('click',function(e){
+  var g=e.target.closest('[data-go]');if(g){S.step=Math.max(0,Math.min(4,S.step+(+g.dataset.go)));saveDraft();render();return;}
+  var a=e.target.closest('[data-act]');
+  if(a){
+    var k=a.dataset.act;
+    if(k==='new'){S=blank();saveDraft();render();toast('새 상담을 시작했습니다');}
+    else if(k==='sample'){S=sampleState();saveDraft();render();toast('예시를 불러왔습니다');}
+    else if(k==='save'){var l=getSaved();var id='s'+Date.now();var copy=JSON.parse(JSON.stringify(S));copy.example=S.example;l.unshift({id:id,name:S.org.name,date:S.org.date,state:copy});if(putSaved(l)){toast('이 기기에 저장했습니다');if(S.step===0)render();}else toast('저장할 수 없는 환경입니다');}
+    else if(k==='addcustom'){var inp=document.getElementById('cu-name');var v=inp.value.trim();if(!v)return;var id2='c'+Date.now();S.custom.push({id:id2,name:v});S.tasks[id2]={on:true,freq:'monthly',min:60,method:'sheet',pain:2};saveDraft();render();}
+    else if(k==='copy'){var txt=reportText();
+      var done=function(){toast('복사했습니다');};
+      var fallback=function(){var r=document.getElementById('rep');if(r){var rg=document.createRange();rg.selectNodeContents(r);var sl=window.getSelection();sl.removeAllRanges();sl.addRange(rg);}toast('글을 선택했습니다. 복사(Ctrl+C)해 주세요');};
+      try{navigator.clipboard.writeText(txt).then(done,fallback);}catch(err){fallback();}}
+    return;
+  }
+  var ld=e.target.closest('[data-load]');if(ld){var it=getSaved().filter(function(s){return s.id===ld.dataset.load;})[0];if(it){S=it.state;S.step=0;saveDraft();render();toast('불러왔습니다');}return;}
+  var dl=e.target.closest('[data-del]');if(dl){putSaved(getSaved().filter(function(s){return s.id!==dl.dataset.del;}));render();}
+});
+function onField(e){
+  var el=e.target,task=el.closest('.task');
+  if(task&&el.dataset.f){
+    var id=task.dataset.id,st=S.tasks[id]||(S.tasks[id]={on:false,freq:'monthly',min:60,method:'sheet',pain:2});
+    var f=el.dataset.f;
+    if(f==='on'){st.on=el.checked;task.classList.toggle('on',st.on);var d=task.querySelector('.det');if(d)d.hidden=!st.on;}
+    else if(f==='min')st.min=+el.value||0;
+    else if(f==='pain')st.pain=+el.value;
+    else st[f]=el.value;
+    S.example=false;saveDraft();renderSum();return;
+  }
+  if(el.dataset.q){
+    var k=el.dataset.q,q=Q.filter(function(x){return x.k===k;})[0];
+    if(q.multi){var arr=[].slice.call(view.querySelectorAll('input[data-q="'+k+'"]:checked')).map(function(i){return i.value;});S.req[k]=arr;}
+    else S.req[k]=el.value;
+    S.example=false;saveDraft();renderSum();return;
+  }
+  var m={'o-name':'name','o-type':'type','o-people':'people','o-date':'date','o-owner':'owner'};
+  if(m[el.id]){S.org[m[el.id]]=el.value;if(el.id==='o-name'||el.id==='o-type')S.example=false;saveDraft();renderSum();return;}
+  if(el.id==='note'){S.note=el.value;saveDraft();}
+}
+view.addEventListener('input',function(e){if(e.target.type==='text'||e.target.type==='number'||e.target.tagName==='TEXTAREA')onField(e);});
+view.addEventListener('change',onField);
+
+S=load();render();
+})();
+</script>
+
+</body></html>
