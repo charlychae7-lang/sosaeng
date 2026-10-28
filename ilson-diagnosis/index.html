@@ -135,11 +135,11 @@ var METHOD=[['paper','종이·수기'],['sheet','엑셀·시트'],['chat','카�
 var PAIN={1:1,2:1.5,3:2};
 var LEVER={cut:'없애기',merge:'합치기',std:'표준화',auto:'자동화'};
 var APPS={
-  apply:{name:'신청·예약 관리 앱',price:99000,desc:'신청서 입력·저장, 신청자 목록·상태, 내보내기'},
-  member:{name:'회원·출석 관리 앱',price:199000,desc:'명단, 출석·활동 기록, 기간별 현황·통계'},
-  report:{name:'자료 정리·보고서 자동화',price:299000,desc:'정해진 항목 입력, 자동 집계, 보고서 초안·요약'},
-  auto:{name:'업무 자동화 앱(알림·연결)',price:399000,desc:'복수 기능 연결, 알림, 결과 집계'},
-  content:{name:'홍보 콘텐츠(카드뉴스 세트부터)',price:49000,desc:'카드뉴스·상세페이지·숏폼 영상'}
+  apply:{name:'신청·예약 관리 앱',desc:'신청서 입력·저장, 신청자 목록·상태, 내보내기'},
+  member:{name:'회원·출석 관리 앱',desc:'명단, 출석·활동 기록, 기간별 현황·통계'},
+  report:{name:'자료 정리·보고서 자동화',desc:'정해진 항목 입력, 자동 집계, 보고서 초안·요약'},
+  auto:{name:'업무 자동화 앱(알림·연결)',desc:'복수 기능 연결, 알림, 결과 집계'},
+  content:{name:'홍보 콘텐츠(카드뉴스 세트부터)',desc:'카드뉴스·상세페이지·숏폼 영상'}
 };
 var GROUPS={recv:'접수·신청',member:'명단·회원',attend:'출석·참여',comm:'공지·소통',money:'회비·회계',event:'행사·일정',record:'기록·보고',doc:'문서·자료',church:'교회·종교단체 전용',shop:'소상공인 전용'};
 var TYPES=[['shop','소상공인·1인 사업자'],['coop','협동조합·사회적경제'],['np','비영리·마을공동체'],['edu','교육기관·강사'],['church','교회·종교단체'],['etc','기타']];
@@ -255,17 +255,15 @@ function plan(c){
   var q2login=S.req.q2==='로그인해 본인 정보 조회';
   if(apps.length){
     var first=apps[0], a=APPS[q2login?'auto':first.app];
-    out.items.push({k:'1순위 · 첫 제작',name:a.name,price:a.price,desc:'우선순위 상위 업무 '+first.n+'건, 월 '+fh(first.hours)+'시간 규모에 해당합니다. '+a.desc+'.'});
-    apps.slice(1,3).forEach(function(g,i){var b=APPS[g.app];out.items.push({k:(i+2)+'순위 · 연결 확장',name:b.name,price:b.price,desc:'관련 업무 '+g.n+'건, 월 '+fh(g.hours)+'시간. 첫 앱 사용 후 효과를 보고 이어서 제작합니다.'});});
+    out.items.push({k:'1순위 · 첫 제작',name:a.name,desc:'우선순위 상위 업무 '+first.n+'건, 월 '+fh(first.hours)+'시간 규모에 해당합니다. '+a.desc+'.'});
+    apps.slice(1,3).forEach(function(g,i){var b=APPS[g.app];out.items.push({k:(i+2)+'순위 · 연결 확장',name:b.name,desc:'관련 업무 '+g.n+'건, 월 '+fh(g.hours)+'시간. 첫 앱 사용 후 효과를 보고 이어서 제작합니다.'});});
   }
   var hasComm=c.rows.some(function(r){return r.t.g==='comm'||r.t.app==='content';});
-  out.expand.push({k:'홍보 콘텐츠',price:'49,000원~',desc:hasComm?'공지·홍보 업무가 확인됐습니다. 카드뉴스 세트나 상세페이지로 모집·안내 자료를 함께 제작합니다.':'앱을 만든 뒤 알리는 자료가 필요하면 카드뉴스, 상세페이지, 숏폼 영상을 추가합니다.'});
-  if(apps.length)out.expand.push({k:'유지관리',price:'월 1만~5만원',desc:'오류 점검, 소규모 수정, 사용 안내를 합의한 범위에서 제공합니다. 무제한 수정과 24시간 대응은 포함하지 않습니다.'});
+  out.expand.push({k:'홍보 콘텐츠',price:'상담 시 안내',desc:hasComm?'공지·홍보 업무가 확인됐습니다. 카드뉴스 세트나 상세페이지로 모집·안내 자료를 함께 제작합니다.':'앱을 만든 뒤 알리는 자료가 필요하면 카드뉴스, 상세페이지, 숏폼 영상을 추가합니다.'});
+  if(apps.length)out.expand.push({k:'유지관리',price:'상담 시 안내',desc:'오류 점검, 소규모 수정, 사용 안내를 합의한 범위에서 제공합니다. 무제한 수정과 24시간 대응은 포함하지 않습니다.'});
   var big=S.req.q1==='6~20명'||S.req.q1==='21명 이상';
-  if(big||apps.length>1)out.expand.push({k:'활용 교육·업무 진단',price:'별도 견적',desc:'담당자가 여럿이거나 앱이 둘 이상이면 사용법 교육과 정기 업무 점검을 묶어 제안합니다.'});
-  out.expand.push({k:'반복 업무 정기 점검',price:'분기 1회 제안',desc:'3개월 뒤 같은 도구로 다시 점검해 줄어든 시간과 새로 생긴 반복 업무를 확인합니다.'});
-  var sum=0;out.items.forEach(function(i){sum+=i.price;});
-  out.sum=sum;
+  if(big||apps.length>1)out.expand.push({k:'활용 교육·업무 진단',price:'상담 시 안내',desc:'담당자가 여럿이거나 앱이 둘 이상이면 사용법 교육과 정기 업무 점검을 묶어 제안합니다.'});
+  out.expand.push({k:'반복 업무 정기 점검',price:'상담 시 안내',desc:'3개월 뒤 같은 도구로 다시 점검해 줄어든 시간과 새로 생긴 반복 업무를 확인합니다.'});
   return out;
 }
 function reportText(){
@@ -281,19 +279,19 @@ function reportText(){
   L.push('2. 우선순위 업무');
   c.rows.slice(0,6).forEach(function(r,i){L.push((i+1)+') '+r.t.name+' — 월 '+fh(r.hours)+'시간 · 현재 '+methodName(r.st.method)+' · 간소화: '+LEVER[r.t.lever]);L.push('   제안: '+r.t.tip);});
   L.push('');
-  L.push('3. 추천 제작(시범가 기준, 부가세·외부 서비스 이용료 별도)');
-  p.items.forEach(function(i){L.push('- '+i.k+': '+i.name+' '+won(i.price)+' / '+i.desc);});
-  if(p.items.length>1)L.push('- 위 항목을 모두 제작할 경우 합계 '+won(p.sum)+' (단계별로 나누어 진행 가능)');
+  L.push('3. 추천 제작(금액은 상담 시 안내)');
+  p.items.forEach(function(i){L.push('- '+i.k+': '+i.name+' / '+i.desc);});
+  if(p.items.length>1)L.push('- 위 항목은 단계별로 나누어 진행할 수 있습니다.');
   L.push('');
   L.push('4. 확장 제안');
-  p.expand.forEach(function(e){L.push('- '+e.k+' ('+e.price+'): '+e.desc);});
+  p.expand.forEach(function(e){L.push('- '+e.k+': '+e.desc);});
   if(f.length){L.push('');L.push('5. 요구사항 점검에서 확인된 주의·범위');f.forEach(function(x){L.push('- '+x.tx);});}
   L.push('');
   L.push('6. 공통 계약 조건');
   L.push('- 포함 기능과 수정 횟수(1회)를 계약서에 명시합니다.');
   L.push('- 앱·데이터·계정은 고객이 소유하고, 종료 시 데이터 이전을 지원합니다.');
   L.push('- 개인정보는 최소 수집하고 접근 권한·보관·삭제 절차를 점검한 뒤 납품합니다.');
-  L.push('- 가격은 초기 시범가이며 제작시간 측정 후 조정될 수 있고, 매출·참여 증가는 보장하지 않습니다.');
+  L.push('- 금액은 상담 시 안내하며, 매출·참여 증가는 보장하지 않습니다.');
   if(S.note){L.push('');L.push('상담 메모: '+S.note);}
   return L.join('\n');
 }
@@ -378,8 +376,8 @@ function step3(){
   h+='<div class="panel"><div class="eyebrow">우선순위</div><div class="tblwrap"><table><thead><tr><th>순위</th><th>업무</th><th class="n">월 시간</th><th>점수</th><th>간소화</th><th>추천 앱</th></tr></thead><tbody>'+
   c.rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(r.t.name)+'<div class="tip">'+esc(methodName(r.st.method))+' · '+['','가끔 불편','꽤 불편','매우 불편'][r.st.pain]+'</div></td><td class="n">'+fh(r.hours)+'</td><td><div class="bar"><i style="width:'+Math.round(r.score/mx*100)+'%"></i></div></td><td><span class="pill lev" style="margin:0">'+LEVER[r.t.lever]+'</span></td><td>'+APPS[r.t.app].name+'</td></tr>';}).join('')+'</tbody></table></div></div>';
   h+='<div class="panel"><div class="eyebrow">업무별 간소화 제안</div>'+c.rows.slice(0,8).map(function(r){var mt=METHOD_TIP[r.st.method];return '<div style="margin-bottom:12px"><b>'+esc(r.t.name)+'</b><span class="pill lev">'+LEVER[r.t.lever]+'</span><p class="tip" style="color:var(--ink)">'+esc(r.t.tip)+'</p>'+(mt?'<p class="tip">'+esc(mt)+'</p>':'')+'</div>';}).join('')+'</div>';
-  h+='<div class="panel"><div class="eyebrow">추천 제작과 견적(시범가)</div><div class="cards">'+p.items.map(function(i){return '<div class="card"><div class="k">'+i.k+'</div><div class="pr">'+i.name+'</div><div class="pr" style="font-size:15px;color:var(--accent-text)">'+won(i.price)+'</div><p>'+esc(i.desc)+'</p></div>';}).join('')+'</div>'+(p.items.length>1?'<p class="tip">모두 제작하면 합계 '+won(p.sum)+'. 단계별로 나누어 진행할 수 있습니다. 부가세와 외부 서비스 이용료는 별도입니다.</p>':'<p class="tip">부가세와 외부 서비스 이용료는 별도입니다.</p>')+'</div>';
-  h+='<div class="panel"><div class="eyebrow">오더 확장 제안</div><div class="cards">'+p.expand.map(function(e){return '<div class="card"><div class="k">'+e.k+'</div><div class="pr" style="font-size:16px">'+e.price+'</div><p>'+esc(e.desc)+'</p></div>';}).join('')+'</div></div>';
+  h+='<div class="panel"><div class="eyebrow">추천 제작</div><div class="cards">'+p.items.map(function(i){return '<div class="card"><div class="k">'+i.k+'</div><div class="pr">'+i.name+'</div><div class="pr" style="font-size:15px;color:var(--accent-text)">상담 시 안내</div><p>'+esc(i.desc)+'</p></div>';}).join('')+'</div>'+(p.items.length>1?'<p class="tip">금액은 상담 시 안내해 드립니다. 단계별로 나누어 진행할 수 있습니다.</p>':'<p class="tip">금액은 상담 시 안내해 드립니다.</p>')+'</div>';
+  h+='<div class="panel"><div class="eyebrow">함께 할 수 있는 일</div><div class="cards">'+p.expand.map(function(e){return '<div class="card"><div class="k">'+e.k+'</div><div class="pr" style="font-size:16px">'+e.price+'</div><p>'+esc(e.desc)+'</p></div>';}).join('')+'</div></div>';
   if(f.length)h+='<div class="panel"><div class="eyebrow">주의와 범위 메모</div>'+f.map(function(x){return '<div class="note '+x.lv+'"><b>'+(x.lv==='danger'?'제외 검토':x.lv==='warn'?'주의':'확인')+'</b><span>'+esc(x.tx)+'</span></div>';}).join('')+'</div>';
   var sens=c.rows.filter(function(r){return r.t.flag;});
   if(sens.length)h+='<div class="note warn"><b>개인정보</b><span>개인정보·금전·상담 기록이 포함된 업무가 '+sens.length+'건 있습니다. 최소 수집, 접근 권한, 보관·삭제 절차를 설계한 뒤 제작하세요.</span></div>';
