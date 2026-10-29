@@ -398,6 +398,28 @@ footer{background:var(--ink);color:var(--muted-on-ink);padding:clamp(3rem,6vw,5r
 .plan-grid.three{grid-template-columns:repeat(3,1fr)}
 @media (max-width:980px){.plan-grid.three,.plan-grid{grid-template-columns:repeat(2,1fr)}.addon-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.plan-grid,.plan-grid.three,.addon-grid{grid-template-columns:1fr}}
+/* ---------- Video hub ---------- */
+.vcrit{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1.5rem}
+.vcrit>div{border:2px solid var(--ink);background:var(--white);padding:1.2rem 1.3rem;border-radius:var(--r,0)}
+.vcrit h4{font-weight:900;margin-bottom:.4rem}.vcrit p{font-size:.9rem;color:var(--muted);line-height:1.6}
+.vfilters{display:flex;flex-direction:column;gap:.7rem;margin-top:2rem}
+.vfilters .filter{margin:0}
+.vfilters .lab{font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem}
+.vcard{display:flex;flex-direction:column;border:2px solid var(--ink);background:var(--white);border-radius:var(--r,0);overflow:hidden;transition:transform .2s}
+.vcard:hover{transform:translateY(-4px)}
+.vthumb{position:relative;aspect-ratio:16/9;background:var(--ink) center/cover no-repeat;display:grid;place-items:center}
+.vthumb::after{content:'▶';width:3rem;height:3rem;display:grid;place-items:center;border-radius:50%;background:var(--lime);color:var(--ink);font-size:1rem;padding-left:.2rem}
+.vbody{padding:1rem 1.1rem 1.2rem;display:flex;flex-direction:column;gap:.5rem}
+.vbody h4{font-size:1.05rem;font-weight:900;line-height:1.35}
+.vbody p{font-size:.88rem;color:var(--muted);line-height:1.55}
+.vchips{display:flex;gap:.4rem;flex-wrap:wrap}
+.vchips span{font-family:var(--mono);font-size:.68rem;font-weight:700;padding:.2rem .5rem;background:var(--ink);color:var(--lime)}
+.vchips span.k{background:var(--lime);color:var(--ink)}
+.vempty{grid-column:1/-1;border:2px dashed var(--ink);padding:2.5rem 1.5rem;text-align:center;color:var(--muted);border-radius:var(--r,0)}
+.vrel{margin-top:1.4rem}
+@media (max-width:900px){.vgrid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.vgrid,.vcrit{grid-template-columns:1fr}}
 
 /* ===== Variant B: Cobalt / Sun — soft, rounded, bento ===== */
 :root{--cobalt:#1F6F55;--cobalt-d:#175A45;--sun:#E3C77B;--r:26px;--shadow:0 22px 44px -22px rgba(31,111,85,.45);--line-soft:rgba(19,33,29,.12)}
@@ -588,6 +610,7 @@ footer{padding-top:3rem}
         <li><a href="#economy" class="nav-item" data-page="economy">지역순환경제</a></li>
         <li><a href="#help" class="nav-item" data-page="help">일손덜기</a></li>
         <li><a href="#books" class="nav-item" data-page="books">출간도서</a></li>
+        <li><a href="#videos" class="nav-item" data-page="videos">영상</a></li>
         <li><a href="#join" class="nav-item" data-page="join">함께하기</a></li>
       </ul>
     </nav>
@@ -886,6 +909,7 @@ footer{padding-top:3rem}
       <div class="hero-actions" style="margin-top:2rem">
         <button class="btn btn-lime" data-scroll="help-apps">만든 앱 보기 <span class="arr">↓</span></button>
         <button class="btn btn-ghost" data-scroll="help-plan">사업계획 보기 <span class="arr">↓</span></button>
+        <button class="btn btn-ghost" data-goto="videos" data-vtopic="apps">관련 영상 <span class="arr">→</span></button>
         <button class="btn btn-ghost" data-goto="join" data-type="help" data-msg="[일손덜기 앱 지원사업] 지원사업에 대해 문의드립니다.">지원 문의하기</button>
       </div>
     </div>
@@ -1082,12 +1106,39 @@ footer{padding-top:3rem}
       <div class="eyebrow">// Publications</div>
       <h2>출간도서</h2>
       <p class="lead">소생커뮤니티가 펴낸 책들을 소개합니다. 표지를 누르면 책 소개를 볼 수 있어요.</p>
+      <div class="vrel"><button class="btn btn-ghost" data-goto="videos" data-vtopic="book">관련 영상 보기 <span class="arr">→</span></button></div>
     </div>
   </div>
   <div class="section">
     <div class="wrap">
       <div class="shelf" id="shelf"></div>
       <p class="note">* 본 페이지는 책 소개 목적으로만 제공되며, 구매·주문 기능은 제공하지 않습니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VIDEOS ================= -->
+<section id="videos" class="page">
+  <div class="phero">
+    <div class="ghost" aria-hidden="true">映</div>
+    <div class="wrap">
+      <div class="eyebrow">// Videos</div>
+      <h2>영상</h2>
+      <p class="lead">소생커뮤니티의 홍보영상, 앱 시연, 강의, 소식 영상을 한곳에 모았습니다. 주제와 형식으로 골라 보세요.</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow reveal">// How we sort</div>
+      <h2 class="h-lg reveal">영상은 이렇게 나눕니다.</h2>
+      <p class="lead reveal">모든 영상에 <b>주제</b>(무엇에 관한 영상인가)와 <b>형식</b>(어떤 종류의 영상인가) 두 가지 이름표를 붙입니다. 주제는 사이트의 메뉴와 같아서, 각 페이지에서 관련 영상으로 바로 이어집니다.</p>
+      <div class="vcrit"><div class="reveal"><h4>《연결할 용기》</h4><p>책 소개, 저자 이야기, 북토크, 독서 활동 영상</p></div><div class="reveal"><h4>교육·사고</h4><p>‘잠깐! 진짜?’, 메타인지·시니어 교육, 강의와 수업 장면</p></div><div class="reveal"><h4>일손덜기·앱</h4><p>작은 앱 시연, 사용법 안내, 도입 사례</p></div><div class="reveal"><h4>지역순환경제</h4><p>협력구매, 공구 대여, 지역 사업 소개</p></div><div class="reveal"><h4>조합 소식</h4><p>설립 준비, 행사, 공지와 활동 기록</p></div><div class="reveal"><h4>형식</h4><p><b>홍보</b> 소개·티저 · <b>시연</b> 앱 사용 장면 · <b>강의</b> 교육·수업 · <b>소식</b> 행사·활동 기록</p></div></div>
+      <div class="vfilters">
+        <div><div class="lab">주제</div><div class="filter" role="group" aria-label="주제 필터" id="vf-topic"></div></div>
+        <div><div class="lab">형식</div><div class="filter" role="group" aria-label="형식 필터" id="vf-kind"></div></div>
+      </div>
+      <div class="vgrid" id="vgrid"></div>
+      <p class="note">영상은 유튜브에서 재생됩니다. 새 영상은 올라오는 대로 이곳에 추가합니다.</p>
     </div>
   </div>
 </section>
@@ -1407,6 +1458,33 @@ footer{padding-top:3rem}
     });
   });
   $$('[data-scroll]').forEach(function(b){ b.addEventListener('click',function(){ var t=document.getElementById(b.dataset.scroll); if(t) t.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'}); }); });
+  /* ---------- Videos ---------- */
+  /* 새 영상은 아래 목록에 한 줄씩 추가합니다. yt = 유튜브 영상 ID 또는 전체 주소
+     topic: book | edu | apps | local | coop   kind: promo | demo | lecture | news */
+  var VIDEOS=[];
+  var VT={all:'전체',book:'《연결할 용기》',edu:'교육·사고',apps:'일손덜기·앱',local:'지역순환경제',coop:'조합 소식'};
+  var VK={all:'전체',promo:'홍보',demo:'시연',lecture:'강의',news:'소식'};
+  var vState={topic:'all',kind:'all'};
+  function ytId(s){ var m=String(s).match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/); return m?m[1]:s; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]}); }
+  function renderVideos(){
+    var g=$('#vgrid'); if(!g) return;
+    $$('#vf-topic .fbtn').forEach(function(b){b.classList.toggle('active',b.dataset.v===vState.topic)});
+    $$('#vf-kind .fbtn').forEach(function(b){b.classList.toggle('active',b.dataset.v===vState.kind)});
+    var list=VIDEOS.filter(function(v){return (vState.topic==='all'||v.topic===vState.topic)&&(vState.kind==='all'||v.kind===vState.kind)});
+    if(!list.length){ g.innerHTML='<div class="vempty">'+(VIDEOS.length?'이 분류에는 아직 올라온 영상이 없습니다.':'영상을 준비하고 있습니다. 곧 이곳에 올라옵니다.')+'</div>'; return; }
+    g.innerHTML=list.map(function(v){
+      var id=ytId(v.yt);
+      return '<a class="vcard" href="https://www.youtube.com/watch?v='+esc(id)+'" target="_blank" rel="noopener"><div class="vthumb" style="background-image:url(https://i.ytimg.com/vi/'+esc(id)+'/hqdefault.jpg)"></div><div class="vbody"><div class="vchips"><span>'+esc(VT[v.topic]||'')+'</span><span class="k">'+esc(VK[v.kind]||'')+'</span></div><h4>'+esc(v.title)+'</h4>'+(v.desc?'<p>'+esc(v.desc)+'</p>':'')+'</div></a>';
+    }).join('');
+  }
+  function vButtons(sel,map,key){
+    var box=$(sel); if(!box) return;
+    box.innerHTML=Object.keys(map).map(function(k){return '<button class="fbtn" data-v="'+k+'">'+map[k]+'</button>'}).join('');
+    box.addEventListener('click',function(e){ var b=e.target.closest('.fbtn'); if(!b) return; vState[key]=b.dataset.v; renderVideos(); });
+  }
+  vButtons('#vf-topic',VT,'topic'); vButtons('#vf-kind',VK,'kind'); renderVideos();
+  $$('[data-vtopic]').forEach(function(el){ el.addEventListener('click',function(){ vState.topic=el.dataset.vtopic; vState.kind='all'; renderVideos(); }); });
   /* ---------- Init ---------- */
   showPage((location.hash||'#home').slice(1),false);
 })();
