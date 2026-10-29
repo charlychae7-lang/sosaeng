@@ -258,11 +258,11 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-si
   <header class="top">
     <div class="brand">
       <p class="eyebrow">사회연대경제 창립·운영 내비게이터</p>
-      <h1>같이<em>세움</em></h1>
+      <div style="display:flex;align-items:center;gap:14px"><img src="icon-192.png" alt="같이세움 앱 아이콘" width="60" height="60" style="border-radius:15px;box-shadow:0 3px 10px rgba(0,0,0,.2);flex:none"><h1>같이<em>세움</em></h1></div>
       <p class="sub">함께 세우고, 오래 가는 조직 — 창립 D-day부터 매년의 운영까지</p>
       <p>협동조합 · 사회적협동조합 · 사회적기업 · 마을기업 · 자활기업</p>
     </div>
-    <div class="hd-tools"><button type="button" class="btn ghost" id="local-tab" aria-haspopup="dialog">민원편람</button><a class="btn" id="guide-link" href="guide.html" style="text-decoration:none">사용 안내</a><button class="btn ghost" type="button" id="share-link">링크 복사해서 공유하기</button><div class="stamp">2026.10 기준</div></div>
+    <div class="hd-tools"><button type="button" class="btn ghost" id="local-tab" aria-haspopup="dialog">민원편람</button><a class="btn" id="guide-link" href="guide.html" style="text-decoration:none">사용 안내</a><button class="btn" type="button" id="install-app">앱으로 설치하기</button><button class="btn ghost" type="button" id="share-link">링크 복사해서 공유하기</button><div class="stamp">2026.10 기준</div></div>
   </header>
 
   <nav class="types" id="types" aria-label="조직 유형 선택"></nav>
@@ -1554,6 +1554,14 @@ document.getElementById("local-close").onclick=closeLocal;
 document.getElementById("local-ovl").addEventListener("click",e=>{if(e.target.id==="local-ovl")closeLocal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("local-ovl").hidden)closeLocal()});
 renderTypes();renderNav();renderMain();
+let dip=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e});
+$("#install-app").onclick=()=>{if(matchMedia("(display-mode: standalone)").matches||navigator.standalone){toast("이미 앱으로 열려 있습니다");return}
+ if(dip){dip.prompt();dip.userChoice.finally(()=>{dip=null});return}
+ const ua=navigator.userAgent;let m;
+ if(/iPhone|iPad|iPod/.test(ua))m="아래쪽 공유 버튼(□↑)을 누르고 '홈 화면에 추가'를 고르세요";
+ else if(/Android/.test(ua))m="오른쪽 위 ⋮ 메뉴에서 '홈 화면에 추가' 또는 '앱 설치'를 고르세요";
+ else m="주소창 오른쪽 끝의 설치 아이콘을 누르거나, 브라우저 메뉴에서 '앱 설치'를 고르세요";
+ toast(m);setTimeout(()=>toast(m),50)};
 $("#share-link").onclick=()=>{const u=location.origin+location.pathname;const done=()=>toast("주소가 복사되었습니다. 카톡·문자에 붙여 넣으세요");
  if(navigator.share){navigator.share({title:document.title,url:u}).catch(()=>{});return}
  try{navigator.clipboard.writeText(u).then(done,()=>prompt("이 주소를 복사하세요",u))}catch(e){prompt("이 주소를 복사하세요",u)}};
