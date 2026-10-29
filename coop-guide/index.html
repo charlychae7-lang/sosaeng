@@ -1554,6 +1554,7 @@ document.getElementById("local-close").onclick=closeLocal;
 document.getElementById("local-ovl").addEventListener("click",e=>{if(e.target.id==="local-ovl")closeLocal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("local-ovl").hidden)closeLocal()});
 renderTypes();renderNav();renderMain();
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 let dip=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e});
 $("#install-app").onclick=()=>{if(matchMedia("(display-mode: standalone)").matches||navigator.standalone){toast("이미 앱으로 열려 있습니다");return}
  if(dip){dip.prompt();dip.userChoice.finally(()=>{dip=null});return}
