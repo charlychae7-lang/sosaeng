@@ -37,6 +37,8 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
 a{color:var(--forest)}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
 header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:8px 18px;border-bottom:2px solid var(--ink)}
+.brand{flex:1 1 440px;min-width:0}
+.hd-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:440px;margin-left:auto;align-self:flex-start}
 .brand h1{font-family:var(--f-display);font-weight:900;font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.04em;margin:0;text-wrap:balance}
 .brand h1 em{font-style:normal;color:var(--seal)}
 .brand .sub{font-size:clamp(16px,2.2vw,20px);font-weight:700;color:var(--ink);margin:6px 0 0;letter-spacing:-.02em}
@@ -229,6 +231,11 @@ ul.clean{margin:0;padding-left:20px} ul.clean li{margin:3px 0}
 .spon-slot img{max-width:100%;max-height:100%;object-fit:contain}
 .spon-slot b{display:block;color:var(--ink);font-size:14px}
 
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(16px,5vh) 16px;overflow:auto}
+.ovl[hidden]{display:none}
+.ovl-box{background:var(--paper);border-radius:12px;max-width:720px;width:100%;padding:14px;position:relative}
+.ovl-x{display:block;margin:0 0 8px auto}
+.ovl .local{margin-top:0}
 /* ── 지자체 민원편람 바로가기 ── */
 .local{margin-top:18px;border-left:4px solid var(--forest)}
 .local h3{margin:0 0 4px}
@@ -251,7 +258,7 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-si
       <p class="sub">함께 세우고, 오래 가는 조직 — 창립 D-day부터 매년의 운영까지</p>
       <p>협동조합 · 사회적협동조합 · 사회적기업 · 마을기업 · 자활기업</p>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><a class="btn" id="guide-link" href="guide.html" style="text-decoration:none">사용 안내</a><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn ghost" type="button" id="share-link">링크 복사해서 공유하기</button><div class="stamp">2026.10 기준</div></div></div>
+    <div class="hd-tools"><button type="button" class="btn ghost" id="local-tab" aria-haspopup="dialog">민원편람</button><a class="btn" id="guide-link" href="guide.html" style="text-decoration:none">사용 안내</a><button class="btn ghost" type="button" id="share-link">링크 복사해서 공유하기</button><div class="stamp">2026.10 기준</div></div>
   </header>
 
   <nav class="types" id="types" aria-label="조직 유형 선택"></nav>
@@ -289,6 +296,7 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-si
     이 매뉴얼은 2026년 10월 12일까지 확인된 법령·공고를 바탕으로 만든 실무 안내서입니다. 법률 자문이 아니며, 실제 제출 전에는 국가법령정보센터의 현행 조문, 관할 기관(시·도, 소관 부처, 시·군·구)의 최신 서식과 연도별 시행지침을 반드시 확인하세요.
   </footer>
 </div>
+<div class="ovl" id="local-ovl" hidden role="dialog" aria-modal="true" aria-label="관할 지자체 민원편람"><div class="ovl-box"><button type="button" class="btn ghost ovl-x" id="local-close" aria-label="닫기">닫기 ✕</button><div id="local-host"></div></div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -448,13 +456,12 @@ function renderMain(){
  const fn={plan:secPlan,compare:secCompare,prep:secPrep,road:secRoad,calc:secCalc,equity:secEquity,charter:secCharter,docsgen:secDocs,submit:secSubmit,first:secFirst,ops:secOps,lib:secLib,year:secYear,meet:secMeet,change:secChange,risk:secRisk,policy:secPolicy}[state.sec];
  const idx=SECTIONS.findIndex(s=>s[0]===state.sec);const phase=SECTIONS[idx][2];
  const prev=SECTIONS[idx-1],next=SECTIONS[idx+1];
- $("#main").innerHTML=`${state.sec==="plan"?"":alertBar()}<div class="phase ${phase}">${PHASE[phase]}${phase==="lib"||phase==="home"?"":" · "+TYPES[state.type].name}</div><section class="pane">${fn()}${["submit","change","lib"].includes(state.sec)?localCard():""}</section>
+ $("#main").innerHTML=`${state.sec==="plan"?"":alertBar()}<div class="phase ${phase}">${PHASE[phase]}${phase==="lib"||phase==="home"?"":" · "+TYPES[state.type].name}</div><section class="pane">${fn()}</section>
  <div class="pager">${prev?`<button class="btn ghost" type="button" data-go="${prev[0]}">← ${prev[1]}</button>`:"<span></span>"}${next?`<button class="btn ghost" type="button" data-go="${next[0]}">${next[1]} →</button>`:""}</div>`;
  const eb=$("#main .pane .eyebrow");if(eb)eb.textContent=`${String(idx+1).padStart(2,"0")} · ${SECTIONS[idx][1]}`;
  $("#main").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{state.sec=b.dataset.go;save();renderNav();renderMain();window.scrollTo({top:0})});
  const after={plan:bindPlan,prep:bindChecks,road:bindRoad,calc:bindCalc,equity:bindEquity,docsgen:bindDocs,submit:bindSubmit,first:bindChecks,meet:bindMeet,year:bindChecks,lib:bindLib}[state.sec];
  if(after)after();
- bindLocal();
 }
 
 /* 01 비교 */
@@ -1535,6 +1542,13 @@ function renderSponsors(){const g=document.getElementById("spon-grid");if(!g)ret
  const real=SPONSORS.map(x=>`<a class="spon-slot on" href="${esc(x.url||"#")}" target="_blank" rel="noopener" title="${esc(x.name)}">${x.logo?`<img src="${esc(x.logo)}" alt="${esc(x.name)}">`:`<b>${esc(x.name)}</b>`}</a>`);
  const empty=Array.from({length:Math.max(0,SPONSOR_SLOTS-SPONSORS.length)},()=>`<div class="spon-slot"><span><b>후원 기관 자리</b>함께해 주실 곳을 찾습니다</span></div>`);
  g.innerHTML=real.concat(empty).join("")}
+
+function openLocal(){document.getElementById("local-host").innerHTML=localCard();bindLocal();document.getElementById("local-ovl").hidden=false;document.getElementById("local-close").focus()}
+function closeLocal(){document.getElementById("local-ovl").hidden=true;const t=document.getElementById("local-tab");if(t)t.focus()}
+document.getElementById("local-tab").onclick=openLocal;
+document.getElementById("local-close").onclick=closeLocal;
+document.getElementById("local-ovl").addEventListener("click",e=>{if(e.target.id==="local-ovl")closeLocal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("local-ovl").hidden)closeLocal()});
 renderTypes();renderNav();renderMain();
 $("#share-link").onclick=()=>{const u=location.origin+location.pathname;const done=()=>toast("주소가 복사되었습니다. 카톡·문자에 붙여 넣으세요");
  if(navigator.share){navigator.share({title:document.title,url:u}).catch(()=>{});return}
