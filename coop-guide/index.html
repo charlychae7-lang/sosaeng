@@ -229,6 +229,10 @@ ul.clean{margin:0;padding-left:20px} ul.clean li{margin:3px 0}
 .edu-list b{font-size:15.5px}
 .edu-list span{font-size:14px;color:var(--ink-2);line-height:1.55}
 .partner .btn{text-decoration:none;display:inline-block}
+.maju-card{border:1px solid var(--line);border-top:4px solid var(--forest);border-radius:8px;padding:14px 16px;background:var(--paper);display:flex;flex-direction:column;gap:6px}
+.maju-k{margin:0;font-size:12.5px;font-weight:800;color:var(--forest)}
+.maju-t{margin:0;font-size:clamp(20px,2.4vw,24px);font-weight:900;letter-spacing:-.04em;line-height:1.3}
+.maju-t em{font-style:normal;color:var(--seal)}
 .spon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
 .spon-slot{aspect-ratio:16/9;max-width:100%;border:1.5px dashed var(--line);border-radius:8px;display:grid;place-items:center;text-align:center;font-size:13px;color:var(--ink-2);padding:8px;background:var(--paper);text-decoration:none}
 .spon-slot.on{border-style:solid;background:#fff}
@@ -290,7 +294,12 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-si
     </div>
     <div class="spon">
       <p class="eyebrow">함께하는 후원 기관</p>
-      <p class="spon-d">같이세움은 후원 기관의 도움으로 누구나 무료로 쓸 수 있게 운영됩니다.</p>
+      <div class="maju-card">
+        <p class="maju-k">광명시 사회연대경제혁신센터 마주(MAJU)</p>
+        <h3 class="maju-t">사회연대경제와 <em>마주</em>하다</h3>
+        <p class="spon-d">카페·스토어·교육·소통 공간에서 사회연대경제기업의 제품과 이야기를 만나는 곳. 2026년 9월 30일 문을 열었습니다.</p>
+        <div class="btnrow"><a class="btn" href="https://charlychae7-lang.github.io/sosaeng/coop-guide/maju.html" target="_blank" rel="noopener">마주센터 소개 보기</a></div>
+      </div>
       <div class="spon-grid" id="spon-grid"></div>
       <p class="small"><a href="https://charlychae7-lang.github.io/sosaeng/coop-guide/guide.html#sponsor" target="_blank" rel="noopener">후원 방식·원칙 보기</a> · 후원·제휴 문의는 <a href="https://sosaengcom.imweb.me" target="_blank" rel="noopener">소생커뮤니티 홈페이지</a>로 해 주세요. 후원 기관은 같이세움의 내용과 안내에 관여하지 않습니다.</p>
     </div>
