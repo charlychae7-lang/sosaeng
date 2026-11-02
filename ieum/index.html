@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이음돌봄 — 마음·약·이웃을 잇는 지역 돌봄 앱</title>
+<meta name="description" content="마음을 살피고, 약을 챙기고, 이웃과 이어지는 우리 동네 돌봄 앱 (소생커뮤니티 협동조합 파일럿)">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2f6b4f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="이음돌봄">
+<style>
+:root{--bg:#fbf7ef;--card:#fff;--ink:#2b2a27;--sub:#6b665c;--main:#2f6b4f;--main2:#e3f0e8;--warm:#d9822b;--warm2:#fdf0df;--red:#b3392f;--red2:#fbe5e2;--line:#e4dccb;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:19px;line-height:1.55;padding-bottom:92px}
+header{background:var(--main);color:#fff;padding:14px 18px}
+header h1{margin:0;font-size:22px}
+header p{margin:2px 0 0;font-size:15px;opacity:.9}
+main{max-width:720px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 8px;font-size:21px}
+.card h3{margin:14px 0 6px;font-size:18px}
+.sub{color:var(--sub);font-size:16px}
+.small{font-size:14px;color:var(--sub)}
+button,.btn{font:inherit;border:0;border-radius:12px;padding:12px 16px;background:var(--main);color:#fff;cursor:pointer;min-height:48px}
+button.alt{background:var(--main2);color:var(--main)}
+button.warn{background:var(--warm)}
+button.danger{background:var(--red)}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+button.sm{padding:6px 12px;min-height:36px;font-size:16px}
+input,select,textarea{font:inherit;width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:4px 0}
+textarea{min-height:110px}
+label{display:block;margin:8px 0 2px;font-weight:bold}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:0 0 auto}
+.moods{display:flex;gap:6px}
+.moods button{flex:1;background:#fff;color:var(--ink);border:2px solid var(--line);font-size:30px;padding:8px 0;line-height:1.1}
+.moods button span{display:block;font-size:13px}
+.moods button.on{border-color:var(--main);background:var(--main2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);border-radius:999px;padding:6px 14px;background:#fff;cursor:pointer;font-size:17px}
+.chip.on{background:var(--main2);border-color:var(--main);color:var(--main);font-weight:bold}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:10}
+nav button{flex:1;background:#fff;color:var(--sub);border-radius:0;padding:8px 2px;font-size:14px;min-height:64px}
+nav button b{display:block;font-size:24px;font-weight:normal}
+nav button.on{color:var(--main);font-weight:bold;background:var(--main2)}
+.banner{border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.banner.warm{background:var(--warm2);border:1px solid #f0cfa0}
+.banner.red{background:var(--red2);border:1px solid #e9b5ae}
+.banner.green{background:var(--main2);border:1px solid #bcd9c8}
+.item{border-top:1px solid var(--line);padding:10px 0}
+.item:first-child{border-top:0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left}
+th{background:var(--main2)}
+.tag{display:inline-block;background:var(--main2);color:var(--main);border-radius:8px;padding:1px 8px;font-size:13px;margin:2px 3px 2px 0}
+.kpi{display:flex;gap:8px;flex-wrap:wrap}
+.kpi div{flex:1 1 130px;background:var(--main2);border-radius:12px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:26px;color:var(--main)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal>div{background:#fff;border-radius:18px;padding:20px;max-width:480px;width:100%;max-height:90vh;overflow:auto}
+pre{white-space:pre-wrap;background:#f6f1e4;border-radius:10px;padding:12px;font-size:15px;font-family:inherit}
+a{color:var(--main)}
+.big3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.big3 button{background:#fff;color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:14px 4px;font-size:18px;font-weight:bold;min-height:110px;position:relative}
+.big3 button b{display:block;font-size:38px;font-weight:normal;line-height:1.2}
+.big3 button.done{border-color:var(--main);background:var(--main2)}
+.badge{position:absolute;top:6px;right:8px;background:var(--red);color:#fff;border-radius:999px;font-size:13px;padding:1px 8px}
+.speak{background:var(--warm2);color:#8a4b0f;border:1px solid #f0cfa0;padding:4px 12px;min-height:36px;font-size:16px;border-radius:999px}
+.lv-high{border-left:6px solid var(--red)}.lv-mid{border-left:6px solid var(--warm)}.lv-low{border-left:6px solid #9bb8a6}
+.steps{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.steps button{padding:4px 10px;min-height:34px;font-size:15px;background:#fff;color:var(--sub);border:1px solid var(--line)}
+.steps button.on{background:var(--main);color:#fff;border-color:var(--main)}
+.stamp{display:inline-block;font-size:30px;margin:2px}
+nav button{font-size:13px}
+@media print{header,nav,button,.noprint{display:none!important}body{padding:0;font-size:14px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>이음돌봄</h1>
+  <p>마음을 살피고, 약을 챙기고, 이웃과 이어지는 우리 동네 돌봄 · 협동조합형 파일럿 v0.2</p>
+</header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<div id="modalRoot"></div>
+
+<script>
+"use strict";
+/* ===== 저장소 ===== */
+var KEY = "ieum_v1";
+var S;
+function defaults(){
+  return {name:"", meds:[], medLog:{}, moods:{}, health:[], journal:[], strengths:[], interests:[],
+    consent:{B:false,C:false}, contact:{name:"",phone:""}, staff:{name:"",phone:""}, family:[], signals:[], lastOpen:"", openDays:{}, thanks:{}, alerts:[], newsLocal:[], helpLog:[], joined:[], resources:[], notified:{}, created:today()};
+}
+function load(){
+  try{ var r=localStorage.getItem(KEY); S = r ? Object.assign(defaults(), JSON.parse(r)) : defaults(); }
+  catch(e){ S = defaults(); }
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
+function p2(n){ return (n<10?"0":"")+n; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function uid(){ return "x"+Math.random().toString(36).slice(2,9); }
+function daysAgo(n){ var d=new Date(); d.setDate(d.getDate()-n); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
+
+function toast(msg){ var b=document.createElement("div"); b.className="banner green"; b.style.cssText="position:fixed;top:10px;left:10px;right:10px;z-index:120;font-size:19px;box-shadow:0 4px 14px rgba(0,0,0,.15)"; b.textContent=msg; document.body.appendChild(b); setTimeout(function(){b.remove();},2800); }
+var _askFn=null;
+function ask(msg,fn){ _askFn=fn; modal('<h2>확인해 주세요</h2><p>'+esc(msg)+'</p><button class="danger" onclick="askYes()">네, 지울게요</button>'); }
+function askYes(){ closeModal(); window._ok=true; var f=_askFn; _askFn=null; if(f) f(); }
+/* ===== 고정 자료 (검수된 문구만 사용, AI 생성 없음) ===== */
+var MOODS=[{s:1,e:"😢",t:"많이 힘들어요"},{s:2,e:"😔",t:"조금 무거워요"},{s:3,e:"😐",t:"보통이에요"},{s:4,e:"🙂",t:"괜찮아요"},{s:5,e:"😊",t:"좋아요"}];
+var PROMPTS=[
+ "오늘 하루 중 가장 편안했던 순간은 언제였나요?",
+ "요즘 가장 자주 떠오르는 옛 기억이 있다면 하나만 들려주세요.",
+ "젊은 시절 가장 자신 있었던 일은 무엇이었나요?",
+ "누군가에게 가르쳐 줄 수 있는 나만의 요령이 있다면 무엇인가요?",
+ "오늘 고마웠던 사람이나 일이 있었나요?",
+ "살면서 가장 잘 해냈다고 느낀 일은 무엇인가요?",
+ "요즘 다시 해 보고 싶은 일이 있나요?",
+ "어릴 적 살던 동네에서 가장 기억나는 장소는 어디인가요?",
+ "내가 만든 음식 중 사람들이 좋아했던 것은 무엇인가요?",
+ "요즘 만나고 싶은 사람이 있다면 누구인가요?",
+ "우리 동네에서 가장 좋아하는 곳은 어디인가요?",
+ "힘든 때를 지나오며 나를 버티게 해 준 것은 무엇이었나요?",
+ "젊은 사람들에게 꼭 해 주고 싶은 말이 있다면요?",
+ "이번 주에 작은 일 한 가지를 한다면 무엇을 하고 싶으세요?"
+];
+var INTERESTS=["노래·음악","요리","텃밭·식물","글쓰기·이야기","손주·아이 돌봄","건강·운동","산책","컴퓨터·스마트폰","봉사","수리·손재주","공예·그림","종교·신앙"];
+var HIGH=["죽고 싶","죽고싶","살기 싫","살기싫","사라지고 싶","사라지고싶","자살","목숨을","극단적"];
+var MID=["외롭","쓸모없","쓸모 없","아무도","잠을 못","밥을 못","의욕이 없","살 이유"];
+var DEF_RES=[
+ {id:"r1",type:"모임",name:"우리 동네 경로당·마을 모임",tags:["노래·음악","산책","종교·신앙"],desc:"가까운 곳에서 매일 만날 수 있는 이웃 모임",contact:"(우리 동네 정보를 등록해 주세요)"},
+ {id:"r2",type:"프로그램",name:"복지관 취미·건강 프로그램",tags:["건강·운동","공예·그림","컴퓨터·스마트폰","노래·음악"],desc:"요가, 공예, 스마트폰 교실 등",contact:"(복지관 연락처 등록)"},
+ {id:"r3",type:"역할",name:"시니어클럽·노인일자리·경험 나눔 활동",tags:["봉사","수리·손재주","요리","손주·아이 돌봄","텃밭·식물"],desc:"내 경험을 다시 쓰는 일과 역할",contact:"(시니어클럽 연락처 등록)"},
+ {id:"r4",type:"역할",name:"세대 교류·이야기 나눔 활동",tags:["글쓰기·이야기","손주·아이 돌봄"],desc:"청소년·아이들과 경험을 나누는 자리",contact:"(운영 주체 등록)"},
+ {id:"r5",type:"마을",name:"마을 텃밭·공동 식사 모임",tags:["텃밭·식물","요리"],desc:"함께 가꾸고 함께 먹는 마을 공동체",contact:"(마을 공동체 등록)"},
+ {id:"r6",type:"상담",name:"정신건강복지센터·보건소 마음 상담",tags:[],desc:"마음이 무거울 때 전문가와 이야기하는 곳",contact:"보건소·정신건강복지센터 (지역번호+문의)"},
+ {id:"r7",type:"돌봄",name:"노인맞춤돌봄서비스 (생활지원사 방문·안부)",tags:[],desc:"주민센터·수행기관에서 상담 후 이용",contact:"주민센터(행정복지센터)에 문의"}
+];
+var HEALTH_APPS=[
+ {n:"The건강보험",o:"국민건강보험공단",w:"내 건강검진 결과·진료 이력 확인"},
+ {n:"치매체크",o:"중앙치매센터",w:"치매 선별 자가 확인과 가까운 치매안심센터 안내 (진단이 아닌 참고용)"},
+ {n:"Samsung Health",o:"삼성",w:"걸음 수·수면·혈압 기록 (삼성 휴대폰에 기본 설치된 경우가 많음)"},
+ {n:"Google Fit",o:"구글",w:"걸음 수·활동 기록 (안드로이드)"},
+ {n:"의약품안전나라(e약은요)",o:"식품의약품안전처",w:"약 이름으로 효능·복용법·주의사항 검색 (웹사이트)",url:"https://nedrug.mfds.go.kr"}
+];
+
+/* ===== 조합 담당자 수정 구역: 동네 소식·이웃의 지혜 (예시를 실제 내용으로 바꿔 주세요) ===== */
+var NEWS=[
+ {d:"매주 화요일",t:"[예시] 복지관 스마트폰 교실",x:"이음돌봄 쓰는 법도 알려 드려요. 실제 일정으로 바꿔 주세요."},
+ {d:"매주 금요일",t:"[예시] 경로당 노래 모임",x:"옛 노래를 함께 부르는 시간이에요."},
+ {d:"이번 달",t:"[예시] 마을 텃밭 함께 가꾸기",x:"상추·고추 모종을 함께 심어요."}
+];
+var WISDOM=[
+ {who:"이웃 어르신 A",t:"[예시] 김치는 배추 절일 때 소금을 두 번에 나눠 뿌리면 고르게 절여져요."},
+ {who:"이웃 어르신 B",t:"[예시] 화가 날 때는 바로 말하지 말고, 물 한 잔 마시고 말해요."},
+ {who:"이웃 어르신 C",t:"[예시] 아이들과 이야기할 때는 먼저 물어보고 끝까지 들어 줘요."}
+];
+var SONGS=["고향의 봄","섬집 아기","과수원 길","오빠 생각","찔레꽃","동백 아가씨","목포의 눈물","울고 넘는 박달재","소양강 처녀","비 내리는 고모령","나그네 설움","번지 없는 주막","흑산도 아가씨","아리랑"];
+var LV={high:{t:"높음",h:1,c:"red",msg:"즉시 확인"},mid:{t:"중간",h:24,c:"warm",msg:"24시간 안에 확인"},low:{t:"낮음",h:48,c:"green",msg:"48시간 안에 확인"}};
+
+/* ===== 말하기·듣기 ===== */
+function speak(text){
+  try{
+    if(!("speechSynthesis" in window)){ toast("이 휴대폰에서는 읽어 주기가 안 돼요."); return; }
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text); u.lang="ko-KR"; u.rate=0.85;
+    window.speechSynthesis.speak(u);
+  }catch(e){ toast("읽어 주기가 안 돼요."); }
+}
+var _sp=[];
+function spk(text){ var i=_sp.push(String(text))-1; return '<button class="speak" onclick="speak(_sp['+i+'])">🔊 읽어 주기</button>'; }
+function listen(targetId){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ voiceGuide(); return; }
+  try{
+    var r=new SR(); r.lang="ko-KR"; r.interimResults=false;
+    toast("말씀하세요. 듣고 있어요…");
+    r.onresult=function(e){ var t=e.results[0][0].transcript; var el=document.getElementById(targetId); if(el){ el.value=(el.value?el.value+" ":"")+t; window._draft=el.value; } };
+    r.onerror=function(){ voiceGuide(); };
+    r.start();
+  }catch(e){ voiceGuide(); }
+}
+function voiceGuide(){
+  modal('<h2>🎤 말로 쓰는 방법</h2><p>이 화면에서는 바로 듣기가 안 될 수 있어요. 대신 휴대폰 <b>글자판(키보드)의 마이크</b>를 쓰시면 돼요.</p><ol><li>글 쓰는 칸을 한 번 누르세요. 아래에 글자판이 올라와요.</li><li>글자판 위쪽이나 옆에 있는 <b>🎤 마이크 모양</b>을 누르세요.</li><li>천천히 말씀하시면 글자로 바뀌어요.</li><li>다 말씀하셨으면 마이크를 한 번 더 누르세요.</li></ol><p class="small">마이크가 안 보이면 가족이나 복지관 선생님께 “음성 입력 켜 주세요”라고 부탁하세요.</p>');
+}
+
+/* ===== 위험 신호 (알림일 뿐 판단이 아님 — 최종 확인은 담당자) ===== */
+function addSignal(level,type,text){
+  var t=today();
+  if(S.signals.some(function(x){return x.date===t && x.type===type;})) return;
+  var d=new Date();
+  S.signals.push({id:uid(),date:t,time:p2(d.getHours())+":"+p2(d.getMinutes()),level:level,type:type,text:text,sent:false});
+}
+function checkSignals(){
+  // 1) 오랜만에 앱을 여심 (기기 안에서는 돌아오셨을 때만 알 수 있음)
+  var t=today();
+  if(S.lastOpen && S.lastOpen<t){
+    var gap=Math.round((new Date(t)-new Date(S.lastOpen))/86400000);
+    if(gap>=3 && Object.keys(S.openDays).length>=3) addSignal("mid","noopen",gap+"일 동안 앱을 열지 않으셨다가 돌아오심");
+  }
+  S.lastOpen=t; S.openDays[t]=1;
+  // 2) 마음 저조 연속
+  if(lowStreak()>=3) addSignal("mid","lowmood","마음 날씨 ‘힘들어요’가 3일 이상 이어짐");
+  // 3) 약 체크 끊김 (어제·그제)
+  if(S.meds.length){
+    var miss=[1,2].every(function(i){ var d=daysAgo(i), log=S.medLog[d]||{}; return S.meds.some(function(m){ return m.created<=d && !log[m.id]; }); });
+    var old=S.meds.some(function(m){return m.created<=daysAgo(2);});
+    if(miss && old) addSignal("low","med","이틀 이상 약 체크가 비어 있음");
+  }
+  // 4) 외로움 표현 반복
+  var wk=daysAgo(7), n=S.journal.filter(function(j){return j.date>=wk && j.risk==="mid";}).length;
+  if(n>=3) addSignal("low","lonely","1주일에 외로움·무기력 표현이 "+n+"번 나옴");
+  save();
+}
+function openSignals(){ return S.signals.filter(function(x){return !x.sent;}); }
+function isIOS(){ return /iPhone|iPad|iPod/i.test(navigator.userAgent); }
+function smsHref(phone,body){ return "sms:"+String(phone).replace(/[^0-9+]/g,"")+(isIOS()?"&":"?")+"body="+encodeURIComponent(body); }
+function signalMsg(list){
+  var who=S.name||"(이름 미입력)";
+  return "[이음돌봄 알림] "+who+"\n"+list.map(function(x){return "· ["+LV[x.level].t+"] "+x.text+" ("+x.date+" "+x.time+")";}).join("\n")+"\n확인 부탁드립니다. (이음돌봄 앱에서 보냄)";
+}
+function signalPanel(){
+  var list=openSignals(); if(!list.length) return "";
+  var top=list.some(function(x){return x.level==="high";})?"high":(list.some(function(x){return x.level==="mid";})?"mid":"low");
+  var h='<div class="banner '+(top==="high"?"red":"warm")+'"><b>'+(top==="high"?"지금 도움이 필요해 보여요.":"요즘 마음 쓰이는 신호가 있어요.")+'</b><ul style="margin:6px 0;padding-left:20px">'+list.map(function(x){return '<li>'+esc(x.text)+'</li>';}).join("")+'</ul>';
+  h+='<div class="row">'+sendButtons(list)+'<button class="ghost sm" onclick="dismissSignals()">괜찮아요</button></div></div>';
+  return h;
+}
+function sendButtons(list){
+  var msg=signalMsg(list), h="";
+  window._sigmsg=msg;
+  if(S.staff.phone) h+='<a class="btn" style="text-decoration:none;display:inline-block" href="'+smsHref(S.staff.phone,msg)+'" onclick="markSent()">담당자에게 문자 보내기</a>';
+  else h+='<button class="warn" onclick="go(\'ieum\')">담당자 번호 등록하기</button>';
+  if(S.contact.phone) h+='<a class="btn" style="text-decoration:none;display:inline-block;background:var(--warm)" href="'+smsHref(S.contact.phone,msg)+'" onclick="markSent()">가족에게 문자 보내기</a>';
+  return h;
+}
+function markSent(){ setTimeout(function(){ S.signals.forEach(function(x){x.sent=true;}); save(); render(); toast("문자 창이 열리면 ‘보내기’를 눌러 주세요."); },800); }
+function dismissSignals(){ S.signals.forEach(function(x){ if(x.level!=="high") x.sent=true; }); save(); render(); }
+
+/* ===== 계산 ===== */
+function moodAvg(from){ var a=[]; for(var d in S.moods){ if(d>=from) a.push(S.moods[d].score); } return a.length? (a.reduce(function(x,y){return x+y;},0)/a.length):null; }
+function lowStreak(){ var c=0; for(var i=0;i<7;i++){ var m=S.moods[daysAgo(i)]; if(m && m.score<=2) c++; else if(i>0 || m) break; } return c; }
+function medAdherence(days){
+  var tot=0, ok=0;
+  for(var i=0;i<days;i++){
+    var d=daysAgo(i);
+    S.meds.forEach(function(m){ if(m.created<=d){ tot++; if(S.medLog[d] && S.medLog[d][m.id]) ok++; } });
+  }
+  return tot? Math.round(ok*100/tot):null;
+}
+function count(arr,from){ return arr.filter(function(x){return x.date>=from;}).length; }
+function riskLevel(text){
+  var t=String(text||"");
+  for(var i=0;i<HIGH.length;i++) if(t.indexOf(HIGH[i])>=0) return "high";
+  for(var j=0;j<MID.length;j++) if(t.indexOf(MID[j])>=0) return "mid";
+  return "low";
+}
+function allRes(){ return DEF_RES.concat(S.resources); }
+
+/* ===== 화면 ===== */
+var TAB="today";
+var TABS=[["today","🏠","오늘"],["news","📬","소식함"],["med","💊","약·건강"],["story","📖","이야기"],["near","🤝","이웃"],["ieum","🔗","이음"]];
+function renderNav(){
+  document.getElementById("nav").innerHTML = TABS.map(function(t){
+    return '<button class="'+(TAB===t[0]||(TAB==="staff"&&t[0]==="ieum")?"on":"")+'" onclick="go(\''+t[0]+'\')"><b>'+t[1]+'</b>'+t[2]+'</button>';
+  }).join("");
+}
+function go(t){ TAB=t; render(); window.scrollTo(0,0); }
+function render(){
+  _sp=[];
+  renderNav();
+  var f={today:vToday,news:vNews,med:vMed,story:vStory,near:vNear,ieum:vIeum,staff:vStaff}[TAB];
+  document.getElementById("app").innerHTML = f();
+  if(TAB==="story"){ var ta=document.getElementById("jtext"); if(ta && window._draft) ta.value=window._draft; }
+}
+function modal(html){ document.getElementById("modalRoot").innerHTML='<div class="modal"><div>'+html+'<div style="margin-top:14px"><button class="ghost" onclick="closeModal()">닫기</button></div></div></div>'; }
+function closeModal(){ document.getElementById("modalRoot").innerHTML=""; }
+
+/* --- 오늘 --- */
+function vToday(){
+  var t=today(), m=S.moods[t], log=S.medLog[t]||{};
+  var medDone=S.meds.length && S.meds.every(function(x){return log[x.id];});
+  var unread=newsUnread();
+  var hello=(S.name? esc(S.name)+"님, ":"")+"안녕하세요.";
+  var h='<div class="card" style="padding:12px 16px"><h2 style="margin:0">'+hello+'</h2><span class="sub">'+t+'</span> '+spk((S.name?S.name+"님, ":"")+"안녕하세요. 오늘도 반가워요.")+'</div>';
+  h+=signalPanel();
+  h+='<div class="big3">';
+  h+='<button class="'+(m?"done":"")+'" onclick="document.getElementById(\'moodcard\').scrollIntoView({behavior:\'smooth\'})"><b>'+(m?MOODS[m.score-1].e:"🌤")+'</b>마음 날씨'+(m?'<br><span class="small">기록함</span>':'')+'</button>';
+  h+='<button class="'+(medDone?"done":"")+'" onclick="document.getElementById(\'medcard\').scrollIntoView({behavior:\'smooth\'})"><b>💊</b>오늘 약'+(medDone?'<br><span class="small">다 먹음</span>':'')+'</button>';
+  h+='<button onclick="go(\'news\')"><b>📬</b>소식함'+(unread?'<span class="badge">'+unread+'</span>':'')+'</button>';
+  h+='</div>';
+  h+='<div class="card" id="moodcard"><h2>오늘 마음은 어떠세요?</h2><div class="moods">'+MOODS.map(function(x){return '<button class="'+(m&&m.score===x.s?"on":"")+'" onclick="setMood('+x.s+')">'+x.e+'<span>'+x.t+'</span></button>';}).join("")+'</div>';
+  if(m) h+='<p class="small">오늘 기록했어요. 마음은 매일 달라도 괜찮아요.</p>';
+  h+='</div>';
+  h+='<div class="card" id="medcard"><h2>💊 오늘 약</h2>';
+  h+= S.meds.length? medToday() : '<p class="sub">등록된 약이 없어요. <a href="#" onclick="go(\'med\');return false">약·건강</a>에서 등록할 수 있어요.</p>';
+  h+='</div>';
+  var q=PROMPTS[dayIndex()%PROMPTS.length], song=SONGS[dayIndex()%SONGS.length];
+  h+='<div class="card"><h2>📖 오늘의 한마디</h2><p style="font-size:21px">“'+q+'”</p><div class="row">'+spk(q)+'<button onclick="goStory()">말로·글로 남기기</button></div></div>';
+  h+='<div class="card"><h2>🎵 오늘의 노래</h2><p style="font-size:21px">「'+esc(song)+'」</p><p class="sub">이 노래를 들으면 어떤 기억이 떠오르세요?</p><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(song)+'" target="_blank" rel="noopener">유튜브에서 듣기</a></div>';
+  if(m && (medDone||!S.meds.length)) h+='<div class="banner green"><b>오늘 챙길 것은 다 하셨어요. 👏</b><br>이제 화면은 잠시 내려놓고, 이웃 한 분께 안부를 건네 보시면 어떨까요?</div>';
+  var sug=suggestions().slice(0,1);
+  if(sug.length){ var sg=sug[0]; h+='<div class="card"><h2>🤝 이웃 제안</h2><b>'+esc(sg.r.name)+'</b><p class="sub">'+esc(sg.reason)+'</p><button class="alt" onclick="go(\'near\')">자세히 보기</button></div>'; }
+  h+='<div class="card" style="background:var(--red2)"><b>급하게 도움이 필요하면</b><div class="row" style="margin-top:8px"><button class="danger" onclick="sos()">도움이 필요해요</button></div></div>';
+  h+='<p class="small" style="text-align:center"><a href="#" onclick="installGuide();return false">📲 휴대폰 첫 화면에 이음돌봄 아이콘 만들기</a></p>';
+  return h;
+}
+/* --- 소식함 --- */
+function familyToday(){ if(!S.family.length) return null; return S.family[dayIndex()%S.family.length]; }
+function allNews(){ return S.newsLocal.concat(NEWS); }
+function newsUnread(){ if(S.newsSeen===today()) return 0; return (familyToday()?1:0)+(allNews().length?1:0); }
+function vNews(){
+  S.newsSeen=today(); save();
+  var f=familyToday(), h='';
+  h+='<div class="card"><h2>💌 오늘의 가족 한마디</h2>';
+  if(f) h+='<p style="font-size:22px">“'+esc(f.t)+'”</p><p class="sub">— '+esc(f.who||"가족")+'</p><div class="row">'+spk(f.t)+(S.contact.phone?'<a class="btn" style="text-decoration:none;display:inline-block" href="'+smsHref(S.contact.phone,"잘 지내고 있어요. 오늘 보내 준 말 고마워요. 💌")+'">고맙다고 문자 보내기</a>':'')+'</div>';
+  else h+='<p class="sub">아직 가족이 남긴 말이 없어요. 가족이 오시면 <b>이음 → 가족이 남기는 말</b>에 응원 한마디를 적어 달라고 부탁해 보세요. 매일 한 마디씩 보여 드려요.</p>';
+  h+='</div>';
+  h+='<div class="card"><h2>📢 우리 동네 소식</h2>'+allNews().map(function(n){return '<div class="item"><span class="tag">'+esc(n.d)+'</span><b>'+esc(n.t)+'</b><br><span class="sub">'+esc(n.x)+'</span><div style="margin-top:4px">'+spk(n.t+". "+n.x)+'</div></div>';}).join("")+'<p class="small">소식은 협동조합·복지관 담당자가 올려요.</p></div>';
+  h+='<div class="card"><h2>🌿 이웃의 지혜 한 줄</h2>'+WISDOM.map(function(w,i){var k="w"+i, on=S.thanks[k];return '<div class="item">“'+esc(w.t)+'”<br><span class="small">— '+esc(w.who)+'</span><div class="row" style="margin-top:4px">'+spk(w.t)+'<button class="'+(on?"":"alt")+' sm" onclick="thank(\''+k+'\')">'+(on?"💚 고마워요 보냄":"🤍 고마워요")+'</button></div></div>';}).join("")+'<p class="small">내 지혜도 나누고 싶으시면 <b>이야기</b>에서 “내 강점으로 남기기”를 하신 뒤 조합에 알려 주세요. 동의하신 것만 소개해요.</p></div>';
+  return h;
+}
+function thank(k){ S.thanks[k]=!S.thanks[k]; save(); render(); if(S.thanks[k]) toast("고마운 마음을 남겼어요. 모임에서 직접 전해 보셔도 좋아요."); }
+function installGuide(){
+  modal('<h2>📲 첫 화면에 아이콘 만들기</h2><p class="sub">한 번만 해 두면 다음부터는 아이콘만 누르면 돼요.</p><h3>삼성·LG 등 안드로이드 (크롬)</h3><ol><li>이음돌봄 화면을 크롬으로 엽니다.</li><li>오른쪽 위 <b>⋮ (점 세 개)</b>를 누릅니다.</li><li><b>“홈 화면에 추가”</b>를 누릅니다.</li><li><b>“추가”</b>를 누르면 첫 화면에 아이콘이 생겨요.</li></ol><h3>아이폰 (사파리)</h3><ol><li>이음돌봄 화면을 사파리로 엽니다.</li><li>아래쪽 가운데 <b>공유 버튼(네모에 위쪽 화살표)</b>을 누릅니다.</li><li><b>“홈 화면에 추가”</b>를 누릅니다.</li><li>오른쪽 위 <b>“추가”</b>를 누릅니다.</li></ol><p class="small">카카오톡 안에서 열면 이 메뉴가 없어요. 카카오톡 화면 오른쪽 위 메뉴에서 “다른 브라우저로 열기”를 먼저 누르세요.</p>');
+}
+function dayIndex(){ return Math.floor(new Date().setHours(0,0,0,0)/86400000); }
+function setMood(s){ S.moods[today()]={score:s}; save(); render(); }
+function goStory(){ TAB="story"; render(); window.scrollTo(0,0); }
+function medToday(){
+  var t=today(), log=S.medLog[t]||{}, list=S.meds.slice().sort(function(a,b){return a.time<b.time?-1:1;});
+  return list.map(function(m){
+    return '<div class="item row"><label style="margin:0;display:flex;gap:10px;align-items:center;font-weight:normal;flex:1"><input type="checkbox" style="width:28px;height:28px;margin:0" '+(log[m.id]?"checked":"")+' onchange="toggleMed(\''+m.id+'\',this.checked)"><span><b>'+esc(m.time)+'</b> '+esc(m.name)+'</span></label></div>';
+  }).join("");
+}
+function toggleMed(id,v){ var t=today(); S.medLog[t]=S.medLog[t]||{}; if(v) S.medLog[t][id]=1; else delete S.medLog[t][id]; save(); }
+
+/* --- 약·건강 --- */
+function vMed(){
+  var h='<div class="card"><h2>💊 약 복용 알림</h2>';
+  h+='<p class="sub">약 이름과 시간을 등록하면 오늘 화면에서 “먹었어요”를 누를 수 있어요.</p>';
+  h+='<label>약 이름 (처방전·약봉지에 적힌 대로)</label><input id="mname" placeholder="예: 혈압약">';
+  h+='<label>먹는 시간</label><input id="mtime" type="time" value="08:00">';
+  h+='<div class="row" style="margin-top:8px"><button onclick="addMed()">약 등록하기</button></div>';
+  if(S.meds.length){
+    h+='<h3>등록된 약</h3>'+S.meds.slice().sort(function(a,b){return a.time<b.time?-1:1;}).map(function(m){
+      return '<div class="item row"><span style="flex:1"><b>'+esc(m.time)+'</b> '+esc(m.name)+'</span><button class="ghost sm" onclick="delMed(\''+m.id+'\')">삭제</button></div>';
+    }).join("");
+    h+='<h3>휴대폰 알람으로 받기 (닫혀 있어도 울려요)</h3><p class="sub">이 앱은 열려 있을 때만 알려 드릴 수 있어요. 아래 버튼을 누르면 <b>휴대폰 캘린더에 매일 반복 알림</b>이 등록돼요.</p>';
+    h+='<div class="row"><button class="warn" onclick="downloadIcs()">캘린더 알림 파일 받기</button><button class="alt" onclick="askNotify()">이 앱 알림 켜기</button></div>';
+    h+='<p class="small">파일을 받은 뒤 휴대폰에서 파일을 눌러 “캘린더에 추가”를 선택하세요. 모르시면 가족이나 복지관 선생님께 보여 주세요.</p>';
+    var a=medAdherence(30); if(a!=null) h+='<p>최근 30일 복용 체크: <b>'+a+'%</b></p>';
+  }
+  h+='<p class="small">※ 이 앱은 약을 처방하거나 복용량을 안내하지 않아요. 약에 대해서는 의사·약사와 상의하세요.</p></div>';
+  // 건강 수치
+  h+='<div class="card"><h2>❤️ 내 건강 기록</h2><p class="sub">재신 숫자를 적어 두면 병원에 갈 때 보여 드릴 수 있어요.</p>';
+  h+='<div class="row"><div style="flex:1 1 120px"><label>혈압(위)</label><input id="hsys" type="number" inputmode="numeric"></div><div style="flex:1 1 120px"><label>혈압(아래)</label><input id="hdia" type="number" inputmode="numeric"></div><div style="flex:1 1 120px"><label>혈당</label><input id="hglu" type="number" inputmode="numeric"></div><div style="flex:1 1 120px"><label>걸음 수</label><input id="hstep" type="number" inputmode="numeric"></div></div>';
+  h+='<button onclick="addHealth()" style="margin-top:8px">기록하기</button>';
+  var rec=S.health.slice(-5).reverse();
+  if(rec.length) h+='<h3>최근 기록</h3>'+rec.map(function(r){return '<div class="item sub">'+esc(r.date)+' · '+(r.sys?('혈압 '+esc(r.sys)+'/'+esc(r.dia)+' '):'')+(r.glu?('혈당 '+esc(r.glu)+' '):'')+(r.step?('걸음 '+esc(r.step)):'')+'</div>';}).join("");
+  h+='<p class="small">※ 이 앱은 수치를 해석하거나 진단하지 않아요. 평소와 많이 다르거나 불편하면 병원·119에 연락하세요.</p></div>';
+  // 무료 앱
+  h+='<div class="card"><h2>📱 무료로 쓸 수 있는 건강 앱</h2><p class="sub">새로 만들지 않고, 이미 있는 믿을 만한 도구를 소개해요. (앱 이름·기능은 바뀔 수 있어요. 설치 전에 확인하세요.)</p>';
+  h+=HEALTH_APPS.map(function(a){
+    var link=a.url? ('<a href="'+a.url+'" target="_blank" rel="noopener">웹사이트 열기</a>') : ('<a href="https://play.google.com/store/search?q='+encodeURIComponent(a.n)+'&c=apps" target="_blank" rel="noopener">앱 찾아보기</a>');
+    return '<div class="item"><b>'+esc(a.n)+'</b> <span class="small">('+esc(a.o)+')</span><br><span class="sub">'+esc(a.w)+'</span><br>'+link+'</div>';
+  }).join("");
+  h+='<p class="small">※ 어르신의 건강 정보는 매우 민감해요. 이 앱은 위 앱들의 데이터를 가져오지 않고, 본인이 직접 적은 기록만 이 기기에 보관해요.</p></div>';
+  return h;
+}
+function addMed(){
+  var n=document.getElementById("mname").value.trim(), t=document.getElementById("mtime").value;
+  if(!n||!t){ toast("약 이름과 시간을 모두 적어 주세요."); return; }
+  S.meds.push({id:uid(),name:n,time:t,created:today()}); save(); render();
+}
+function delMed(id){ if(!window._ok){ ask("이 약을 목록에서 지울까요?",function(){delMed(id);}); return; } window._ok=false; S.meds=S.meds.filter(function(m){return m.id!==id;}); save(); render(); }
+function addHealth(){
+  var r={date:today(),sys:v("hsys"),dia:v("hdia"),glu:v("hglu"),step:v("hstep")};
+  if(!r.sys&&!r.glu&&!r.step){ toast("적을 숫자를 하나 이상 넣어 주세요."); return; }
+  S.health.push(r); save(); render();
+}
+function v(id){ var e=document.getElementById(id); return e? e.value.trim():""; }
+function askNotify(){
+  if(!("Notification" in window)){ toast("이 브라우저는 알림을 지원하지 않아요. 캘린더 알림 파일을 이용해 주세요."); return; }
+  Notification.requestPermission().then(function(p){ toast(p==="granted"? "알림을 켰어요. 앱이 열려 있을 때 시간이 되면 알려 드려요.":"알림이 허용되지 않았어요."); });
+}
+function downloadIcs(){
+  var d=new Date(), ymd=d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate());
+  var L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ieum-dolbom//KO"];
+  S.meds.forEach(function(m){
+    var hm=m.time.replace(":","");
+    L.push("BEGIN:VEVENT","UID:"+m.id+"@ieum","DTSTAMP:"+ymd+"T000000Z","DTSTART:"+ymd+"T"+hm+"00","DURATION:PT10M","RRULE:FREQ=DAILY","SUMMARY:약 드실 시간: "+m.name.replace(/[,;\n]/g," "),"BEGIN:VALARM","TRIGGER:PT0S","ACTION:DISPLAY","DESCRIPTION:약 드실 시간이에요","END:VALARM","END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  dl("약알림.ics",L.join("\r\n"),"text/calendar");
+}
+var _dlns=null;
+if(window.claude && typeof window.claude.use==="function"){ window.claude.use("downloads").then(function(d){_dlns=d;},function(){}); }
+function dl(name,text,type){
+  if(_dlns){ _dlns.save({filename:name,data:text}).then(function(){toast("파일을 저장했어요.");},function(){toast("저장을 취소했거나 저장할 수 없었어요.");}); return; }
+  dlLocal(name,text,type);
+}
+function dlLocal(name,text,type){
+  var b=new Blob([text],{type:type+";charset=utf-8"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  window._dltext=text;
+  modal('<h2>파일 저장</h2><p>“'+esc(name)+'” 파일을 저장했어요.</p><p class="small">파일이 보이지 않으면 claude.ai 링크 화면에서 여신 경우일 수 있어요(그 화면은 파일 받기가 막혀 있어요). 휴대폰·PC에 받은 <b>ieum-dolbom-app.html 파일</b>로 열면 저장돼요. 아래 버튼으로 내용을 복사할 수도 있어요.</p><button class="alt" onclick="copyText(window._dltext)">내용 복사하기</button>');
+}
+function copyText(t){ try{ navigator.clipboard.writeText(t).then(function(){toast("복사했어요.");},function(){toast("복사가 안 돼요.");}); }catch(e){ toast("복사가 안 돼요."); } }
+/* 앱이 열려 있을 때 알림 */
+setInterval(function(){
+  var d=new Date(), hm=p2(d.getHours())+":"+p2(d.getMinutes()), t=today();
+  S.meds.forEach(function(m){
+    var k=t+m.id;
+    if(m.time===hm && !S.notified[k]){
+      S.notified[k]=1; save();
+      var msg="약 드실 시간이에요: "+m.name;
+      try{ if("Notification" in window && Notification.permission==="granted") new Notification("이음돌봄",{body:msg}); }catch(e){}
+      var b=document.createElement("div"); b.className="banner warm"; b.style.cssText="position:fixed;top:8px;left:8px;right:8px;z-index:99;font-size:20px";
+      b.innerHTML="💊 "+esc(msg)+' <button class="sm" onclick="this.parentNode.remove()">확인</button>'; document.body.appendChild(b);
+    }
+  });
+},20000);
+
+/* --- 내 이야기 --- */
+function vStory(){
+  var q=PROMPTS[dayIndex()%PROMPTS.length];
+  var h='<div class="card"><h2>📖 내 이야기 쓰기</h2><p style="font-size:20px">“'+q+'”</p>';
+  h+='<div class="row" style="margin-bottom:6px">'+spk(q)+'<button class="warn" onclick="listen(\'jtext\')">🎤 말로 쓰기</button><button class="ghost sm" onclick="voiceGuide()">말로 쓰는 방법</button></div>';
+  h+='<textarea id="jtext" placeholder="생각나는 대로 편하게 적거나, 🎤 말로 쓰기를 눌러 말씀해 보세요. 정답은 없어요." oninput="window._draft=this.value"></textarea>';
+  h+='<p class="small">쓴 글은 이 기기에만 저장돼요. 본인이 켜지 않으면 누구에게도 가지 않아요.</p>';
+  h+='<div class="row"><button onclick="saveJournal(false)">저장하기</button><button class="alt" onclick="saveJournal(true)">저장 + 내 강점으로 남기기</button></div></div>';
+  h+='<div class="card"><h2>✨ 나의 강점·경험 카드</h2>';
+  if(!S.strengths.length) h+='<p class="sub">이야기를 쓰고 “내 강점으로 남기기”를 누르면 여기에 쌓여요. 이 카드는 이웃·역할 제안의 근거가 돼요.</p>';
+  else h+=S.strengths.slice().reverse().map(function(s){return '<div class="item"><b>'+esc(s.title)+'</b><br><span class="small">'+esc(s.date)+'</span></div>';}).join("");
+  h+='</div>';
+  h+='<div class="card"><h2>🗂 경험 아카이브</h2><p class="sub">지금까지 쌓은 이야기 '+S.journal.length+'개</p>';
+  h+=S.journal.slice().reverse().slice(0,20).map(function(j){return '<div class="item"><span class="small">'+esc(j.date)+'</span><br><span class="small">'+esc(j.q)+'</span><br>'+esc(j.text)+' <button class="ghost sm" onclick="delJ(\''+j.id+'\')">지우기</button></div>';}).join("");
+  h+='</div>';
+  return h;
+}
+function saveJournal(asStrength){
+  var t=v("jtext"); if(!t){ toast("먼저 이야기를 적어 주세요."); return; }
+  var q=PROMPTS[dayIndex()%PROMPTS.length], r=riskLevel(t), id=uid();
+  S.journal.push({id:id,date:today(),q:q,text:t,risk:r});
+  if(asStrength){ var title=t.length>40? t.slice(0,40)+"…":t; S.strengths.push({id:uid(),date:today(),title:title}); }
+  save(); window._draft="";
+  if(r==="high"){ addSignal("high","word","이야기에 위험한 표현이 나옴 (내용은 보내지 않음)"); save(); render(); sos(true); return; }
+  checkSignals();
+  if(r==="mid"){ render(); modal('<h2>마음이 무거우신 것 같아요</h2><p>적어 주셔서 고마워요. 혼자 견디지 않으셔도 돼요. 이야기 나눌 사람이나 곳을 보여 드릴까요?</p><button class="warn" onclick="closeModal();go(\'near\')">이야기 나눌 곳 보기</button>'); return; }
+  render(); toast("저장했어요.");
+}
+function delJ(id){ if(!window._ok){ ask("이 글을 지울까요?",function(){delJ(id);}); return; } window._ok=false; S.journal=S.journal.filter(function(j){return j.id!==id;}); save(); render(); }
+
+/* --- 이웃·도움 --- */
+function suggestions(){
+  var picks=S.interests.concat(); S.strengths.forEach(function(s){ INTERESTS.forEach(function(i){ var key=i.split("·")[0]; if(s.title.indexOf(key)>=0 && picks.indexOf(i)<0) picks.push(i); }); });
+  var out=[];
+  allRes().forEach(function(r){
+    var hit=r.tags.filter(function(t){return picks.indexOf(t)>=0;});
+    if(hit.length) out.push({r:r,reason:"“"+hit[0]+"”에 관심이 있다고 하셔서 소개해 드려요."});
+  });
+  return out;
+}
+function vNear(){
+  var h='<div class="card"><h2>🤝 관심 있는 것 고르기</h2><p class="sub">고르신 것만 근거로 이웃·모임을 소개해요. 언제든 바꿀 수 있어요.</p><div class="chips">'+INTERESTS.map(function(i,k){return '<span class="chip '+(S.interests.indexOf(i)>=0?"on":"")+'" onclick="togInt('+k+')">'+esc(i)+'</span>';}).join("")+'</div></div>';
+  var sg=suggestions();
+  h+='<div class="card"><h2>이런 곳은 어떠세요?</h2>';
+  if(!sg.length) h+='<p class="sub">위에서 관심 있는 것을 고르시면 소개해 드려요. 기본으로 보시려면 아래 전체 목록을 보세요.</p>';
+  h+=sg.map(function(s){return resCard(s.r,s.reason);}).join("");
+  h+='<p class="small">※ 기본으로 제안되는 것은 이웃과 만나는 활동이에요. 혼자 하는 활동을 원하시면 그렇게 하셔도 괜찮아요.</p></div>';
+  var st=S.joined.length;
+  h+='<div class="card"><h2>🏅 나의 참여 도장</h2><p class="sub">이웃 활동에 참여할 때마다 도장이 하나씩 찍혀요. (앱을 쓴 시간이 아니라 <b>사람을 만난 횟수</b>예요)</p><div>'+(st?new Array(Math.min(st,30)+1).join('<span class="stamp">🌸</span>'):'<span class="sub">아직 도장이 없어요. 아래 모임에 “참여했어요”를 눌러 보세요.</span>')+'</div>'+(st?'<p><b>'+st+'개</b> 모았어요.</p>':'')+'<p class="small">앞으로 조합 포인트·지역 상품권과 연결하는 방안을 지자체와 협의할 예정이에요(아직 준비 중).</p></div>';
+  h+='<div class="card"><h2>🙋 또래 디지털 도우미</h2><p class="sub">이 앱 쓰는 법을 옆에서 알려 주는 <b>또래 어르신 도우미</b>가 있어요. 어려우면 언제든 부탁하세요.</p>'+(S.staff.phone?'<a class="btn" style="text-decoration:none;display:inline-block" href="'+smsHref(S.staff.phone,"[이음돌봄] 앱 쓰는 법을 알려 줄 도우미를 연결해 주세요.")+'">도우미 연결 부탁하기</a> ':'')+(S.staff.phone?'<a class="btn" style="text-decoration:none;display:inline-block;background:var(--warm)" href="'+smsHref(S.staff.phone,"[이음돌봄] 저도 다른 어르신을 돕는 디지털 도우미를 해 보고 싶어요.")+'">나도 도우미 해 보기</a>':'<p class="small">조합 담당자 번호를 <b>이음</b> 탭에 등록하면 바로 문자로 부탁할 수 있어요.</p>')+'<p class="small">도우미 활동은 노인일자리·경험 나눔 활동과 연결될 수 있어요.</p></div>';
+  h+='<div class="card"><h2>📍 우리 동네 전체 목록</h2>'+allRes().map(function(r){return resCard(r,"");}).join("")+'</div>';
+  h+='<div class="card"><h2>📞 이야기 나눌 곳·급한 도움</h2><div class="item"><b>119</b> 응급 상황</div><div class="item"><b>109</b> 자살예방 상담전화 (24시간)</div><div class="item"><b>129</b> 보건복지상담센터 (복지 서비스 문의)</div>'+(S.staff.phone?'<div class="item"><b>담당자</b> '+esc(S.staff.name)+' '+esc(S.staff.phone)+'</div>':'')+'<div class="item">주민센터(행정복지센터) · 보건소 · 정신건강복지센터</div><p class="small">전화번호는 변경될 수 있으니 조합 담당자가 지역 정보를 확인해 등록해 주세요.</p></div>';
+  return h;
+}
+function resCard(r,reason){
+  var joined=S.joined.some(function(j){return j.id===r.id;});
+  return '<div class="item"><span class="tag">'+esc(r.type)+'</span><b>'+esc(r.name)+'</b><br><span class="sub">'+esc(r.desc)+'</span>'+(reason?'<br><span style="color:var(--main)">'+esc(reason)+'</span>':'')+'<br><span class="small">문의: '+esc(r.contact)+'</span><div class="row" style="margin-top:6px">'+(joined?'<span class="tag">참여 기록됨</span>':'<button class="alt sm" onclick="joinRes(\''+r.id+'\')">참여했어요 / 가 볼게요</button>')+'</div></div>';
+}
+function togInt(k){ var i=INTERESTS[k], p=S.interests.indexOf(i); if(p>=0) S.interests.splice(p,1); else S.interests.push(i); save(); render(); }
+function joinRes(id){ S.joined.push({id:id,date:today()}); save(); render(); }
+
+/* --- 도움 요청 --- */
+function sos(fromJournal){
+  if(!fromJournal){ addSignal("high","help","본인이 ‘도움이 필요해요’를 누름"); save(); }
+  var list=openSignals(), c=S.contact, st=S.staff;
+  var h='<h2>도움이 필요하시군요</h2><p>말씀해 주셔서 고마워요. 지금 혼자가 아니에요.</p>';
+  h+='<div class="banner red"><b>지금 위험하다고 느끼시면 바로 전화하세요</b><br>119 (응급) · 109 (자살예방 상담, 24시간)</div>';
+  h+='<p><b>담당자·가족에게 알리기</b><br><span class="small">버튼을 누르면 보낼 문자가 미리 써진 채로 열려요. ‘보내기’만 누르시면 돼요. 이야기 내용은 보내지 않아요.</span></p>';
+  h+='<div class="row">'+sendButtons(list.length?list:[{level:"high",text:"본인이 도움을 요청함",date:today(),time:""}])+'</div>';
+  if(st.phone) h+='<p class="small">담당자 번호: '+esc(st.name)+' '+esc(st.phone)+'</p>';
+  if(c.phone) h+='<p class="small">가족 번호: '+esc(c.name)+' '+esc(c.phone)+'</p>';
+  h+='<p class="small">문자 창이 안 열리면 위 번호로 직접 전화하거나 문자를 보내 주세요. 이 알림은 담당자 근무시간에 확인돼요. 급하면 119·109로 연락하세요.</p>';
+  modal(h);
+}
+function logHelp(level){ S.helpLog.push({date:today(),level:level,note:"본인 도움 요청"}); save(); closeModal(); toast("기록을 남겼어요. 담당자가 확인하는 대로 연락드려요."); render(); }
+
+/* --- 이음·조합 --- */
+function vIeum(){
+  var h='<div class="card"><h2>🔒 내 정보 공유 설정</h2><p class="sub">내 정보는 내가 정해요. 기본은 “아무에게도 공유 안 함”이에요.</p>';
+  h+='<label>이름(부르는 이름)</label><input id="uname" value="'+esc(S.name)+'" onchange="S.name=this.value;save()">';
+  h+='<label>내가 정한 연락처 (이름 / 전화번호)</label><div class="row"><input style="flex:1 1 120px" placeholder="이름" value="'+esc(S.contact.name)+'" onchange="S.contact.name=this.value;save()"><input style="flex:1 1 160px" placeholder="전화번호" value="'+esc(S.contact.phone)+'" onchange="S.contact.phone=this.value;save()"></div>';
+  h+='<label>담당자(복지사·조합) 연락처 (이름 / 전화번호) — 위험 신호 문자를 받는 분</label><div class="row"><input style="flex:1 1 120px" placeholder="예: 이음센터 김복지" value="'+esc(S.staff.name)+'" onchange="S.staff.name=this.value;save()"><input style="flex:1 1 160px" placeholder="전화번호" value="'+esc(S.staff.phone)+'" onchange="S.staff.phone=this.value;save()"></div>';
+  h+='<div class="item"><b>A 등급 · 내 글·대화 원문</b><br><span class="sub">항상 본인만 봐요. 공유하는 기능이 없어요.</span></div>';
+  h+='<div class="item"><label style="display:flex;gap:10px;align-items:center;font-weight:normal"><input type="checkbox" style="width:28px;height:28px;margin:0" '+(S.consent.B?"checked":"")+' onchange="S.consent.B=this.checked;save();render()"><span><b>B 등급 · 월간 요약 공유</b>: 마음 평균, 복약 체크율, 참여 횟수 같은 숫자 요약만 담당자에게</span></label></div>';
+  h+='<div class="item"><label style="display:flex;gap:10px;align-items:center;font-weight:normal"><input type="checkbox" style="width:28px;height:28px;margin:0" '+(S.consent.C?"checked":"")+' onchange="S.consent.C=this.checked;save();render()"><span><b>C 등급 · 위기 시 인계</b>: “도움이 필요해요”를 눌렀을 때 담당자가 확인할 수 있게</span></label></div>';
+  h+='<p class="small">※ 실제 서비스에서는 개인정보 동의서(민감정보 별도 동의)와 법률 검토를 거쳐야 해요. 지금은 파일럿용 화면이에요.</p></div>';
+
+  h+='<div class="card"><h2>💌 가족이 남기는 말</h2><p class="sub">가족이 방문했을 때 응원 한마디를 여러 개 적어 두면, <b>소식함</b>에 매일 하나씩 보여 드려요.</p><label>보내는 사람</label><input id="fwho" placeholder="예: 큰딸 지은"><label>남길 말</label><input id="ftext" placeholder="예: 엄마, 오늘도 산책 꼭 하세요. 사랑해요."><button onclick="addFamily()" style="margin-top:8px">남기기</button>'+(S.family.length?'<h3>남긴 말 '+S.family.length+'개</h3>'+S.family.map(function(f){return '<div class="item row"><span style="flex:1">“'+esc(f.t)+'” <span class="small">— '+esc(f.who)+'</span></span><button class="ghost sm" onclick="delFamily(\''+f.id+'\')">삭제</button></div>';}).join(""):"")+'</div>';
+  h+='<div class="card"><h2>🖥 담당자 화면 (가칭 통합돌봄센터)</h2><p class="sub">어르신 문자로 들어온 위험 신호를 접수하고, 확인 → 연락 → 연계 → 종결까지 기록하는 화면이에요. 조합·센터 담당자가 쓰세요.</p><button onclick="go(\'staff\')">담당자 화면 열기</button></div>';
+  h+='<div class="card"><h2>📋 월간 이음노트 만들기</h2><p class="sub">담당자(생활지원사·복지사)가 방문 전에 1분 안에 읽는 한 장 요약이에요. B 등급 동의가 켜져 있을 때만 만들 수 있어요. 글 내용은 들어가지 않아요.</p><button '+(S.consent.B?'':'disabled style="opacity:.5"')+' onclick="makeNote()">이번 달 이음노트 만들기</button></div>';
+
+  var from=daysAgo(30), ma=moodAvg(from), ad=medAdherence(30);
+  h+='<div class="card"><h2>📊 내 30일 현황</h2><div class="kpi"><div><b>'+Object.keys(S.moods).filter(function(d){return d>=from;}).length+'일</b>마음 체크</div><div><b>'+(ma==null?"-":ma.toFixed(1))+'</b>마음온도 평균(5점)</div><div><b>'+(ad==null?"-":ad+"%")+'</b>복약 체크율</div><div><b>'+count(S.joined,from)+'회</b>이웃 활동 참여</div></div></div>';
+
+  h+='<div class="card"><h2>🏛 협동조합이 지역 정책과 만나는 곳</h2><p class="sub">이음돌봄은 앱이 아니라 <b>조합이 지역 돌봄 체계의 한 조각을 맡는 방법</b>이에요. 아래 표는 초안이며, 조문·절차는 반드시 담당 기관에서 확인하세요.</p>'+policyTable()+'</div>';
+
+  h+='<div class="card"><h2>🌱 협동조합 운영 원칙 (초안)</h2><ol class="sub" style="padding-left:20px"><li><b>데이터는 어르신의 것</b> — 원문 비공유, 동의 기반, 광고·마케팅 이용 금지</li><li><b>안전은 빌리고 의미는 만든다</b> — 안부·관제는 기존 서비스·기관과 연동, 조합은 이야기·역할·이웃 연결을 맡음</li><li><b>수익보다 지역 환원</b> — 잉여는 어르신 활동·돌봄 인력·지역 자원에 재투자</li><li><b>사람이 최종 판단</b> — 앱은 알리고 연결할 뿐, 위험 판단·조치는 담당자</li><li><b>과의존 방지</b> — 성과는 “앱 사용 시간”이 아니라 “실제로 사람을 만난 횟수”</li></ol></div>';
+
+  h+='<div class="card"><h2>✅ 파일럿 시작 전 점검 (Go / No-Go)</h2><ul class="sub" style="padding-left:20px"><li>담당 부서·센터 담당자 1명 이상 지정, 역할·책임 문서화</li><li>위기 알림 확인·연락 시한과 야간·주말 처리 범위 합의</li><li>개인정보 동의서(민감정보)·위탁 계약 법률 검토 완료</li><li>업무 시간이 늘지 않는다는 담당자 확인 (월 요약 1장 이내)</li><li>대화 시간이 아니라 <b>오프라인 참여가 늘지 않으면 중단·재설계</b></li></ul></div>';
+
+  h+='<div class="card"><h2>🧩 지역 자원 등록 (조합 담당자용)</h2><p class="sub">우리 동네 모임·기관 정보를 등록하면 “이웃·도움” 화면에 나타나요.</p><label>이름</label><input id="rname"><label>종류</label><select id="rtype"><option>모임</option><option>프로그램</option><option>역할</option><option>마을</option><option>상담</option><option>돌봄</option></select><label>설명</label><input id="rdesc"><label>관심 태그 (쉼표로 구분: '+esc(INTERESTS.join(", "))+')</label><input id="rtags"><label>문의처</label><input id="rcon"><button onclick="addRes()" style="margin-top:8px">등록하기</button>'+(S.resources.length?'<h3>등록된 자원</h3>'+S.resources.map(function(r){return '<div class="item row"><span style="flex:1">'+esc(r.name)+'</span><button class="ghost sm" onclick="delRes(\''+r.id+'\')">삭제</button></div>';}).join(""):"")+'</div>';
+
+  h+='<div class="card"><h2>💾 내 정보 관리</h2><div class="row"><button class="alt" onclick="exportAll()">내 기록 파일로 저장</button><button class="danger" onclick="wipe()">모두 지우기</button></div><p class="small">이 앱은 서버가 없어요. 모든 기록은 이 휴대폰(브라우저)에만 저장돼요. 브라우저 기록을 지우면 사라질 수 있으니 가끔 파일로 저장해 두세요.</p></div>';
+  return h;
+}
+function policyTable(){
+  var rows=[
+   ["지역사회 통합돌봄 (돌봄통합지원법, 2026.3 시행)","예방적 서비스(정서·인지 모니터링), 사회적 처방, 공급주체 다양화","사회적연대경제조직(협동조합)으로 공급주체 참여 검토","마음 체크, 이웃 연결, 인계, 이음노트","공급주체 등록 절차·정보공유 조항(지자체 확인)"],
+   ["노인맞춤돌봄서비스","생활지원사 방문·안부","방문 전 요약으로 기록 부담 완화","월간 이음노트(B 등급 동의)","수행기관 기록 체계와 연동 가능성"],
+   ["고독사 예방사업","고립 위험 조기 발견","연속 저조 신호 → 이웃 모임 연결","마음 연속 저조 알림, 이웃 제안","동의 없는 정보 이용 불가, 대상자 기준 확인"],
+   ["노인일자리·시니어클럽 / 노인경제공동체","경험을 활용한 역할·일자리","강점 카드로 역할 후보 제안","강점·경험 카드, 역할 자원 등록","일자리 사업 연계 방식·참여 기준"],
+   ["보건소·정신건강복지센터","상담·평가·사례관리","위기 시 사람에게 빠르게 인계","도움 요청(C 등급), 109·129 안내","인계 후 처리 상태 회신 방식"],
+   ["건강 증진·치매안심센터","검진·선별 안내","무료 건강 앱·기관 안내로 연결","약·건강 탭의 무료 앱 소개","치료·예방 효과 표현 금지"]
+  ];
+  return '<div style="overflow-x:auto"><table><tr><th>정책·제도</th><th>핵심 내용</th><th>조합의 역할</th><th>앱 기능</th><th>확인할 것</th></tr>'+rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+esc(c)+'</td>';}).join("")+'</tr>';}).join("")+'</table></div>';
+}
+function makeNote(){
+  var from=daysAgo(30), ma=moodAvg(from), ad=medAdherence(30), days=Object.keys(S.moods).filter(function(d){return d>=from;}).length;
+  var helps=S.helpLog.filter(function(x){return x.date>=from;}).length;
+  var lines=["[월간 이음노트] "+today()+" 기준 최근 30일","대상: "+(S.name||"(이름 미입력)"),"",
+   "· 마음 체크: "+days+"일 / 평균 "+(ma==null?"기록 없음":ma.toFixed(1)+" (5점 만점)"),
+   "· 복약 체크율: "+(ad==null?"약 미등록":ad+"%"),
+   "· 이야기 작성: "+count(S.journal,from)+"개 (내용은 공유되지 않음)",
+   "· 이웃 활동 참여 기록: "+count(S.joined,from)+"회",
+   "· 도움 요청: "+helps+"건 (C 등급 동의 "+(S.consent.C?"있음":"없음")+")",
+   "· 관심 분야(본인 선택): "+(S.interests.join(", ")||"없음"),
+   "","※ 본 요약은 본인 동의(B 등급)로 생성된 참고 자료이며 진단·평가가 아닙니다. 판단과 조치는 담당자가 합니다."];
+  var txt=lines.join("\n");
+  window._note=txt;
+  modal('<h2>이음노트</h2><pre>'+esc(txt)+'</pre><div class="row"><button onclick="copyNote()">복사하기</button><button class="alt" onclick="window.print()">인쇄·PDF 저장</button><button class="ghost" onclick="dl(\'이음노트.txt\',window._note,\'text/plain\')">파일로 저장</button></div>');
+}
+function copyNote(){ try{ navigator.clipboard.writeText(window._note); toast("복사했어요."); }catch(e){ toast("복사가 안 돼요. 글을 길게 눌러 직접 복사해 주세요."); } }
+function addRes(){
+  var n=v("rname"); if(!n){ toast("이름을 적어 주세요."); return; }
+  var tags=v("rtags").split(",").map(function(x){return x.trim();}).filter(function(x){return INTERESTS.indexOf(x)>=0;});
+  S.resources.push({id:uid(),type:document.getElementById("rtype").value,name:n,desc:v("rdesc"),tags:tags,contact:v("rcon")||"(문의처 미입력)"});
+  save(); render();
+}
+function delRes(id){ S.resources=S.resources.filter(function(r){return r.id!==id;}); save(); render(); }
+function addFamily(){ var t=v("ftext"); if(!t){ toast("남길 말을 적어 주세요."); return; } S.family.push({id:uid(),who:v("fwho")||"가족",t:t}); save(); render(); toast("남겼어요. 소식함에 매일 하나씩 보여 드려요."); }
+function delFamily(id){ S.family=S.family.filter(function(f){return f.id!==id;}); save(); render(); }
+
+/* ===== 담당자 화면 ===== */
+var STEPS=["접수","연락함","연계함","종결"];
+var DB=null, DB_ALERTS=null, DB_NEWS=null, DB_STATE="local";
+function alertsList(){ return (DB_ALERTS||S.alerts).slice().sort(function(a,b){ return (a.status==="종결")-(b.status==="종결") || (a.due<b.due?-1:1); }); }
+function vStaff(){
+  var h='<div class="card"><h2>🖥 담당자 화면 <span class="small">(가칭 통합돌봄센터 · 파일럿)</span></h2>';
+  h+='<p class="small">저장 위치: '+(DB_STATE==="shared"?'<b>공유 저장소</b> — 초대된 담당자끼리 같은 목록을 봐요.':'<b>이 기기</b> — 이 기기에서만 보여요.')+' 실명 대신 <b>가명(예: 어르신A)</b>만 쓰세요.</p>';
+  h+='<button class="ghost sm" onclick="go(\'ieum\')">← 어르신 화면으로</button></div>';
+  var list=alertsList(), now=Date.now(), open=list.filter(function(a){return a.status!=="종결";});
+  var over=open.filter(function(a){return a.status==="접수" && now>a.due;}).length;
+  h+='<div class="card"><div class="kpi"><div><b>'+open.length+'</b>진행 중</div><div><b style="color:var(--red)">'+over+'</b>확인 시한 지남</div><div><b>'+list.filter(function(a){return a.status==="종결";}).length+'</b>종결</div></div></div>';
+  h+='<div class="card"><h2>➕ 신호 접수</h2><p class="sub">어르신 문자(“[이음돌봄 알림]”)를 받으면 여기에 접수하세요. 문자를 통째로 붙여 넣으면 등급을 자동으로 읽어요.</p>';
+  h+='<label>가명</label><input id="aname" placeholder="예: 어르신A"><label>받은 문자 또는 내용</label><textarea id="atext" style="min-height:80px" placeholder="[이음돌봄 알림] … 붙여 넣기"></textarea><label>등급</label><select id="alevel"><option value="">자동(문자에서 읽기)</option><option value="high">높음 — 즉시</option><option value="mid">중간 — 24시간</option><option value="low">낮음 — 48시간</option></select><button onclick="addAlert()" style="margin-top:8px">접수하기</button></div>';
+  h+='<div class="card"><h2>📋 신호 목록</h2>';
+  if(!list.length) h+='<p class="sub">접수된 신호가 없어요.</p>';
+  h+=list.map(function(a){
+    var lv=LV[a.level]||LV.low, late=a.status==="접수"&&now>a.due;
+    var dueTxt=new Date(a.due); dueTxt=p2(dueTxt.getMonth()+1)+"/"+p2(dueTxt.getDate())+" "+p2(dueTxt.getHours())+":"+p2(dueTxt.getMinutes());
+    return '<div class="item lv-'+a.level+'" style="padding-left:10px"><b>'+esc(a.name)+'</b> <span class="tag">'+lv.t+' · '+lv.msg+'</span>'+(late?' <span class="tag" style="background:var(--red2);color:var(--red)">시한 지남</span>':'')+'<br><span class="sub" style="white-space:pre-wrap">'+esc(a.text)+'</span><br><span class="small">접수 '+esc(a.recv)+' · 확인 시한 '+dueTxt+'</span><div class="steps">'+STEPS.map(function(sx){return '<button class="'+(a.status===sx?"on":"")+'" onclick="setStep(\''+a.id+'\',\''+sx+'\')">'+sx+'</button>';}).join("")+'</div>'+(a.log&&a.log.length?'<div class="small">'+a.log.map(esc).join(" → ")+'</div>':'')+'<input placeholder="처리 메모 (예: 전화 통화, 복지관 상담 연계)" value="'+esc(a.memo||"")+'" onchange="setMemo(\''+a.id+'\',this.value)"></div>';
+  }).join("");
+  h+='</div>';
+  h+='<div class="card"><h2>📢 동네 소식 올리기</h2><p class="sub">'+(DB_STATE==="shared"?"공유 저장소에 올라가 같은 링크를 보는 분들께 보여요.":"이 기기의 소식함에만 보여요. 모든 어르신께 보이게 하려면 조합에서 앱의 ‘동네 소식’ 목록을 고쳐 다시 게시해야 해요.")+'</p><label>언제</label><input id="nd" placeholder="예: 11월 5일(수) 오후 2시"><label>제목</label><input id="nt"><label>내용</label><input id="nx"><button onclick="addNews()" style="margin-top:8px">올리기</button>'+(S.newsLocal.length?'<h3>올린 소식</h3>'+S.newsLocal.map(function(n){return '<div class="item row"><span style="flex:1">'+esc(n.t)+'</span><button class="ghost sm" onclick="delNews(\''+n.id+'\')">삭제</button></div>';}).join(""):"")+'</div>';
+  h+='<div class="card"><h2>📏 운영 원칙</h2><ul class="sub" style="padding-left:20px"><li>앱 신호는 <b>판단이 아니라 알림</b>이에요. 확인·판단·조치는 담당자가 해요.</li><li>확인 시한: 높음 즉시 / 중간 24시간 / 낮음 48시간 (파일럿에서 기관과 합의해 확정)</li><li>야간·주말 처리 범위를 어르신께 미리 알려 드리세요.</li><li>개인정보: 가명 사용, 이야기 원문은 받지 않음, 종결 후 일정 기간 뒤 삭제</li></ul></div>';
+  return h;
+}
+function parseLevel(t){ if(t.indexOf("[높음]")>=0) return "high"; if(t.indexOf("[중간]")>=0) return "mid"; return "low"; }
+function addAlert(){
+  var name=v("aname")||"이름 미기재", text=v("atext"); if(!text){ toast("내용을 적거나 붙여 넣어 주세요."); return; }
+  var lv=document.getElementById("alevel").value||parseLevel(text), d=new Date();
+  var a={id:uid(),name:name,text:text,level:lv,recv:p2(d.getMonth()+1)+"/"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes()),due:Date.now()+LV[lv].h*3600000,status:"접수",log:["접수 "+p2(d.getHours())+":"+p2(d.getMinutes())],memo:""};
+  saveAlert(a,true);
+}
+function findAlert(id){ return alertsList().filter(function(a){return a.id===id;})[0]; }
+function setStep(id,st){ var a=findAlert(id); if(!a||a.status===st) return; a=JSON.parse(JSON.stringify(a)); var d=new Date(); a.status=st; a.log=(a.log||[]).concat([st+" "+p2(d.getHours())+":"+p2(d.getMinutes())]); saveAlert(a,false); }
+function setMemo(id,m){ var a=findAlert(id); if(!a) return; a=JSON.parse(JSON.stringify(a)); a.memo=m; saveAlert(a,false); }
+function saveAlert(a,isNew){
+  if(DB_STATE==="shared" && DB){
+    DB.collection("alerts").doc(a.id).set(a).then(function(){ if(isNew) toast("접수했어요."); },function(e){ toast("공유 저장에 실패했어요. 이 기기에 저장할게요."); DB_STATE="local"; saveAlertLocal(a,isNew); });
+    return;
+  }
+  saveAlertLocal(a,isNew);
+}
+function saveAlertLocal(a,isNew){ var i=S.alerts.findIndex(function(x){return x.id===a.id;}); if(i>=0) S.alerts[i]=a; else S.alerts.push(a); save(); render(); if(isNew) toast("접수했어요."); }
+function addNews(){ var t=v("nt"); if(!t){ toast("제목을 적어 주세요."); return; } var n={id:uid(),d:v("nd")||"공지",t:t,x:v("nx")}; if(DB_STATE==="shared"&&DB){ DB.collection("news").doc(n.id).set(n).then(function(){toast("올렸어요.");},function(){toast("공유 저장에 실패했어요.");}); return; } S.newsLocal.unshift(n); save(); render(); toast("올렸어요."); }
+function delNews(id){ if(DB_STATE==="shared"&&DB){ DB.collection("news").doc(id).delete(); return; } S.newsLocal=S.newsLocal.filter(function(n){return n.id!==id;}); save(); render(); }
+/* 공유 저장소 (claude.ai 링크에서 초대된 담당자에게만 동작; 없으면 이 기기 저장) */
+if(window.claude && typeof window.claude.use==="function"){
+  window.claude.use("db").then(function(db){
+    if(!db) return; DB=db;
+    try{
+      db.collection("news").onSnapshot(function(snap){ var arr=snap.docs.map(function(d){return d.data();}); S.newsLocal=arr; if(TAB==="news"||TAB==="staff") render(); },function(){});
+      db.collection("alerts").onSnapshot(function(snap){ DB_STATE="shared"; DB_ALERTS=snap.docs.map(function(d){return d.data();}); if(TAB==="staff") render(); },function(){ DB_STATE="local"; DB_ALERTS=null; });
+    }catch(e){}
+  },function(){});
+}
+
+function exportAll(){ dl("이음돌봄_내기록.json",JSON.stringify(S,null,1),"application/json"); }
+function wipe(){ if(!window._ok){ ask("이 휴대폰에 저장된 모든 기록을 지울까요? 되돌릴 수 없어요.",function(){wipe();}); return; } window._ok=false; { try{localStorage.removeItem(KEY);}catch(e){} load(); render(); } }
+
+load(); checkSignals(); render();
+</script>
+</body>
+</html>
