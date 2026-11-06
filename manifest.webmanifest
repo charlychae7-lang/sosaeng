@@ -1,0 +1,17 @@
+{
+  "name": "소생커뮤니티 협동조합",
+  "short_name": "소생커뮤니티",
+  "description": "AI 대전환 사회의 새로운 사회 계약 — 지역순환경제, 시니어 메타인지 교육, 자아&공동체 연구소",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1F6F55",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
