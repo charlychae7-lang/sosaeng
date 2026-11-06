@@ -1254,7 +1254,7 @@ footer{padding-top:3rem}
     <div class="foot-big" aria-hidden="true">消生<br>COMMUNITY</div>
     <div class="foot-grid">
       <div><h4>소생커뮤니티 협동조합 (설립 준비중)</h4><p>소비자와 생산자를 잇고, 지역의 가치를 살려 함께 성장하는 공동체</p><p class="copy">개인사업자 등록번호: 453-26-00766</p></div>
-      <div style="text-align:right"><button class="top" id="to-top">↑ TOP</button><p class="copy">© 2026 SoSaeng Community. All rights reserved.</p></div>
+      <div style="text-align:right"><button class="top" id="install-app" hidden style="margin-right:.6rem">앱으로 설치</button><button class="top" id="to-top">↑ TOP</button><p class="copy">© 2026 SoSaeng Community. All rights reserved.</p></div>
     </div>
   </div>
 </footer>
@@ -1499,6 +1499,12 @@ footer{padding-top:3rem}
   }
   vButtons('#vf-topic',VT,'topic'); vButtons('#vf-kind',VK,'kind'); renderVideos();
   $$('[data-vtopic]').forEach(function(el){ el.addEventListener('click',function(){ vState.topic=el.dataset.vtopic; vState.kind='all'; renderVideos(); }); });
+  /* ---------- 앱 설치 (PC·휴대폰) ---------- */
+  if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+  var deferredInstall=null, instBtn=$('#install-app');
+  window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferredInstall=e; if(instBtn) instBtn.hidden=false; });
+  if(instBtn) instBtn.addEventListener('click',function(){ if(!deferredInstall) return; deferredInstall.prompt(); deferredInstall.userChoice.finally(function(){ deferredInstall=null; instBtn.hidden=true; }); });
+  window.addEventListener('appinstalled',function(){ if(instBtn) instBtn.hidden=true; });
   /* ---------- Init ---------- */
   showPage((location.hash||'#home').slice(1),false);
 })();
