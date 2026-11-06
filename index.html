@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RLNB5CMVVJ"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-RLNB5CMVVJ',{send_page_view:false});
+</script>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1280,6 +1285,7 @@ footer{padding-top:3rem}
     if(push!==false && location.hash!=='#'+id){ try{ history.pushState(null,'','#'+id); }catch(e){} }
     document.title = (id==='home'?'':$('.nav-item[data-page="'+id+'"]').textContent+' · ')+'소생커뮤니티 협동조합';
     observe(); netState();
+    if(window.gtag) gtag('event','page_view',{page_title:document.title,page_location:location.origin+location.pathname+'#'+id,page_path:'/'+id});
   }
   navItems.forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();showPage(a.dataset.page)})});
   $$('[data-goto]').forEach(function(el){el.addEventListener('click',function(){
@@ -1505,6 +1511,15 @@ footer{padding-top:3rem}
   window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferredInstall=e; if(instBtn) instBtn.hidden=false; });
   if(instBtn) instBtn.addEventListener('click',function(){ if(!deferredInstall) return; deferredInstall.prompt(); deferredInstall.userChoice.finally(function(){ deferredInstall=null; instBtn.hidden=true; }); });
   window.addEventListener('appinstalled',function(){ if(instBtn) instBtn.hidden=true; });
+  /* ---------- 방문·클릭 기록 (Google Analytics) ---------- */
+  document.addEventListener('click',function(e){
+    if(!window.gtag) return;
+    var t=e.target, a=t.closest('.applink'), g=t.closest('[data-goto]'), v=t.closest('.vcard'), i=t.closest('#install-app');
+    if(a){ var c=a.closest('.appcard'); gtag('event','app_open',{app_name:c?(c.querySelector('h4')||{}).textContent:'',link_text:a.textContent.trim()}); }
+    else if(v){ gtag('event','video_open',{video_title:(v.querySelector('h4')||{}).textContent}); }
+    else if(i){ gtag('event','install_click'); }
+    else if(g && g.dataset.goto==='join'){ gtag('event','join_click',{from_page:(location.hash||'#home').slice(1),type:g.dataset.type||''}); }
+  });
   /* ---------- Init ---------- */
   showPage((location.hash||'#home').slice(1),false);
 })();
