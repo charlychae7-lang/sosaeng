@@ -29,3 +29,10 @@ ffmpeg -i vertical.mp4 -i music.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 19
 - 장면·문구는 `index.html` 안에서 수정합니다. 모든 화면은 시간 `t`만으로 그려져서 어느 시점이든 같은 화면이 나옵니다.
 - 자막은 `CAPS` 배열(시작초, 끝초, 줄들), 장면 시간은 `SCENES`·각 `S1`~`S7` 함수에서 조절합니다.
 - 필요: ffmpeg, Playwright(chromium).
+
+## 깊이 읽기 주제별 영상 (세로형 19편)
+앱 「책과 함께 · 깊이 읽기」 1~19번 각 주제의 짧은 설명을 바탕으로, 근거 안에서 예시와 연결을 덧붙여 만든 약 40초 영상입니다.
+결과: `app/media/deep/NN-주제.mp4` (1080×1920, 배경음악 포함)
+- 대본: `topics-data.js` (주제별 장면 4개 × 자막 2줄, 맺음 문장) · 장면 템플릿: `topics.src.html` (`MOT.*`)
+- `./make-deep.sh` (전체) 또는 `./make-deep.sh 3 7` (일부) — 필요: ffmpeg, Playwright, numpy/scipy
+- 배경음악은 `make-music.py out.wav 길이 변주(0~5) 종소리시작:간격`으로 주제마다 다른 조성으로 합성합니다.

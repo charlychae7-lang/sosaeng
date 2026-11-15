@@ -10,14 +10,16 @@ const path = require('path');
 
 const FPS = 30;
 const portrait = process.argv.includes('--portrait');
-const args = process.argv.filter(a => a !== '--portrait');
+const ti = process.argv.indexOf('--topic');
+const topic = ti > 0 ? process.argv[ti + 1] : null;
+const args = process.argv.filter((a, i) => a !== '--portrait' && a !== '--topic' && !(ti > 0 && i === ti + 1));
 const mode = args[2] || 'stills';
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-  const page = await browser.newPage({ viewport: portrait ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: (portrait || topic) ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => { console.error('PAGEERR', e.message); process.exitCode = 1; });
-  await page.goto('file://' + path.resolve(__dirname, portrait ? 'index-portrait.html' : 'index.html'));
+  await page.goto('file://' + path.resolve(__dirname, topic ? 'topics.html' : portrait ? 'index-portrait.html' : 'index.html') + (topic ? '?id=' + topic : ''));
   await page.waitForFunction('window.READY===true', null, { timeout: 30000 });
   const dur = await page.evaluate('window.DURATION');
 
@@ -32,7 +34,7 @@ const mode = args[2] || 'stills';
     const out = path.resolve(args[3] || 'thought-to-matter.mp4');
     fs.mkdirSync(path.dirname(out), { recursive: true });
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-      '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', process.env.CRF || '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
     const total = Math.round(dur * FPS);
     for (let f = 0; f < total; f++) {
       const data = await page.evaluate(t => window.frameData(t, 0.95), f / FPS);
