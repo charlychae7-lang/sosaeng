@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>생각은 어떻게 물질이 되는가</title>
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-kr/korean-400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-kr/korean-500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-kr/korean-700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-kr/latin-400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-kr/latin-500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-kr/latin-700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/gowun-batang/korean-700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/gowun-batang/latin-700.css">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+/* =====================================================================
+   생각은 어떻게 물질이 되는가 — 모션그래픽 (1920×1080, 30fps)
+   모든 장면은 시간 t(초)만으로 그려지는 순수 함수라서, 프레임을 임의의 순서로 뽑아도 같은 화면이 나옵니다.
+   내용 출처: 《연결할 용기》 / 잠깐! 진짜? 앱 「책과 함께 · 깊이 읽기」
+   ===================================================================== */
+const W=1920,H=1080,cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const DURATION=95;
+const SANS="'Noto Sans KR',sans-serif", SERIF="'Gowun Batang','Noto Sans KR',serif";
+const C={bg1:'#06100f',bg2:'#0c2428',fg:'#EAF2F3',mut:'#9FB6BC',teal:'#5FC7BF',amber:'#F0A55A',violet:'#B3A4F0',green:'#8ECAB0',rose:'#F28FA0',blue:'#6EB4F0',line:'#2B4A52',white:'#FFFFFF'};
+
+/* ---------- 유틸 ---------- */
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const eo=t=>1-Math.pow(1-t,3);
+const P=(t,a,b)=>clamp((t-a)/(b-a));
+const E=(t,a,b)=>eio(P(t,a,b));
+const O=(t,a,b)=>eo(P(t,a,b));
+const win=(t,a,b,c,d)=>P(t,a,b)*(1-P(t,c,d));
+const TAU=Math.PI*2;
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function hex(c,a=1){const n=parseInt(c.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function dot(x,y,r,col,a=1){ctx.fillStyle=hex(col,a);ctx.beginPath();ctx.arc(x,y,Math.max(0,r),0,TAU);ctx.fill()}
+function ring(x,y,r,col,a=1,w=2){ctx.strokeStyle=hex(col,a);ctx.lineWidth=w;ctx.beginPath();ctx.arc(x,y,Math.max(0,r),0,TAU);ctx.stroke()}
+function glow(x,y,r,col,a=1){if(r<=0||a<=0)return;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,hex(col,a));g.addColorStop(1,hex(col,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill()}
+function line(x1,y1,x2,y2,col,a=1,w=2,cap='round'){ctx.strokeStyle=hex(col,a);ctx.lineWidth=w;ctx.lineCap=cap;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function text(s,x,y,o={}){const{size=44,w=500,col=C.fg,a=1,align='center',font=SANS,ls=0}=o;ctx.font=`${w} ${size}px ${font}`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.letterSpacing=ls?ls+'px':'0px';ctx.fillStyle=hex(col,a);ctx.fillText(s,x,y)}
+function tw(s,size,w=500,font=SANS){ctx.font=`${w} ${size}px ${font}`;ctx.letterSpacing='0px';return ctx.measureText(s).width}
+function pill(x,y,w,h,col,a,label,sub,hl=0,fs=34){
+  ctx.save();ctx.globalAlpha=a;
+  if(hl>0)glow(x,y,w*.7,col,.25*hl);
+  rr(x-w/2,y-h/2,w,h,h/2);ctx.fillStyle=hex(col,.14+.2*hl);ctx.fill();
+  ctx.strokeStyle=hex(col,.65+.35*hl);ctx.lineWidth=2+2*hl;ctx.stroke();
+  text(label,x,y-(sub?12:0),{size:fs,w:700});
+  if(sub)text(sub,x,y+(fs>30?26:22),{size:fs>30?22:18,col:C.mut});
+  ctx.restore();
+}
+function person(x,y,s,col,a,swing=0,carry=false){ // (x,y)=발 위치
+  ctx.save();ctx.globalAlpha=a;ctx.strokeStyle=hex(col,1);ctx.fillStyle=hex(col,1);ctx.lineWidth=6*s;ctx.lineCap='round';
+  const hy=y-86*s;
+  ctx.beginPath();ctx.arc(x,hy,15*s,0,TAU);ctx.fill();
+  ctx.beginPath();ctx.moveTo(x,hy+18*s);ctx.lineTo(x,y-34*s);ctx.stroke();            // 몸
+  const sw=Math.sin(swing)*14*s;
+  ctx.beginPath();ctx.moveTo(x,y-34*s);ctx.lineTo(x-12*s+sw,y);ctx.moveTo(x,y-34*s);ctx.lineTo(x+12*s-sw,y);ctx.stroke(); // 다리
+  ctx.beginPath();ctx.moveTo(x,hy+30*s);
+  if(carry){ctx.lineTo(x+22*s,hy+10*s);ctx.moveTo(x,hy+30*s);ctx.lineTo(x+10*s,hy+2*s)}else{ctx.lineTo(x-20*s-sw,y-46*s);ctx.moveTo(x,hy+30*s);ctx.lineTo(x+20*s+sw,y-46*s)}
+  ctx.stroke();ctx.restore();
+}
+
+/* ---------- 사전 생성 ---------- */
+const R1=rng(7);
+const STARS=Array.from({length:90},()=>({x:R1()*W,y:R1()*H,r:.6+R1()*1.6,a:.25+R1()*.6,v:2+R1()*6,p:R1()*6}));
+// 신경세포(수상돌기)
+const DEN=(()=>{const r=rng(21),segs=[];function br(x,y,ang,len,depth,order){if(depth>3)return;const x2=x+Math.cos(ang)*len,y2=y+Math.sin(ang)*len;segs.push({x1:x,y1:y,x2,y2,order,w:depth===0?7:depth===1?5:3});const n=depth<2?2:2;for(let i=0;i<n;i++)br(x2,y2,ang+(i?1:-1)*(.35+r()*.5),len*(.68+r()*.1),depth+1,order+1)}
+  [[Math.PI,110],[Math.PI*0.78,105],[Math.PI*1.22,105],[Math.PI*0.58,95],[Math.PI*1.42,95]].forEach(([a,l])=>br(520+Math.cos(a)*66,470+Math.sin(a)*66,a,l,0,0));return segs})();
+// 머리 윤곽(옆모습)과 신경망
+const HEAD=(()=>{const p=[[860,790],[826,690],[796,600],[800,500],[830,400],[890,320],[980,270],[1090,262],[1170,300],[1214,372],[1226,452],[1252,500],[1226,520],[1236,560],[1222,610],[1190,650],[1130,672],[1088,704],[1070,760],[1064,800]];
+  const path=new Path2D();path.moveTo((p[0][0]+p[1][0])/2,(p[0][1]+p[1][1])/2);for(let i=1;i<p.length-1;i++){const m=[(p[i][0]+p[i+1][0])/2,(p[i][1]+p[i+1][1])/2];path.quadraticCurveTo(p[i][0],p[i][1],m[0],m[1])}
+  const poly=new Path2D();poly.moveTo(p[0][0],p[0][1]);p.forEach(q=>poly.lineTo(q[0],q[1]));poly.closePath();
+  const r=rng(33),nodes=[];let guard=0;while(nodes.length<96&&guard++<5000){const x=820+r()*430,y=270+r()*400;if(ctx.isPointInPath(poly,x,y)&&y<660&&x>835){if(nodes.every(n=>Math.hypot(n.x-x,n.y-y)>46))nodes.push({x,y,p:r()*6,s:.8+r()*1.4})}}
+  const links=[];for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const d=Math.hypot(nodes[i].x-nodes[j].x,nodes[i].y-nodes[j].y);if(d<104)links.push([i,j,d])}
+  return{path,nodes,links}})();
+// S1 분자 군집(세포막으로 모이는 장면)
+const MOL=(()=>{const r=rng(55),a=[];for(let i=0;i<64;i++){const ang=i/64*TAU;a.push({sx:80+r()*1760,sy:120+r()*760,ex:960+Math.cos(ang)*220,ey:470+Math.sin(ang)*220,rot:r()*TAU,d:r()*.5})}return a})();
+// S2 세포 내부 입자
+const CELLP=(()=>{const r=rng(77),a=[];for(let i=0;i<26;i++)a.push({ang:r()*TAU,ph:r(),sp:.18+r()*.2,col:i%3?C.teal:C.amber});return a})();
+// S4 이웃 건물
+const CITY=[{x:360,w:130,h:210,c:C.blue,d:0},{x:520,w:110,h:300,c:C.violet,d:.25},{x:690,w:120,h:160,c:C.green,d:.5},{x:1420,w:130,h:240,c:C.blue,d:.15},{x:1580,w:120,h:330,c:C.violet,d:.4},{x:1740,w:110,h:180,c:C.green,d:.65}];
+
+/* ---------- 배경·공통 ---------- */
+function bg(t){
+  const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,C.bg1);g.addColorStop(1,C.bg2);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  for(const s of STARS){const a=(.5+.5*Math.sin(t*.9+s.p))*s.a*.55;ctx.fillStyle=`rgba(190,225,235,${a})`;ctx.beginPath();ctx.arc(s.x,(s.y+t*s.v)%H,s.r,0,TAU);ctx.fill()}
+}
+const SCENES=[ // [시작, 끝, 라벨]
+  [0,5.5,''],[5.5,19,'① 물질'],[19,34,'② 생명과 신경계'],[34,47,'③ 경험이 생각이 되는 과정'],[47,69,'④ 생각이 물질이 되는 길'],[69,78,'⑤ 순환'],[78,88,''],[88,95,'']];
+function sa(t,i){const[a,b]=SCENES[i];const fi=i===0?0:.9,fo=i===7?1.2:.9;return P(t,a,a+(fi||.001))*(1-P(t,b-fo,b))}
+function chip(t){
+  for(let i=1;i<=5;i++){const[a,b,l]=SCENES[i];const al=win(t,a+.2,a+1.2,b-1.2,b-.2);if(al<=0)continue;
+    ctx.save();ctx.globalAlpha=al;const w=tw(l,30,700)+64;rr(70,56,w,56,28);ctx.fillStyle='rgba(95,199,191,.14)';ctx.fill();ctx.strokeStyle='rgba(95,199,191,.55)';ctx.lineWidth=2;ctx.stroke();dot(98,84,6,C.teal);text(l,118,85,{size:30,w:700,align:'left',col:C.fg});ctx.restore()}
+}
+const CAPS=[
+ [5.8,9.2,['물질은 단단한 덩어리가 아니라 관계로 이루어진 구조입니다.','현대 물리학은 입자를 ‘장의 들뜬 상태’로 보기도 합니다.']],
+ [9.6,12.4,['입자가 모여 원자를, 원자가 모여 분자를 이룹니다.']],
+ [12.8,16.5,['수소와 산소는 물과 전혀 다른 성질을 가졌지만,','결합하면 물이 됩니다. 전체는 부분의 합과 다릅니다 — 창발']],
+ [16.9,18.9,['창발이 쌓이며 물질은 점점 더 복잡한 조직이 됩니다.']],
+ [19.4,22.5,['분자들이 조직되어 세포가 됩니다.','생명의 시작은 아직 열린 연구 주제입니다.']],
+ [22.9,26.8,['정보를 전달하는 데 특화된 세포, 신경세포(뉴런).','세포 안에서는 전기 신호가 흐릅니다.']],
+ [27.2,30.2,['세포와 세포 사이에서는','화학 신호(신경전달물질)가 건너갑니다.']],
+ [30.6,32.4,['세포 → 신경세포 → 신경망 → 뇌','물질의 세계가 ‘정보의 세계’로 넘어갑니다.']],
+ [32.6,33.8,['생각은 화학물질 하나가 아니라, 뇌와 몸, 기억과 환경이','함께 만드는 과정입니다.']],
+ [34.6,38.4,['외부 자극은 그대로 사실로 기록되지 않습니다.','과거의 기억·감정·욕구와 먼저 섞입니다.']],
+ [38.8,43.0,['같은 비가 아이에게는 놀이, 농부에게는 안도,','신랑에게는 걱정이 됩니다.']],
+ [43.3,46.8,['사실과 생각 사이에는 ‘해석’이 있고,','여기가 생각의 틈을 만들 수 있는 자리입니다.']],
+ [47.6,50.5,['생각은 눈에 보이지 않지만','판단과 선택을 거쳐 행동이 됩니다.']],
+ [50.9,53.3,['생각을 따라 몸이 움직이면','세상에 첫 번째 흔적이 남습니다.']],
+ [53.6,56.1,['같은 행동이 반복되면 습관이 됩니다.']],
+ [56.4,59.1,['습관을 공유하는 사람들이 모이면','집단의 행동이 됩니다.']],
+ [59.4,63.5,['집단의 행동은 문화와 규범이 되고,','조직의 관행과 제도로 굳어집니다.']],
+ [63.8,68.8,['마침내 건물과 도시, 환경이라는','눈에 보이는 물질의 모습으로 남습니다.']],
+ [69.5,73.6,['환경은 다시 사람의 경험과 마음, 생각을 만듭니다.']],
+ [73.9,77.6,['사람이 시스템을 만들고, 시스템이 다시 사람을 만드는 순환.']]
+];
+function caption(t){
+  for(const[a,b,lines]of CAPS){if(t<a||t>=b)continue;const al=P(t,a,a+.5)*(1-P(t,b-.5,b));
+    const size=42,lh=62;let mw=0;for(const l of lines)mw=Math.max(mw,tw(l,size,500));
+    const bw=mw+110,bh=lines.length*lh+30,x=W/2-bw/2,y=H-84-bh+lines.length*0;
+    ctx.save();ctx.globalAlpha=al;rr(x,y,bw,bh,28);ctx.fillStyle='rgba(4,14,16,.62)';ctx.fill();ctx.strokeStyle='rgba(95,199,191,.25)';ctx.lineWidth=1.5;ctx.stroke();
+    lines.forEach((l,i)=>text(l,W/2,y+15+lh*(i+.5),{size,w:500,col:C.fg}));ctx.restore();return}
+}
+function progress(t){ctx.fillStyle='rgba(95,199,191,.16)';ctx.fillRect(0,H-6,W,6);ctx.fillStyle=hex(C.teal,.85);ctx.fillRect(0,H-6,W*clamp(t/DURATION),6)}
+function brand(t){const a=.55*win(t,6,7,86,88);if(a<=0)return;text('잠깐! 진짜?  ·  《연결할 용기》',W-70,64,{size:24,col:C.mut,a,align:'right'})}
+
+/* ---------- S0 제목 ---------- */
+function S0(t,A){
+  ctx.save();ctx.globalAlpha=A;
+  const cx=960,cy=440;
+  const g=glow;g(cx,cy,520,C.teal,.10*P(t,0,2));
+  for(let i=0;i<150;i++){const r=rng(900+i),ang=r()*TAU,rad=260+r()*520,spd=(r()-.5)*.25;const k=eo(P(t,0,3.2));const a2=ang+t*spd,rr2=lerp(rad*2.2,rad,k);
+    const x=cx+Math.cos(a2)*rr2*1.2,y=cy+Math.sin(a2)*rr2*.62;dot(x,y,1.2+r()*2.6,i%4?C.teal:C.amber,.15+.5*k*r())}
+  const ta=O(t,1.2,2.6)*(1-P(t,4.7,5.4));
+  text('생각은 어떻게',cx,cy-70,{size:96,w:700,font:SERIF,a:ta});
+  text('물질이 되는가',cx,cy+50,{size:96,w:700,font:SERIF,a:ta,col:C.teal});
+  const sb=O(t,2.4,3.6)*(1-P(t,4.7,5.4));
+  text('물질에서 생각으로, 생각에서 다시 세상으로',cx,cy+190,{size:40,col:C.mut,a:sb});
+  const sc=O(t,3,4.2)*(1-P(t,4.7,5.4));
+  text('잠깐! 진짜?  ·  《연결할 용기》 동행 앱 — 사고의 순환 지도',cx,cy+270,{size:28,col:C.mut,a:sc*.8});
+  ctx.restore();
+}
+
+/* ---------- S1 물질 ---------- */
+function S1(t,A){
+  ctx.save();ctx.globalAlpha=A;const cx=960,cy=470;
+  // a. 양자장
+  const fa=win(t,5.6,6.6,9.2,10.2);
+  if(fa>0){
+    const cols=46,rows=24,sx=36,sy=34,x0=cx-(cols-1)*sx/2,y0=cy-(rows-1)*sy/2,bt=P(t,7,9.2);
+    for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const x=x0+i*sx,y=y0+j*sy,d=Math.hypot(x-cx,y-cy);
+      const wave=Math.sin(d*.02-t*3.2)*Math.exp(-d*.0018)*(1-.55*bt)*9;
+      const bump=Math.exp(-(d*d)/(2*Math.pow(90-55*bt,2)))*48*bt*(1+.12*Math.sin(t*7));
+      const ang=Math.atan2(y-cy,x-cx);const px=x+Math.cos(ang)*wave*.5,py=y+Math.sin(ang)*wave*.5-bump;
+      const br=clamp(.2+Math.abs(wave)/16+bump/48,0,1);dot(px,py,2+br*3.4,C.teal,fa*(.22+.7*br))}
+    for(let k=0;k<3;k++){const rt=((t*.55+k/3)%1);ctx.strokeStyle=hex(C.teal,fa*bt*(1-rt)*.5);ctx.lineWidth=2.2;ctx.beginPath();ctx.ellipse(cx,cy-22,60+rt*300,(60+rt*300)*.4,0,0,TAU);ctx.stroke()}
+    glow(cx,cy-40*bt,100*bt+14,C.teal,fa*(.25+.7*bt));dot(cx,cy-44*bt,8+10*bt,C.white,fa*bt);
+    text('양자장',cx,150,{size:60,w:700,font:SERIF,a:fa});text('입자는 장이 들뜬 상태',cx,222,{size:32,col:C.mut,a:fa*P(t,7.6,8.6)});
+  }
+  // b. 원자
+  const fb=win(t,9.3,10.3,12.5,13.3);
+  if(fb>0){const s=.55+.45*O(t,9.3,11);
+    glow(cx,cy,260*s,C.amber,.12*fb);
+    const nu=[[0,0],[18,6],[-16,10],[8,-18],[-10,-14],[20,-12],[-22,-4]];nu.forEach((p,i)=>{dot(cx+p[0]*s*1.3,cy+p[1]*s*1.3,13*s,i%2?C.rose:C.amber,fb);glow(cx+p[0]*s*1.3,cy+p[1]*s*1.3,26*s,i%2?C.rose:C.amber,.3*fb)});
+    for(let i=0;i<3;i++){const rot=i*Math.PI/3+t*.15;ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.strokeStyle=hex(C.teal,.45*fb);ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,230*s,80*s,0,0,TAU);ctx.stroke();
+      const a=t*(2.2+i*.5)+i*2;const ex=Math.cos(a)*230*s,ey=Math.sin(a)*80*s;glow(ex,ey,30,C.teal,.6*fb);dot(ex,ey,9,C.white,fb);ctx.restore()}
+    text('원자',cx,150,{size:60,w:700,font:SERIF,a:fb});text('핵과 전자 — 모두 상호작용하는 구조',cx,222,{size:32,col:C.mut,a:fb});
+  }
+  // c. 분자와 창발
+  const fc=win(t,12.4,13.4,16.2,17.0);
+  if(fc>0){const k=E(t,12.9,14.6);const Ox=cx,Oy=cy+30;
+    const h1=[lerp(cx-720,cx-112,k),lerp(cy-260,cy-52,k)],h2=[lerp(cx+720,cx+112,k),lerp(cy-260,cy-52,k)];
+    if(k>.92){const b=P(t,14.4,15);line(Ox,Oy,h1[0],h1[1],C.white,.7*b*fc,5);line(Ox,Oy,h2[0],h2[1],C.white,.7*b*fc,5)}
+    glow(Ox,Oy,170,C.blue,.28*fc*k);dot(Ox,Oy,64,C.blue,fc);text('O',Ox,Oy,{size:46,w:700,a:fc,col:'#06202a'});
+    [h1,h2].forEach(h=>{glow(h[0],h[1],70,C.white,.25*fc);dot(h[0],h[1],36,C.white,fc);text('H',h[0],h[1],{size:34,w:700,a:fc,col:'#06202a'})});
+    const eq=win(t,12.9,13.7,14.6,15.4);text('수소  +  수소  +  산소',cx,170,{size:50,w:700,a:eq*fc});text('둘 다 물과는 전혀 다른 기체',cx,236,{size:30,col:C.mut,a:eq*fc});
+    const w2=P(t,14.9,15.9);text('H₂O  =  물',cx,170,{size:62,w:700,font:SERIF,a:w2*fc,col:C.teal});text('창발 · 전체는 부분의 합과 다른 성질을 가진다',cx,246,{size:32,col:C.mut,a:w2*fc});
+    if(k>.92)for(let i=0;i<14;i++){const a=t*.9+i/14*TAU;dot(Ox+Math.cos(a)*(240+20*Math.sin(t*2+i)),Oy+Math.sin(a)*(190+16*Math.cos(t*2+i)),3,C.blue,.4*w2*fc)}
+  }
+  // d. 분자들이 조직되어 세포로
+  const fd=win(t,16.5,17.3,18.4,19.2);
+  if(fd>0){const k=E(t,16.8,18.9);
+    MOL.forEach((m,i)=>{const kk=clamp((k-m.d*.5)/(1-m.d*.5));const x=lerp(m.sx,m.ex,eio(kk)),y=lerp(m.sy,m.ey,eio(kk));
+      const rot=m.rot+t*.8;dot(x,y,9,C.blue,fd);dot(x+Math.cos(rot+.9)*13,y+Math.sin(rot+.9)*13,5,C.white,fd);dot(x+Math.cos(rot-.9)*13,y+Math.sin(rot-.9)*13,5,C.white,fd)});
+    text('분자 → 조직',cx,150,{size:60,w:700,font:SERIF,a:fd});
+  }
+  ctx.restore();
+}
+
+/* ---------- S2 생명과 신경계 ---------- */
+function S2(t,A){
+  ctx.save();ctx.globalAlpha=A;const cx=960,cy=470;
+  // 세포 → 신경세포 이동
+  const mv=E(t,22.8,24.4);
+  const rcx=lerp(cx,520,mv),rcy=lerp(cy,470,mv),rad=lerp(220,66,mv);
+  const cellA=1-P(t,31,31.8);
+  if(cellA>0){
+    ctx.save();ctx.globalAlpha=A*cellA;
+    // 막: 분자 고리 → 연속 막
+    const mem=P(t,19.3,20.6);
+    for(let i=0;i<64;i++){const a=i/64*TAU+t*.06*(1-mv);const x=rcx+Math.cos(a)*rad,y=rcy+Math.sin(a)*rad;dot(x,y,lerp(9,4,mem),C.blue,1-.5*mem);if(mem<.8){dot(x+Math.cos(a+.9)*13*(1-mv),y+Math.sin(a+.9)*13*(1-mv),5*(1-mv),C.white,.8)}}
+    ctx.strokeStyle=hex(C.blue,.75*mem);ctx.lineWidth=lerp(3,6,mv);ctx.beginPath();ctx.arc(rcx,rcy,rad,0,TAU);ctx.stroke();
+    glow(rcx,rcy,rad*1.5,C.teal,.13+.1*mv);
+    // 내부
+    const inA=1-P(t,22.6,23.6);
+    if(inA>0){glow(rcx,rcy,70,C.violet,.5*inA);dot(rcx,rcy,44,C.violet,.55*inA);ring(rcx,rcy,44,C.violet,.9*inA,2);
+      [[-110,-70],[120,-50],[-90,90],[100,100]].forEach((p,i)=>{ctx.save();ctx.translate(rcx+p[0],rcy+p[1]);ctx.rotate(i);ctx.fillStyle=hex(C.amber,.7*inA);ctx.beginPath();ctx.ellipse(0,0,26,13,0,0,TAU);ctx.fill();ctx.restore()});
+      CELLP.forEach(c=>{const ph=(t*c.sp+c.ph)%1,k=ph<.5?ph*2:2-ph*2;const rrr=rad*(1.35-.65*k);dot(rcx+Math.cos(c.ang)*rrr,rcy+Math.sin(c.ang)*rrr,4,c.col,.75*inA*(.4+.6*k))})}
+    const lab=win(t,19.6,20.4,22.4,23.2);text('세포',cx,150,{size:60,w:700,font:SERIF,a:lab});text('에너지와 물질을 교환하고, 환경을 감지하고, 자기 상태를 유지한다',cx,222,{size:30,col:C.mut,a:lab});
+    ctx.restore();
+  }
+  // 신경세포
+  const nA=win(t,23.6,24.6,30.8,31.6);
+  if(nA>0){
+    const dp=E(t,24,26);
+    DEN.forEach(s=>{const f=clamp(dp*4.6-s.order*1.15);if(f<=0)return;line(s.x1,s.y1,lerp(s.x1,s.x2,f),lerp(s.y1,s.y2,f),C.teal,.8*nA,s.w)});
+    glow(520,470,150,C.teal,.28*nA);dot(520,470,66,C.teal,.35*nA);ring(520,470,66,C.teal,.95*nA,5);dot(520,470,26,C.violet,.8*nA);
+    const ax=E(t,24.8,26.2);const axEnd=lerp(586,1148,ax);line(586,470,axEnd,470,C.teal,.9*nA,9);
+    if(ax>.9)for(let i=0;i<5;i++){rr(660+i*92,470-17,60,34,15);ctx.fillStyle=hex(C.blue,.35*nA);ctx.fill();ctx.strokeStyle=hex(C.blue,.8*nA);ctx.lineWidth=2;ctx.stroke()}
+    if(ax>.95){dot(1160,470,20,C.teal,.95*nA);ring(1160,470,20,C.white,.6*nA,2)}
+    // 전기 펄스
+    const pp=P(t,26.6,28.0);if(pp>0&&pp<1){const px=lerp(590,1150,pp);const g=ctx.createLinearGradient(px-200,0,px,0);g.addColorStop(0,hex(C.white,0));g.addColorStop(1,hex(C.white,.95));ctx.strokeStyle=g;ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(Math.max(590,px-200),470);ctx.lineTo(px,470);ctx.stroke();glow(px,470,80,C.white,.9*nA);glow(px,470,160,C.teal,.35*nA)}
+    const e1=win(t,26.4,27.2,28.6,29.6);text('전기 신호',860,372,{size:40,w:700,a:e1*nA,col:C.white});
+    // 시냅스 후 뉴런
+    const n2=O(t,27.4,28.6);
+    if(n2>0){const a2=n2*nA;line(1352,470,1498,470,C.teal,.85*a2,8);[[1352,470,-.5],[1352,470,.5]].forEach(d=>line(1352,470,1352-60,470+Math.sin(d[2])*70,C.teal,.8*a2,5));
+      glow(1560,470,130,C.teal,.22*a2);dot(1560,470,62,C.teal,.3*a2);ring(1560,470,62,C.teal,.9*a2,5);dot(1560,470,24,C.violet,.8*a2);
+      const lit=P(t,29.3,29.9);if(lit>0)glow(1560,470,200*lit,C.white,.45*(1-P(t,30,30.8))*a2)}
+    // 신경전달물질
+    const vs=P(t,27.9,29.4);
+    if(vs>0){for(let i=0;i<22;i++){const r=rng(300+i),d=r()*.5,k=clamp((P(t,27.9+d,29.5+d)));if(k<=0||k>=1)continue;const y=470+(r()-.5)*60*(.4+k)+Math.sin(t*5+i)*6;dot(lerp(1175,1345,eo(k)),y,5+r()*3,C.amber,(1-P(k,.85,1))*nA);glow(lerp(1175,1345,eo(k)),y,18,C.amber,.35*nA*(1-k*.4))}}
+    const e2=win(t,28.2,29,30.6,31.4);text('화학 신호',1252,372,{size:40,w:700,a:e2*nA,col:C.amber});text('신경전달물질',1252,420,{size:26,a:e2*nA,col:C.mut});
+    const lb=win(t,23.8,24.6,28.2,29);text('신경세포(뉴런)',cx,150,{size:60,w:700,font:SERIF,a:lb*nA});
+  }
+  // 신경망 → 뇌
+  const bA=win(t,31,32,33.2,34);
+  if(bA>0){
+    const gA=P(t,31,32.4),dr=E(t,31.2,33.0);
+    ctx.save();ctx.setLineDash([3400,3400]);ctx.lineDashOffset=3400*(1-dr);ctx.strokeStyle=hex(C.teal,.9*bA);ctx.lineWidth=5;ctx.lineJoin='round';ctx.stroke(HEAD.path);ctx.restore();
+    glow(1010,470,380,C.teal,.10*bA*gA);
+    HEAD.links.forEach(([i,j,d])=>{const a=HEAD.nodes[i],b=HEAD.nodes[j];const act=.5+.5*Math.sin(t*3+a.p+b.p);line(a.x,a.y,b.x,b.y,C.teal,bA*gA*(.12+.28*act),1.6)});
+    HEAD.nodes.forEach((n,i)=>{const act=Math.pow(.5+.5*Math.sin(t*3.4+n.p*3),3);dot(n.x,n.y,n.s*3+act*4,C.teal,bA*gA*(.4+.5*act));if(act>.55)glow(n.x,n.y,26,C.white,.4*act*bA*gA)});
+    // 전파 파동
+    const wv=((t-31.6)*220)%560;ctx.strokeStyle=hex(C.white,.18*bA*gA);ctx.lineWidth=2;ctx.beginPath();ctx.arc(960,470,Math.max(0,wv),0,TAU);ctx.stroke();
+    text('신경망 → 뇌',cx,150,{size:60,w:700,font:SERIF,a:bA});
+  }
+  ctx.restore();
+}
+
+/* ---------- S3 경험이 생각이 되는 과정 ---------- */
+function S3(t,A){
+  ctx.save();ctx.globalAlpha=A;
+  const Y=400,xs=[260,610,960,1310,1660];
+  const nodes=[['외부 자극','세상의 정보·상황',C.teal],['감각','보고·듣고·느끼고',C.amber],['기억·감정·욕구','과거가 반응을 만든다',C.rose],['해석','의미를 부여한다',C.violet],['생각','여러 가능성을 떠올린다',C.blue]];
+  const t0=[34.6,35.6,36.6,37.6,38.6];
+  // 빗방울
+  const rA=O(t,34.6,36)*(1-P(t,45,46.2));
+  for(let i=0;i<44;i++){const r=rng(500+i),x=130+r()*260,ph=(t*(.7+r()*.5)+r())%1;const y=215+ph*240;line(x,y,x-6,y+22,C.blue,.55*rA*(1-ph*.6),2.4)}
+  // 연결선과 패킷
+  for(let i=0;i<4;i++){const a=O(t,t0[i+1]-.2,t0[i+1]+.5);if(a>0){line(xs[i]+150,Y,xs[i+1]-150,Y,C.mut,.4*a,3);const tip=xs[i+1]-150;ctx.fillStyle=hex(C.mut,.8*a);ctx.beginPath();ctx.moveTo(tip,Y);ctx.lineTo(tip-14,Y-9);ctx.lineTo(tip-14,Y+9);ctx.fill()}}
+  const pk=P(t,37.2,44.6);if(pk>0){const cyc=(pk*2.2)%1;const px=lerp(xs[0]+120,xs[4]-120,cyc);glow(px,Y,46,C.white,.5*(1-P(t,45,46)));dot(px,Y,8,C.white,1-P(t,45,46))}
+  nodes.forEach((n,i)=>{const a=O(t,t0[i],t0[i]+.8);if(a>0){const hl=(i===3?P(t,40.8,41.6)*(1-P(t,45,46)):0)+(i===4?P(t,44.4,46)*.9:0);const yy=Y+(1-a)*28;pill(xs[i],yy,296,128,n[2],a,n[0],n[1],hl)}});
+  // 해석의 갈래
+  const tags=[['아이','“장화 신고 물웅덩이에서 놀 수 있겠다!”',C.green],['농부','“드디어 비가 오는구나, 한숨 돌리겠어.”',C.amber],['신랑','“하필 오늘 비가… 내 인생은 왜 이럴까.”',C.rose],['배달기사','“길이 미끄러워 두 배는 힘들겠네.”',C.blue]];
+  const tx=[330,780,1230,1680];
+  tags.forEach((g,i)=>{const a=O(t,39.4+i*.55,40.3+i*.55);if(a<=0)return;const x=tx[i],y=700+(1-a)*30;const out=1-P(t,46,47);
+    ctx.save();ctx.globalAlpha=a*out;ctx.strokeStyle=hex(g[2],.5);ctx.lineWidth=2;ctx.setLineDash([8,8]);ctx.beginPath();ctx.moveTo(1310,Y+64);ctx.bezierCurveTo(1310,Y+150,x,Y+170,x,y-62);ctx.stroke();ctx.setLineDash([]);
+    rr(x-215,y-62,430,128,24);ctx.fillStyle=hex(g[2],.12);ctx.fill();ctx.strokeStyle=hex(g[2],.7);ctx.lineWidth=2;ctx.stroke();
+    text(g[0],x,y-26,{size:30,w:700,col:g[2]});
+    const q=g[1],sz=22;text(q,x,y+22,{size:sz,col:C.fg});ctx.restore()});
+  // 잠깐! 표시
+  const gp=win(t,41.2,42,45,46);if(gp>0){const pul=1+.08*Math.sin(t*6);ctx.save();ctx.globalAlpha=gp;glow(1310,262,110*pul,C.amber,.35);rr(1310-110,262-34,220,68,34);ctx.fillStyle=hex(C.amber,.95);ctx.fill();text('잠깐! 생각의 틈',1310,263,{size:32,w:700,col:'#2a1604'});line(1310,298,1310,Y-70,C.amber,.9,3);ctx.restore()}
+  text('같은 비, 서로 다른 현실',W/2,150,{size:60,w:700,font:SERIF,a:win(t,34.8,35.6,45,46)});
+  ctx.restore();
+}
+
+/* ---------- S4 생각이 물질이 되는 길 ---------- */
+const ST=[47.5,50.8,53.4,56.2,59.2,63.6,69];
+const STG=['생각','행동','반복·습관','집단의 행동','규범·제도','환경(물질)'];
+const STC=[C.blue,C.amber,C.rose,C.violet,C.green,C.teal];
+function stage(t){for(let i=0;i<6;i++)if(t<ST[i+1])return i;return 5}
+function bld(t){return .12*E(t,51.6,53.4)+.18*E(t,53.4,56.2)+.30*E(t,56.2,59.2)+.25*E(t,59.2,63.6)+.15*E(t,63.6,65.6)}
+function house(x,y,w,h,col,a,lit){ // 바닥 중앙 기준
+  ctx.save();ctx.globalAlpha=a;rr(x-w/2,y-h,w,h,10);ctx.fillStyle=hex(col,.2);ctx.fill();ctx.strokeStyle=hex(col,.85);ctx.lineWidth=3;ctx.stroke();
+  const cols=Math.max(1,Math.floor(w/44)),rows=Math.max(1,Math.floor((h-30)/58));
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const wx=x-w/2+(c+.5)*(w/cols),wy=y-h+28+r*58;const on=Math.sin(c*3.1+r*5.3+lit*9)>-.2;ctx.fillStyle=on?hex(C.amber,.35+.5*lit):hex(C.line,.6);ctx.fillRect(wx-9,wy,18,26)}
+  ctx.restore();
+}
+function S4(t,A){
+  ctx.save();ctx.globalAlpha=A;
+  const sg=stage(t),GY=800,SX=1080;
+  // 단계 레일
+  STG.forEach((n,i)=>{const x=360+i*240,a=O(t,47.2+i*.15,48);if(a<=0)return;const act=i===sg?1:0;ctx.save();ctx.globalAlpha=A*a*(act?1:.5);pill(x,245,220,66,STC[i],1,n,null,act,28);ctx.restore();if(i<5){line(x+112,245,x+128,245,C.mut,.4*a,3)}});
+  // 월드 레이어 (환경 장면에서 줌아웃)
+  const zo=E(t,63.6,68.4),zs=lerp(1,.8,zo);
+  ctx.save();ctx.translate(SX,GY);ctx.scale(zs,zs);ctx.translate(-SX,-GY);
+  // 지면
+  const gl=O(t,47.4,49);line(150,GY,1770,GY,C.line,gl,4);const gg=ctx.createLinearGradient(0,GY,0,GY+120);gg.addColorStop(0,'rgba(95,199,191,.08)');gg.addColorStop(1,'rgba(95,199,191,0)');ctx.fillStyle=gg;ctx.globalAlpha=A*gl;ctx.fillRect(150,GY,1620,120);ctx.globalAlpha=A;
+  // 환경(이웃 건물·나무)
+  const cityK=E(t,63.8,67.4);
+  if(cityK>0){CITY.forEach(b=>{const k=clamp((cityK-b.d*.45)/(1-b.d*.45));if(k>0)house(b.x,GY,b.w,b.h*eo(k),b.c,.85*k,t*.2+b.x)});
+    [300,880,1330,1860].forEach((tx,i)=>{const k=clamp((cityK-.2-i*.1)/.5);if(k>0){line(tx,GY,tx,GY-60*k,C.green,.8,5);dot(tx,GY-76*k,30*k,C.green,.5);dot(tx-14,GY-60*k,20*k,C.green,.45)}})}
+  // 건물(작업 현장)
+  const b=bld(t),rows=10,bw=60,bh=30,x0=SX-180;
+  const filled=b*rows*6,done=Math.floor(filled);
+  for(let k=0;k<Math.min(60,Math.ceil(filled));k++){const r=Math.floor(k/6),c=k%6;const frac=k<done?1:filled-done;const off=(r%2)*(bw/2)*.0;const x=x0+c*bw+off,y=GY-(r+1)*bh;
+    if(k<done||frac>0){ctx.save();ctx.globalAlpha=A*(k<done?1:frac);rr(x+2,y+2,bw-4,bh-4,6);ctx.fillStyle=hex(C.amber,.55);ctx.fill();ctx.strokeStyle=hex(C.amber,.95);ctx.lineWidth=2;ctx.stroke();ctx.restore()}}
+  const roof=E(t,63.2,65);
+  if(roof>0){ctx.save();ctx.globalAlpha=A*roof;ctx.beginPath();ctx.moveTo(x0-24,GY-300);ctx.lineTo(SX,GY-300-170*roof);ctx.lineTo(x0+360+24,GY-300);ctx.closePath();ctx.fillStyle=hex(C.rose,.5);ctx.fill();ctx.strokeStyle=hex(C.rose,.95);ctx.lineWidth=4;ctx.stroke();ctx.restore()}
+  const lit=E(t,64,66);
+  if(lit>0){ctx.save();ctx.globalAlpha=A*lit;for(let r=0;r<3;r++)for(let c=0;c<3;c++){ctx.fillStyle=hex(C.amber,.5+.4*Math.sin(t*2+r*c));ctx.fillRect(x0+40+c*110,GY-270+r*80,50,46)}rr(SX-34,GY-96,68,96,10);ctx.fillStyle=hex(C.violet,.9);ctx.fill();glow(SX,GY-150,340,C.amber,.16);ctx.restore()}
+  // 사람들
+  const WK=[{x0:480,x1:830,a:47.4,go:51,col:C.fg},{x0:200,x1:740,a:56.2,go:56.4,col:C.green},{x0:120,x1:1330,a:56.4,go:56.8,col:C.violet},{x0:1800,x1:1390,a:56.6,go:57.2,col:C.rose},{x0:200,x1:660,a:56.8,go:57.6,col:C.blue}];
+  WK.forEach((w,i)=>{const appear=i===0?O(t,47.2,48):O(t,w.a,w.a+.6);if(appear<=0)return;const k=E(t,w.go,w.go+1.8);const x=lerp(w.x0,w.x1,k);const moving=k>0&&k<1;
+    const working=t>51.6;const swing=moving?t*9:(working?t*5+i:0);const out=1-P(t,66,67.5)*(i>0?1:0);
+    person(x,GY,1.35,w.col,A*appear*out,swing,i===0&&t>51&&t<53.2)});
+  // 단계 0: 생각 풍선
+  const tb=win(t,47.8,48.8,50.2,51.2);
+  if(tb>0){const bx=620,by=520;ctx.save();ctx.globalAlpha=A*tb;dot(520,660,10,C.blue,.6);dot(552,622,16,C.blue,.6);glow(bx,by,260,C.blue,.2);
+    ctx.beginPath();ctx.ellipse(bx,by,170,128,0,0,TAU);ctx.fillStyle='rgba(110,180,240,.16)';ctx.fill();ctx.strokeStyle=hex(C.blue,.9);ctx.lineWidth=4;ctx.stroke();
+    ctx.strokeStyle=hex(C.white,.95);ctx.lineWidth=5;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(bx-70,by+44);ctx.lineTo(bx-70,by-8);ctx.lineTo(bx,by-62);ctx.lineTo(bx+70,by-8);ctx.lineTo(bx+70,by+44);ctx.closePath();ctx.stroke();ctx.strokeStyle=hex(C.white,.7);ctx.strokeRect(bx-18,by+4,36,40);
+    text('함께 쓰는 공간이 있으면…',bx,by-176,{size:30,col:C.fg});ctx.restore()}
+  // 단계 2: 반복 화살표
+  const rp=win(t,53.6,54.2,55.8,56.4);if(rp>0){ctx.save();ctx.globalAlpha=A*rp;const rx=860,ry=GY-90;ctx.strokeStyle=hex(C.rose,.9);ctx.lineWidth=5;ctx.beginPath();ctx.arc(rx,ry-120,60,-1,4.4);ctx.stroke();const ea=4.4;ctx.fillStyle=hex(C.rose,.95);ctx.beginPath();ctx.moveTo(rx+Math.cos(ea)*60,ry-120+Math.sin(ea)*60);ctx.lineTo(rx+Math.cos(ea)*60+18,ry-120+Math.sin(ea)*60-14);ctx.lineTo(rx+Math.cos(ea)*60-8,ry-120+Math.sin(ea)*60-22);ctx.fill();text('×'+(1+Math.floor((t-53.6)*3)),rx,ry-120,{size:34,w:700,col:C.rose});ctx.restore()}
+  // 단계 4: 문화·규범·제도 아이콘
+  const cu=P(t,59.4,60.4)*(1-P(t,62.6,63.4));
+  if(cu>0){ctx.save();ctx.globalAlpha=A*cu;const ics=[[SX-300,GY-410,'공유된 가치',C.rose],[SX,GY-470,'함께 지키는 규범',C.violet],[SX+300,GY-410,'조직의 관행',C.green]];
+    ics.forEach((c,i)=>{const bob=Math.sin(t*2+i)*8;const x=c[0],y=c[1]+bob;glow(x,y,90,c[3],.25);
+      if(i===0){ctx.fillStyle=hex(c[3],.95);ctx.beginPath();ctx.moveTo(x,y+28);ctx.bezierCurveTo(x-60,y-18,x-24,y-52,x,y-22);ctx.bezierCurveTo(x+24,y-52,x+60,y-18,x,y+28);ctx.fill()}
+      else if(i===1){ring(x-16,y,26,c[3],.95,5);ring(x+16,y,26,c[3],.95,5)}
+      else{rr(x-24,y-32,48,64,8);ctx.strokeStyle=hex(c[3],.95);ctx.lineWidth=4;ctx.stroke();for(let l=0;l<3;l++)line(x-12,y-14+l*14,x+12,y-14+l*14,c[3],.9,3)}
+      text(c[2],x,y+66,{size:26,col:C.fg})});ctx.restore()}
+  const stp=O(t,61.2,62)*(1-P(t,62.8,63.6));if(stp>0){ctx.save();ctx.globalAlpha=A*stp;const x=SX+300,y=GY-410,s=2-stp;ctx.translate(x,y);ctx.rotate(-.18);ctx.scale(s,s);ring(0,0,64,C.rose,.95,6);ring(0,0,52,C.rose,.7,2);text('제도',0,2,{size:44,w:700,col:C.rose});ctx.restore()}
+  ctx.restore();
+  ctx.restore();
+}
+
+/* ---------- S5 순환 ---------- */
+function S5(t,A){
+  ctx.save();ctx.globalAlpha=A;
+  const cx=960,cy=525,rx=560,ry=232;
+  const nodes=[['생각',C.blue],['행동',C.amber],['습관·제도',C.green],['환경(물질)',C.teal],['경험',C.rose],['마음·감정',C.violet]];
+  const pos=nodes.map((n,i)=>{const a=-Math.PI/2+i*TAU/6;return[cx+rx*Math.cos(a),cy+ry*Math.sin(a),a]});
+  const arc=E(t,69.6,73.2);
+  // 타원 궤도
+  ctx.save();ctx.strokeStyle=hex(C.mut,.28);ctx.lineWidth=3;ctx.setLineDash([2,10]);ctx.lineCap='round';ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,-Math.PI/2,-Math.PI/2+TAU*arc);ctx.stroke();ctx.restore();
+  // 움직이는 빛
+  const orb=P(t,72.4,77.8);if(orb>0){const a=-Math.PI/2+orb*TAU*1.6;const x=cx+rx*Math.cos(a),y=cy+ry*Math.sin(a);for(let k=1;k<26;k++){const aa=a-k*.028;dot(cx+rx*Math.cos(aa),cy+ry*Math.sin(aa),9-k*.3,C.white,.4*(1-k/26))}glow(x,y,70,C.white,.7);dot(x,y,9,C.white,1)}
+  pos.forEach((p,i)=>{const a=O(t,69.8+i*.45,70.7+i*.45);if(a<=0)return;
+    const on=orb>0?Math.pow(Math.max(0,Math.cos(((-Math.PI/2+orb*TAU*1.6)-p[2]))),8):0;
+    pill(p[0],p[1],250,86,nodes[i][1],a,nodes[i][0],null,on,34);
+    if(i===3&&a>.6){ // 환경: 작은 도시
+      ctx.save();ctx.globalAlpha=A*a;[[-70,34],[-30,50],[12,28],[52,44]].forEach((b,k)=>{ctx.fillStyle=hex(C.teal,.55);ctx.fillRect(p[0]+b[0]-9,p[1]+70-b[1]*.6,18,b[1]*.6)});ctx.restore()}});
+  // 잠깐! — 마음·감정 → 생각 사이
+  const gp=win(t,74,74.8,77.2,78);if(gp>0){const a=-Math.PI/2-TAU/12,x=cx+rx*Math.cos(a)*1.0,y=cy+ry*Math.sin(a)*1.0;ctx.save();ctx.globalAlpha=A*gp;const pul=1+.08*Math.sin(t*6);glow(x,y-6,100*pul,C.amber,.3);rr(x-84,y-52,168,52,26);ctx.fillStyle=hex(C.amber,.95);ctx.fill();text('잠깐!',x,y-26,{size:30,w:700,col:'#2a1604'});ctx.restore()}
+  text('개인과 사회는 하나의 순환입니다',cx,160,{size:58,w:700,font:SERIF,a:O(t,69.4,70.4)*(1-P(t,77,78))});
+  text('사람이 시스템을 만들고, 시스템이 사람을 만든다',cx,cy,{size:34,col:C.mut,a:O(t,71.5,72.8)*(1-P(t,77,78))});
+  ctx.restore();
+}
+
+/* ---------- S6 정직한 한계 · 열린 질문 ---------- */
+function S6(t,A){
+  ctx.save();ctx.globalAlpha=A;const cx=960;
+  // 배경: 희미한 신경망
+  HEAD.links.forEach(([i,j])=>{const a=HEAD.nodes[i],b=HEAD.nodes[j];line(a.x+0,a.y+60,b.x,b.y+60,C.teal,.05*A,1.5)});
+  const s1=win(t,78.6,79.8,83.4,84.4),s2=win(t,84.2,85.4,87.2,88);
+  glow(cx,540,520,C.teal,.08);
+  if(s1>0){text('생각이 곧바로 물질을 움직이는 것은 아닙니다.',cx,420,{size:66,w:700,font:SERIF,a:s1});
+    text('생각은 행동과 관계, 제도를 거쳐 세상을 바꿉니다.',cx,540,{size:44,col:C.teal,a:s1*P(t,79.6,80.8)});
+    text('물질적 기반 → 생각 → 행동 → 환경, 그리고 다시 순환',cx,630,{size:30,col:C.mut,a:s1*P(t,80.6,81.8)})}
+  if(s2>0){const q=1+.05*Math.sin(t*3);glow(cx,330,160*q,C.violet,.25*s2);text('?',cx,330,{size:200,w:700,font:SERIF,col:C.violet,a:s2});
+    text('물질의 활동이 어떻게 주관적인 경험이 되는가',cx,560,{size:50,w:700,font:SERIF,a:s2});
+    text('과학과 철학이 함께 묻는, 아직 열린 질문입니다.',cx,650,{size:36,col:C.mut,a:s2})}
+  ctx.restore();
+}
+
+/* ---------- S7 마무리 ---------- */
+function S7(t,A){
+  ctx.save();ctx.globalAlpha=A;const cx=960,cy=430;
+  const k=O(t,88,89.4);
+  for(let i=0;i<3;i++){const ph=((t*.5+i/3)%1);ring(cx,cy-30,120+ph*300,C.teal,.35*(1-ph)*k,3)}
+  glow(cx,cy-30,260,C.amber,.12*k);
+  text('잠깐!',cx,cy-90,{size:150,w:700,font:SERIF,col:C.amber,a:k});text('진짜?',cx,cy+60,{size:150,w:700,font:SERIF,col:C.amber,a:k});
+  text('순환의 어느 지점에서든, 생각의 틈을 열 수 있습니다.',cx,760,{size:48,w:700,font:SERIF,a:O(t,89.2,90.6)});
+  text('《연결할 용기》  ·  잠깐! 진짜? 동행 앱',cx,850,{size:32,col:C.mut,a:O(t,90,91.2)});
+  ctx.restore();
+}
+
+/* ---------- 프레임 ---------- */
+function drawFrame(t){
+  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;bg(t);
+  const fns=[S0,S1,S2,S3,S4,S5,S6,S7];
+  fns.forEach((f,i)=>{const[a,b]=SCENES[i];if(t>=a-.01&&t<b+.01){const A=sa(t,i);if(A>0)f(t,A)}});
+  chip(t);caption(t);brand(t);progress(t);
+}
+window.DURATION=DURATION;window.drawFrame=drawFrame;
+window.frameData=(t,q=.95)=>{drawFrame(t);return cv.toDataURL('image/jpeg',q)};
+window.stillData=t=>{drawFrame(t);return cv.toDataURL('image/png')};
+Promise.all([
+  document.fonts.load("400 30px 'Noto Sans KR'","가나다"),document.fonts.load("500 30px 'Noto Sans KR'","가나다"),document.fonts.load("700 30px 'Noto Sans KR'","가나다"),
+  document.fonts.load("700 60px 'Gowun Batang'","가나다 ?")
+]).then(()=>document.fonts.ready).then(()=>{window.READY=true;drawFrame(0)});
+</script>
+</body>
+</html>

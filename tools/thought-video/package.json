@@ -1,0 +1,9 @@
+{
+  "name": "thought-video",
+  "private": true,
+  "description": "생각은 어떻게 물질이 되는가 — 모션그래픽 영상 렌더러 (캔버스 + Playwright + ffmpeg)",
+  "dependencies": {
+    "@fontsource/gowun-batang": "^5.0.0",
+    "@fontsource/noto-sans-kr": "^5.0.0"
+  }
+}
