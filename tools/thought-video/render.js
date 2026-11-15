@@ -9,25 +9,27 @@ const fs = require('fs');
 const path = require('path');
 
 const FPS = 30;
-const mode = process.argv[2] || 'stills';
+const portrait = process.argv.includes('--portrait');
+const args = process.argv.filter(a => a !== '--portrait');
+const mode = args[2] || 'stills';
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: portrait ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => { console.error('PAGEERR', e.message); process.exitCode = 1; });
-  await page.goto('file://' + path.resolve(__dirname, 'index.html'));
+  await page.goto('file://' + path.resolve(__dirname, portrait ? 'index-portrait.html' : 'index.html'));
   await page.waitForFunction('window.READY===true', null, { timeout: 30000 });
   const dur = await page.evaluate('window.DURATION');
 
   if (mode === 'stills') {
     fs.mkdirSync(path.join(__dirname, 'frames'), { recursive: true });
-    for (const s of process.argv.slice(3)) {
+    for (const s of args.slice(3)) {
       const t = parseFloat(s);
       const data = await page.evaluate(t => window.stillData(t), t);
       fs.writeFileSync(path.join(__dirname, 'frames', `t${String(t).padStart(5, '0')}.png`), Buffer.from(data.split(',')[1], 'base64'));
     }
   } else {
-    const out = path.resolve(process.argv[3] || 'thought-to-matter.mp4');
+    const out = path.resolve(args[3] || 'thought-to-matter.mp4');
     fs.mkdirSync(path.dirname(out), { recursive: true });
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
       '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
