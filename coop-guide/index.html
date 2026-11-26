@@ -352,7 +352,7 @@ coop:{name:"일반협동조합",short:"협동조합",law:"협동조합 기본법
   ["사업자등록","관할 세무서","법인 등기사항증명서를 갖고 세무서에서 사업자등록을 합니다. 업종·업태가 정관의 사업과 맞는지 확인하세요."],
   ["운영체계 구축","설립 직후","조합원 명부·출자금 대장, 회계·지출 승인 절차, 이사회·총회 일정, 개인정보 관리 체계를 만듭니다. 출자금 총액·조합원 수가 바뀌면 회계연도 종료 후 3개월 안에 변경신고합니다."]
  ],
- docs:["협동조합 설립신고서","정관 사본","창립총회 개최 공고문","창립총회 의사록 사본","임원 명부 (이력서·사진 등 관할 기관 요구분)","사업계획서","수입·지출 예산서","출자 1좌당 금액과 조합원별 인수 출자좌수를 적은 서류","발기인 및 설립동의자 명부","개인정보 수집·이용 및 행정정보 공동이용 사전 동의서 (발기인·임원 각자 서명)","임원 취임승낙서 (선출된 임원 각자 서명)"]
+ docs:["협동조합 설립신고서","정관 사본","창립총회 개최 공고문","창립총회 의사록 사본","임원 명부 (이력서·사진 등 관할 기관 요구분)","사업계획서","수입·지출 예산서","출자 1좌당 금액과 조합원별 인수 출자좌수를 적은 서류","발기인 및 설립동의자 명부","개인정보 수집·이용 및 행정정보 공동이용 사전 동의서 (임원 전원 각 1부 · 결격사유 조회용)"]
 },
 social:{name:"사회적협동조합",short:"사회적협동조합",law:"협동조합 기본법 (제4장)",
  facts:[["설립 방식","설립인가 (기획예산처장관 → 주사업 소관 부처 위탁)"],["최소 인원","발기인 5인 이상"],["처리 기간","신청 후 60일 이내 통지"],["법인 성격","비영리법인(배당 금지)"],["등기 기한","인가 문서 도달일부터 60일 이내"],["주사업","공익사업이 전체 사업의 40% 이상"]],
@@ -817,7 +817,7 @@ function bindDocs(){
 }
 
 /* 07 제출서류 */
-const FORMLINK={"협동조합 설립신고서":"estab","정관 사본":"charter","창립총회 개최 공고문":"notice","창립총회 의사록 사본":"minutes","임원 명부":"officers3","사업계획서":"plan","수입·지출 예산서":"budget","출자 1좌당":"capital","발기인 및 설립동의자 명부":"roster","개인정보 수집":"privacy","임원 취임승낙서":"accept"};
+const FORMLINK={"협동조합 설립신고서":"estab","정관 사본":"charter","창립총회 개최 공고문":"notice","창립총회 의사록 사본":"minutes","임원 명부":"officers3","사업계획서":"plan","수입·지출 예산서":"budget","출자 1좌당":"capital","발기인 및 설립동의자 명부":"roster","개인정보 수집":"privacy"};
 function formOf(d){if(state.type!=="coop")return"";for(const k in FORMLINK)if(d.startsWith(k))return FORMLINK[k];return""}
 function secSubmit(){
  const t=TYPES[state.type];const done=store.get("sub-"+state.type,[]);
@@ -826,7 +826,7 @@ function secSubmit(){
  <p class="lead">접수처: <b>${where}</b>. 정관·공고문·의사록·사업계획서·예산서·출자 명세의 이름, 날짜, 금액이 서로 일치하는지 마지막에 대조하세요.</p>
  <div class="sheet"><ul class="cl">${t.docs.map((d,i)=>`<li><label for="sb-${state.type}-${i}"><input type="checkbox" id="sb-${state.type}-${i}" data-i="${i}" ${done.includes(i)?"checked":""}> <span>${d}</span></label>${formOf(d)?` <button type="button" class="small" data-form="${formOf(d)}" style="margin-left:6px;border:1px solid var(--line);background:none;color:var(--forest);border-radius:6px;padding:2px 8px;cursor:pointer">서식 보기 →</button>`:""}</li>`).join("")}</ul></div>
  <div class="sheet"><h3>등기 단계에서 더 필요한 것 ${state.type==="coop"||state.type==="social"?"":'<span class="chip warn">협동조합 형태일 때</span>'}</h3><ul class="clean">
-  <li>설립등기 신청서와 신고확인증(또는 인가증)</li><li>정관, 창립총회 의사록 <b>공증본</b></li><li>임원 취임승낙서, 인감증명서·주민등록초본(등기소 요구분)</li><li>출자금 납입 증명서(잔고증명 등)</li><li>등록면허세·지방교육세 영수증, 등기신청수수료</li></ul>
+  <li>설립등기 신청서와 신고확인증(또는 인가증)</li><li>정관, 창립총회 의사록 <b>공증본</b></li><li>임원 취임승낙서 <button type="button" class="small" data-form="accept" style="margin-left:6px;border:1px solid var(--line);background:none;color:var(--forest);border-radius:6px;padding:2px 8px;cursor:pointer">서식 보기 →</button>, 인감증명서·주민등록초본(등기소 요구분)</li><li>출자금 납입 증명서(잔고증명 등)</li><li>등록면허세·지방교육세 영수증, 등기신청수수료</li></ul>
   <p class="small mt">등기소마다 요구 서류가 다를 수 있어 방문 전 전화 확인을 권합니다.</p></div>
  <div class="note">흔한 보완 사유: 공고일과 총회일 사이 기간 부족, 정관 필수기재사항 누락, 의사록의 출석·찬성 인원이 정족수에 못 미침, 1인 출자 30% 초과, 같은 지역 내 동일 명칭 사용.</div>`;
 }
