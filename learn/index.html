@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>4단계 사고 학습</title>
+<meta name="description" content="문제 정의부터 구조 설계까지, 4단계 사고를 한 화면 한 질문으로 배우는 학습 앱">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:light;
+    --primary:#1E40AF;--primary-soft:#EFF6FF;--on-primary:#fff;
+    --teal:#0D9488;--amber:#C2740A;--violet:#6D28D9;--slate:#64748B;
+    --teal-soft:#E6F6F4;--amber-soft:#FEF3C7;--violet-soft:#F1EAFE;--slate-soft:#EEF1F5;
+    --danger:#DC2626;--ok:#15803D;
+    --bg:#F7F8FA;--surface:#fff;--border:#E4E7EC;--text:#1B2130;--muted:#5B6472;--chip:#EEF1F5;
+    --shadow:0 1px 2px rgba(20,22,31,.04),0 8px 24px -12px rgba(20,22,31,.12);
+    --r:14px;--rs:10px;
+    --display:'Noto Serif KR','Apple SD Gothic Neo','Malgun Gothic',serif;
+    --body:'Noto Sans KR','Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+    color-scheme:dark;
+    --primary:#7DA6FF;--primary-soft:#182238;--on-primary:#0E1420;
+    --teal:#35C6B3;--amber:#F0A93C;--violet:#B79BFA;--slate:#9BA3B2;
+    --teal-soft:#10282A;--amber-soft:#2E2513;--violet-soft:#241C3A;--slate-soft:#232935;
+    --danger:#F27272;--ok:#4ADE80;
+    --bg:#101319;--surface:#171B24;--border:#2A303C;--text:#EDEFF3;--muted:#9BA3B2;--chip:#232935;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.5);
+  }}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px;padding-bottom:96px}
+  button,input,textarea,select{font:inherit;color:inherit}
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px}
+
+  header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+  .top .row{display:flex;align-items:center;gap:10px;height:52px}
+  .brand{font-family:var(--display);font-weight:700;font-size:17px;flex:1;cursor:pointer}
+  .badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--primary-soft);color:var(--primary)}
+  .ghost{background:none;border:1px solid var(--border);border-radius:99px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--muted)}
+  #stepper{display:flex;gap:6px;padding-bottom:10px}
+  .pill{flex:1;text-align:center;font-size:12px;font-weight:700;padding:5px 0;border-radius:8px;background:var(--chip);color:var(--muted);cursor:pointer;border:0}
+  .pill.on{color:#fff}
+  .pill.done:not(.on){background:var(--slate-soft);color:var(--text)}
+  .bar{height:4px;background:var(--chip)}
+  .bar i{display:block;height:100%;background:var(--primary);transition:width .3s}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 18px;margin:18px 0}
+  .kick{font-size:12px;font-weight:700;letter-spacing:.02em;margin-bottom:6px}
+  h1{font-family:var(--display);font-size:24px;line-height:1.35;margin:0 0 6px}
+  .lead{margin:0 0 18px;color:var(--muted);font-size:16px}
+  h2{font-size:15px;margin:22px 0 8px}
+  .lab{display:block;font-weight:700;font-size:15px;margin:18px 0 6px}
+  .hint{font-size:13px;color:var(--muted);margin:-2px 0 8px}
+  input[type=text],textarea,select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--surface);font-size:16px}
+  textarea{min-height:96px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:transparent}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid var(--border);background:var(--chip);color:var(--text);border-radius:99px;padding:8px 14px;font-size:14px;cursor:pointer;min-height:40px}
+  .chip.ex{background:transparent;border-style:dashed;color:var(--muted)}
+  .chip.sel{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-weight:700}
+  .big{display:flex;gap:12px;flex-wrap:wrap}
+  .opt{flex:1 1 200px;text-align:left;border:2px solid var(--border);background:var(--surface);border-radius:var(--r);padding:16px;cursor:pointer}
+  .opt b{display:block;font-size:17px;margin:4px 0 2px}
+  .opt span{font-size:14px;color:var(--muted)}
+  .opt.sel{border-color:var(--primary);background:var(--primary-soft)}
+  .opt[disabled]{opacity:.55;cursor:not-allowed}
+  .opt .tag{font-size:11px;font-weight:700;background:var(--chip);border-radius:99px;padding:2px 8px;color:var(--muted)}
+
+  .mini{border:1.5px solid var(--border);border-radius:var(--rs);padding:12px;margin:10px 0;background:var(--bg)}
+  .mini .hd{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+  .mini input[type=text]{margin:4px 0}
+  .mini small{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+  .mini small.sl{font-weight:700;margin:8px 0 2px}
+  .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 8px}
+  .add{width:100%;border:2px dashed var(--border);background:none;border-radius:var(--rs);padding:12px;color:var(--primary);font-weight:700;cursor:pointer;margin-top:6px}
+
+  .row3{display:grid;grid-template-columns:1fr;gap:6px;margin:10px 0;padding:12px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--bg)}
+  .row3 .nm{font-weight:700;font-size:15px}
+  .seg{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .seg .cl{font-size:13px;color:var(--muted);min-width:76px}
+  .seg button{flex:0 0 auto;min-width:48px;border:1.5px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;min-height:36px}
+  .seg button.sel{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-weight:700}
+  .tot{font-size:12px;font-weight:700;color:var(--muted)}
+  .res{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px}
+  .res.s{background:var(--teal-soft);color:var(--teal)} .res.a{background:var(--amber-soft);color:var(--amber)}
+
+  .info{background:var(--primary-soft);border-radius:var(--rs);padding:14px;margin:14px 0;font-size:15px}
+  .info b{color:var(--primary)}
+  .quote{font-family:var(--display);font-size:18px;line-height:1.6}
+  .banner{background:var(--amber-soft);color:var(--amber);border-radius:var(--rs);padding:10px 14px;font-size:14px;font-weight:700;margin-bottom:14px}
+  .coach{display:flex;gap:10px;background:var(--violet-soft);border-radius:var(--r);padding:12px 14px;margin-top:18px;align-items:flex-start}
+  .coach .av{font-size:22px;line-height:1}
+  .coach p{margin:0 0 6px;font-weight:500}
+  .coach button{background:none;border:0;color:var(--violet);font-weight:700;cursor:pointer;padding:0;font-size:13px}
+  details.why{margin-top:18px;font-size:14px;color:var(--muted)}
+  details.why summary{cursor:pointer;font-weight:700}
+  .dist{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:10px 0;background:var(--chip)}
+  .dist i{display:block;font-style:normal;font-size:12px;color:#fff;text-align:center;line-height:26px;font-weight:700}
+  .leg{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+
+  .chk{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1.5px solid var(--border);border-radius:var(--rs);margin:8px 0;cursor:pointer;background:var(--surface);width:100%;text-align:left}
+  .chk .bx{flex:0 0 22px;height:22px;border-radius:6px;border:2px solid var(--border);display:grid;place-items:center;font-size:14px;color:transparent}
+  .chk.on{border-color:var(--primary);background:var(--primary-soft)}
+  .chk.on .bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+  .crit{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+  .crit:last-child{border:0}
+  .crit .st{font-size:20px;line-height:1.3}
+  .back{display:block;width:100%;text-align:left;margin-top:8px;border:1.5px dashed var(--border);background:none;border-radius:var(--rs);padding:10px 12px;cursor:pointer;font-size:14px;color:var(--text)}
+
+  nav#nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  nav#nav .in{max-width:680px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  .btn{border:0;border-radius:12px;padding:14px 20px;font-weight:700;cursor:pointer;font-size:16px;min-height:48px}
+  .btn.pri{background:var(--primary);color:var(--on-primary);flex:1}
+  .btn.sec{background:var(--chip);color:var(--text)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .cnt{font-size:12px;color:var(--muted);min-width:44px;text-align:center}
+  .skip{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+
+  .paper{background:#fff;color:#111;border:1px solid var(--border);border-radius:6px;padding:26px 24px;font-size:14px;line-height:1.65}
+  .paper h3{font-family:var(--display);font-size:20px;margin:0 0 4px}
+  .paper h4{margin:16px 0 4px;font-size:14px;border-bottom:1.5px solid #111;padding-bottom:2px;display:flex;justify-content:space-between}
+  .paper ul{margin:4px 0;padding-left:20px}
+  .paper .miss{font-size:11px;background:#FEE2E2;color:#B91C1C;border-radius:99px;padding:1px 8px;font-weight:700}
+  .paper .ed{font-size:11px;color:#1E40AF;cursor:pointer;border:0;background:none;text-decoration:underline}
+  .paper .meta{color:#555;font-size:12px}
+  .print-only{display:none}
+  @media print{
+    body{background:#fff;padding:0}
+    header.top,nav#nav,#app>*:not(.printzone){display:none!important}
+    .printzone,.printzone .paper{display:block!important;border:0;box-shadow:none;margin:0;padding:0}
+    .paper .ed{display:none}
+  }
+  @media (max-width:420px){h1{font-size:21px}.pill{font-size:11px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="row">
+      <div class="brand" id="brand">🧭 4단계 사고 학습</div>
+      <span class="badge" id="lvBadge" hidden></span>
+      <button class="ghost" id="menuBtn">메뉴</button>
+    </div>
+    <div id="stepper"></div>
+  </div>
+  <div class="bar"><i id="prog" style="width:0"></i></div>
+</header>
+<main class="wrap" id="app"></main>
+<nav id="nav"><div class="in">
+  <button class="btn sec" id="prev">← 이전</button>
+  <span class="cnt" id="cnt"></span>
+  <button class="btn pri" id="next">다음 →</button>
+</div></nav>
+
+<script>
+/* ================= 상태 ================= */
+const KEY='sosaeng-learn-v1';
+const blank=()=>({level:null,mode:'solo',problem:'',d:{},mod:{},round:1,rounds:[],portfolio:[],cur:'0-1'});
+let S=load();
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&typeof r==='object')return Object.assign(blank(),r)}catch(e){}return blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lv=()=>S.level==='g'?'g':'s';
+const t=x=>Array.isArray(x)?x[lv()==='g'?1:0]:x;           // [초급, 중급] 쌍
+const D=id=>S.d[id]||(S.d[id]={});
+const tr=v=>String(v||'').trim();
+const jong=w=>{const c=tr(w).slice(-1).charCodeAt(0);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28>0};
+const eunn=w=>w+(jong(w)?'은':'는');
+const qeul=w=>'‘'+w+'’'+(jong(w)?'을':'를'),qgwa=w=>'‘'+w+'’'+(jong(w)?'과':'와');
+
+/* ================= 파생 데이터 ================= */
+const LAYERS=['개인','관계','제도','문화'];
+const LCOL={개인:'#1E40AF',관계:'#0D9488',제도:'#C2740A',문화:'#6D28D9'};
+const cardsOf=(id,k)=>D(id)[k]||[];
+const stakeholders=()=>cardsOf('1-2','cards').map(c=>tr(c.name)).filter(Boolean);
+const causes=()=>{const o=[];cardsOf('2-1','cards').forEach(b=>['w1','w2','w3'].forEach(k=>{const v=tr(b[k]);if(v&&!o.includes(v))o.push(v)}));return o};
+const dist=()=>{const m=D('2-2').map||{},c={개인:0,관계:0,제도:0,문화:0};causes().forEach(x=>{if(m[x])c[m[x]]++});return c};
+const vA=()=>tr(D('1-3').vA),vB=()=>tr(D('1-3').vB);
+const defText=()=>{const d=D('1-5');if(!tr(d.who)||!tr(d.where)||!tr(d.diff))return '';
+  const a=vA()||'한 가치',b=vB()||'다른 가치';
+  return `${tr(d.where)}에서 ${eunn(tr(d.who))} ${qgwa(a)} ‘${b}’ 사이의 긴장 때문에 ${tr(d.diff).replace(/[.。]$/,'')}.`};
+const levers=()=>D('2-5').sel||[];
+const actions=()=>cardsOf('3-4','cards').filter(a=>tr(a.act));
+const isStruct=a=>{const v=(D('4-1').yn||{})[tr(a.act)];return !!(v&&v.p===1&&v.b===1&&v.r===1)};
+const rated=n=>{const r=(D('2-4').rt||{})[n];return r?(r.i||0)+(r.f||0)+(r.s||0):0};
+const crit5=()=>Object.values(D('1-5').chk||{}).filter(Boolean).length;
+const filledN=(arr,k)=>arr.filter(x=>tr(x[k])).length;
+
+/* ================= 문구 ================= */
+const CASES={
+ s:['동네 골목 가게가 자꾸 문을 닫아요','빈집이 늘어나 마을이 어두워져요','혼자 사는 어르신이 외로워해요','청년이 일자리를 찾아 동네를 떠나요','분리배출이 제대로 안 지켜져요','아이 돌봄 공백(방과후)이 생겨요'],
+ g:['청년 정착 지원사업을 해도 정착률이 낮다','주민참여예산 제안이 형식적 의견수렴에 그친다','복지 전달체계에서 위기가구 사각지대가 생긴다','민관협력 보조사업이 예산 종료와 함께 멈춘다','마을공동체 사업 후 활동가와 공간이 유지되지 않는다','전통시장 활성화 사업의 효과가 단기에 그친다']};
+const SEED_STK={
+ s:['주민','소상공인','청년','어르신','건물주','시청·구청','학교','시민단체'],
+ g:['주민','소상공인','담당 부서','의회','수혜자','수탁 기관','중간지원조직','인접 부서']};
+const VALUES=['안전','공정','자유','돌봄','수익','지속가능성','존엄','효율'];
+
+/* ================= 코치 (규칙 기반 질문) ================= */
+const EVAL=/(나쁜|이기적|무책임|욕심|게으|무능|탐욕|못된|무식|형편없)/;
+const SOLN=/(해야|필요하|만들|도입|설치|늘려|늘리|확대|지원해|해결)/;
+const COMP=/(절충|반반|중간|타협|조금씩|적당히)/;
+const Q={
+ '0-3':{alt:'이 문제를 가장 가까이서 겪는 사람은 누구인가요?',
+   when:()=>tr(S.problem).length>0&&tr(S.problem).length<14,
+   q:['구체적인 장소나 대상 하나로 좁히면 어떻게 될까요?','범위를 하나의 현장(장소·대상)으로 좁히면 어떤 문장이 되나요?']},
+ '1-1':{alt:'이 원인을 말한 사람은 어떤 입장에서 보고 있을까요?',
+   when:()=>D('1-1').type==='개인',
+   q:['제도 층위에서는 어떻게 보일까요?','같은 현상을 제도·규정 층위에서 보면 원인이 어떻게 달라지나요?']},
+ '1-2':{alt:'목소리를 내기 어려운 사람은 누구인가요?',
+   when:()=>{const c=cardsOf('1-2','cards');return c.length>=3&&c.some(x=>tr(x.name)&&!tr(x.fear))},
+   q:['풀릴 때 가장 불편해지는 사람은 누구인가요?','이 문제가 해소될 때 가장 큰 비용·불이익을 지는 이해관계자는 누구인가요?']},
+ '1-3':{alt:'두 입장이 사실 같은 걸 원하고 있진 않나요?',
+   when:()=>EVAL.test(vA()+vB()),
+   q:['그 사람이 지키려는 가치로 바꾸면 뭐라고 쓸 수 있을까요?','평가어 대신 그 입장이 지키려는 가치를 한 단어로 바꿔 보면요?']},
+ '1-4':{alt:'지금 안이 두 가치를 모두 살리는지 어떻게 확인할 수 있을까요?',
+   when:()=>{const d=D('1-4'),c=cardsOf('1-4','cards')[+d.rep];return !!(c&&COMP.test((c.name||'')+(c.how||'')))},
+   q:['두 쪽이 정말 원하는 더 큰 목적은 무엇일까요?','양측 이해를 한 단계 위의 공통 목적으로 묶으면 어떤 안이 나올까요?']},
+ '1-5':{alt:'이 문장을 처음 듣는 사람도 장면이 그려지나요?',
+   when:()=>SOLN.test(tr(D('1-5').diff)),
+   q:['해결책을 빼고 긴장만 남기면 어떻게 쓸 수 있을까요?','해결책 표현을 제거하고 현상과 긴장만 남긴 문장으로 바꿔 보세요.']},
+ '2-1':{alt:'가장 쉽게 넘어간 “왜?”는 무엇인가요?',
+   when:()=>{const c=cardsOf('2-1','cards');return c.length===1&&tr(c[0].w1)},
+   q:['다른 이유는 없을까요?','다른 갈래의 원인은 없는지 한 가지만 더 찾아볼까요?']},
+ '2-2':{alt:'어느 층위가 비어 있나요? 왜일까요?',
+   when:()=>{const d=dist(),n=Object.values(d).reduce((a,b)=>a+b,0);return n>=3&&d.개인/n>0.5},
+   q:['제도·문화 층위의 원인도 찾아볼까요?','개인 층위에 쏠려 있습니다. 제도·문화 층위의 원인을 보완해 보세요.']},
+ '2-3':{alt:'이 고리를 끊을 수 있는 가장 약한 연결은 어디인가요?',
+   when:()=>tr(D('2-3').a)&&tr(D('2-3').b),
+   q:['이 고리를 더 강하게 만드는 것은 무엇인가요?','이 되먹임을 증폭시키는 요인(예산·규정·관행)은 무엇인가요?']},
+ '2-4':{alt:'점수가 높은 후보는 정말 다른 원인에 영향을 주나요?',
+   when:()=>Object.keys(D('2-4').rt||{}).length>0&&!tr(D('2-4').why),
+   q:['그렇게 본 근거는 무엇인가요?','점수의 근거(경험·통계·사례)를 한 줄로 남겨 볼까요?']},
+ '3-1':{alt:'그날 가장 크게 달라진 것은 무엇인가요?',
+   when:()=>tr(D('3-1').scene).length>0&&tr(D('3-1').scene).length<50,
+   q:['그날 아침 누가 무엇을 하고 있나요?','그날 아침, 누가 어디서 무엇을 하는지 한 장면으로 그려 보세요.']},
+ '3-2':{alt:'가장 넘기 어려운 해는 어느 해인가요?',
+   when:()=>{const d=D('3-2');return tr(d.y10)&&!tr(d.y5)||tr(d.y5)&&!tr(d.y2)},
+   q:['이 장면이 되려면 바로 전에 무엇이 일어나야 하나요?','한 단계 뒤 시점의 결과가 되려면 직전에 어떤 조건이 갖춰져야 하나요?']},
+ '3-3':{alt:'이 일을 그만두면 누가 불편해지나요?',
+   when:()=>cardsOf('3-3','cards').length>0,
+   q:['이 일을 시작한 이유가 지금도 유효한가요?','이 업무의 도입 목적이 현재도 유효한지 점검해 보셨나요?']},
+ '4-1':{alt:'가장 쉽게 사라질 항목은 어느 것인가요?',
+   when:()=>actions().some(a=>!isStruct(a)&&(D('4-1').yn||{})[tr(a.act)]),
+   q:['담당자가 바뀌어도 계속되나요?','인사이동·예산 삭감 후에도 이 항목은 유지되나요?']},
+ '4-2':{alt:'가장 약한 칸은 어디인가요?',
+   when:()=>{const d=D('4-2'),ks=['rule','role','money','data','decide'];return ks.some(k=>tr(d[k]))&&ks.some(k=>!tr(d[k]))},
+   q:['이 칸이 비어 있으면 무엇이 멈추나요?','비어 있는 칸 때문에 운영이 멈추는 지점은 어디인가요?']}
+};
+let altOn=false;
+
+/* ================= 화면 정의 ================= */
+/* 필드 type: text | long | choice | cards | rate | classify | checks | pick | info | map | custom */
+const SCREENS=[
+{id:'0-1',st:0,ic:'🚪',min:1,title:'시작',custom:'start',ok:()=>!!S.level},
+{id:'0-2',st:0,ic:'👥',min:1,title:['어떻게 할까요?','학습 방식 선택'],lead:['오늘은 혼자 해 봐요.','학습 모드를 선택하세요.'],custom:'mode',ok:()=>!!S.mode},
+{id:'0-3',st:0,ic:'🎯',min:2,title:['어떤 문제를 풀어 볼까요?','다룰 문제 설정'],lead:['카드를 고르거나 한 문장으로 적어요.','사례 카드를 고르거나 한 문장으로 직접 입력하세요.'],custom:'problem',ok:()=>tr(S.problem).length>0},
+
+{id:'1-1',st:1,ic:'🔍',min:2,title:['내가 생각하는 원인은?','사고 점검: 나의 원인 인식'],lead:['정답은 없어요. 지금 생각을 적어 봐요.','현재의 원인 인식을 먼저 기록합니다.'],
+ why:['먼저 내 생각을 적어 두면, 나중에 얼마나 달라졌는지 볼 수 있어요.','출발점 인식을 기록하면 단계 후 변화를 비교할 수 있습니다.'],
+ fields:[
+  {k:'cause',type:'text',label:['원인을 한 줄로','원인 한 줄'],ph:['예) 사람들이 관심이 없어서','예) 담당 인력과 예산 부족'],ex:{s:['사람들이 무관심해서','돈이 부족해서','규칙이 없어서'],g:['예산·인력 부족','부서 간 칸막이','성과지표가 단기 중심']}},
+  {k:'src',type:'choice',label:['그렇게 생각한 이유는?','경험 출처'],opts:['직접 겪었어요|직접 경험','뉴스·SNS|뉴스·SNS','주변 이야기|주변 사례','통계·자료|통계·보고서']},
+  {k:'type',type:'choice',label:['이 원인은 어디에 가까운가요?','원인 유형'],opts:['개인|개인','관계|관계','제도|제도','문화|문화']},
+  {k:'evid',type:'text',lv:'g',label:['','근거 자료 (통계·민원·보고서, 선택)'],ph:['','예) 2024 지역사회조사 3p']}],
+ ok:()=>!!tr(D('1-1').cause)},
+{id:'1-2',st:1,ic:'🗺️',min:4,title:['누가 얽혀 있나요?','이해관계자 지도'],lead:['사람·단체 카드를 만들어요. 이름만 적어도 돼요.','이해관계자 카드를 6~8장 작성합니다.'],
+ why:['한쪽 입장만 보면 해결책이 다른 쪽에 부담을 넘기기 쉬워요.','이해관계자별 기대·우려를 보면 갈등 지점을 미리 확인할 수 있습니다.'],
+ fields:[{k:'cards',type:'cards',min:[4,6],max:8,addLabel:'＋ 카드 추가',title:'카드',seed:'stk',
+   fields:[{k:'name',label:'누구?',ph:'예) 소상공인'},{k:'wish',label:'원하는 것',ph:'예) 손님이 늘었으면'},{k:'fear',label:'두려운 것 (풀릴 때 잃는 것)',ph:'예) 임대료가 오를까 봐'}]}],
+ ok:()=>stakeholders().length>=3},
+{id:'1-3',st:1,ic:'⚡',min:3,title:['어디서 부딪히나요?','관점 충돌'],lead:['부딪히는 두 사람을 골라 지키려는 가치를 적어요.','충돌하는 두 관점을 선택하고 각자 지키려는 가치를 작성합니다.'],
+ why:['충돌은 나쁜 게 아니라 서로 중요하게 여기는 게 다르다는 신호예요.','관점 충돌의 핵심은 가치 간 긴장입니다. 평가어는 가치로 번역해 기록하세요.'],
+ fields:[
+  {k:'pa',type:'pick',label:['한쪽','관점 A'],opts:()=>stakeholders()},
+  {k:'vA',type:'text',label:['이 쪽이 지키려는 것','관점 A가 지키려는 가치'],ph:['예) 안전','예) 형평성'],ex:{s:VALUES,g:VALUES}},
+  {k:'pb',type:'pick',label:['다른 쪽','관점 B'],opts:()=>stakeholders()},
+  {k:'vB',type:'text',label:['이 쪽이 지키려는 것','관점 B가 지키려는 가치'],ph:['예) 수익','예) 효율성'],ex:{s:VALUES,g:VALUES}},
+  {k:'_c',type:'info',html:()=>{const d=D('1-3');return tr(d.pa)&&tr(d.pb)&&vA()&&vB()?`<b>충돌 문장</b><br><span class="quote">${esc(eunn(d.pa))} ${esc(qeul(vA()))}, ${esc(eunn(d.pb))} ${esc(qeul(vB()))} 지키려 한다.</span>`:''}}],
+ ok:()=>!!(vA()&&vB())},
+{id:'1-4',st:1,ic:'💡',min:4,title:['모두 살리는 길은?','제3의 안'],lead:['양쪽을 다 살릴 아이디어를 3장 이상 적어요.','안 카드를 3장 이상 작성하고 가치별로 평가한 뒤 대표안을 고르세요.'],
+ why:['A냐 B냐가 아니라 “둘 다 되려면?”을 묻는 단계예요.','양자택일 구조를 벗어나 두 가치를 동시에 충족하는 안을 탐색합니다.'],
+ fields:[{k:'cards',type:'cards',min:[3,3],max:6,addLabel:'＋ 안 추가',title:'안',
+   fields:[{k:'name',label:'아이디어',ph:'예) 낮엔 시장, 밤엔 청년 공방'},{k:'how',label:'어떻게 둘 다 살리나요?',ph:'한 줄'}],
+   chips:[{k:'a',label:()=>`‘${vA()||'가치 A'}’ 살림`,opts:['낮음|1','보통|2','높음|3']},{k:'b',label:()=>`‘${vB()||'가치 B'}’ 살림`,opts:['낮음|1','보통|2','높음|3']}]},
+  {k:'rep',type:'rep'}],
+ ok:()=>filledN(cardsOf('1-4','cards'),'name')>=1&&D('1-4').rep!=null},
+{id:'1-5',st:1,ic:'📝',min:4,title:['문제를 한 문장으로','공통 문제 정의문'],lead:['빈칸 3개만 채우면 문장이 완성돼요.','템플릿 빈칸을 채우고 기준 5개를 확인하세요.'],
+ why:['좋은 정의문은 해결책이 아니라 “긴장”을 담아요. 이후 모든 단계의 출발점이에요.','정의문은 이후 단계의 기준점입니다. 해결책이 섞이면 탐색이 좁아집니다.'],
+ fields:[
+  {k:'where',type:'text',label:['어디서?','장소·상황'],ph:['예) 시장 골목','예) 전통시장 상권'],ex:{s:['우리 동네 골목','마을 회관','학교 앞'],g:['관내 전통시장','복지 접수 창구','보조사업 종료 시점']}},
+  {k:'who',type:'text',label:['누가?','대상'],ph:['예) 가게 사장님','예) 소상공인'],ex:{s:['가게 사장님','어르신','청년'],g:['수혜 주민','소상공인','담당 공무원']}},
+  {k:'diff',type:'text',label:['어떤 어려움을 겪나요? (해결책 말고!)','겪는 어려움 (해결책 제외)'],ph:['예) 손님은 늘리고 싶은데 임대료는 못 올리는 처지에 놓인다','예) 사업 종료 후 운영 동력을 잃는다']},
+  {k:'_d',type:'info',html:()=>{const x=defText();return x?`<b>내 정의문</b><br><span class="quote">${esc(x)}</span>`:''}},
+  {k:'chk',type:'checks',label:['이 문장, 이렇게 돼 있나요?','정의문 기준 5개'],items:[['sol','해결책이 들어 있지 않다'],['spot','구체적인 장소·대상이 있다'],['both','두 가치가 모두 들어 있다'],['obs','눈으로 확인할 수 있는 상황이다'],['one','한 문장으로 끝난다']]}],
+ ok:()=>!!defText()},
+
+{id:'2-1',st:2,ic:'⛓️',min:5,title:['왜? 왜? 왜?','원인 사슬'],lead:['정의문에서 시작해 “왜?”를 세 번 물어요. 갈래는 2개 이상!','정의문에서 시작해 “왜?”를 반복하고 갈래를 나눕니다.'],
+ why:['한 줄로만 파면 놓치는 게 많아요. 다른 갈래를 꼭 하나 더 찾아요.','복수의 원인 갈래를 확보해야 레버리지 비교가 가능합니다.'],
+ fields:[
+  {k:'_s',type:'info',html:()=>defText()?`<b>출발점</b><br><span class="quote">${esc(defText())}</span>`:'<b>1-5에서 정의문을 먼저 완성하면 여기에 표시돼요.</b>'},
+  {k:'cards',type:'cards',min:[2,2],max:4,addLabel:'＋ 갈래 추가',title:'갈래',
+   fields:[{k:'w1',label:'왜 그럴까요? ①',ph:'이유'},{k:'w2',label:'그건 또 왜요? ②',ph:'이유'},{k:'w3',label:'그건 또 왜요? ③',ph:'이유'}]}],
+ ok:()=>cardsOf('2-1','cards').filter(b=>tr(b.w1)).length>=1},
+{id:'2-2',st:2,ic:'🧱',min:3,title:['어느 층에 있나요?','층위 분류'],lead:['원인마다 해당하는 층을 골라요.','원인을 개인 / 관계 / 제도 / 문화로 분류합니다.'],
+ why:['개인 탓으로만 몰리면 제도·문화에 숨은 뿌리를 놓쳐요.','층위 분포가 편중되면 개입 지점도 편중됩니다.'],
+ fields:[{k:'map',type:'classify',rows:causes,cats:LAYERS,empty:'2-1에서 원인을 먼저 적어 주세요.'},
+  {k:'_g',type:'info',html:()=>{const d=dist(),n=Object.values(d).reduce((a,b)=>a+b,0);if(!n)return '';return `<div class="dist">${LAYERS.map(l=>d[l]?`<i style="width:${d[l]/n*100}%;background:${LCOL[l]}">${l} ${d[l]}</i>`:'').join('')}</div>`}}],
+ ok:()=>Object.keys(D('2-2').map||{}).length>0},
+{id:'2-3',st:2,ic:'🔁',min:4,title:['돌고 도는 고리','악순환 고리'],lead:['원인 3~4개를 이어 고리를 만들어요.','원인을 연결해 되먹임 고리를 구성합니다.'],
+ why:['원인은 일직선이 아니라 서로 키워 주며 돌아요. 고리를 보면 끊을 곳이 보여요.','되먹임 구조를 파악하면 개입 지점을 정확히 고를 수 있습니다.'],
+ fields:[{k:'a',type:'pick',label:['① 시작','시작 요인'],opts:causes},{k:'b',type:'pick',label:['② 그래서','연결 요인 1'],opts:causes},{k:'c',type:'pick',label:['③ 그래서','연결 요인 2'],opts:causes},{k:'d',type:'pick',label:['④ 그래서 (선택)','연결 요인 3 (선택)'],opts:causes,optional:true},
+  {k:'_l',type:'info',html:()=>{const d=D('2-3'),a=[d.a,d.b,d.c,d.d].map(tr).filter(Boolean);return a.length>=2?`<b>고리</b><br><span class="quote">${a.map(esc).join(' → ')} → (다시) ${esc(a[0])}</span>`:''}}],
+ ok:()=>!!(tr(D('2-3').a)&&tr(D('2-3').b))},
+{id:'2-4',st:2,ic:'⚖️',min:5,title:['어디를 건드릴까요?','레버리지 비교'],lead:['원인마다 하·중·상으로 눌러요.','후보를 영향력·실행 가능성·지속성으로 평가합니다.'],
+ why:['작게 건드려도 크게 바뀌는 곳이 레버리지예요. 영향·실행·지속 세 가지를 같이 봐요.','세 기준의 합이 높은 지점이 우선 개입 후보입니다.'],
+ fields:[{k:'rt',type:'rate',rows:causes,cols:[['i','영향력'],['f','실행 가능성'],['s','지속성']],empty:'2-1에서 원인을 먼저 적어 주세요.'},
+  {k:'why',type:'text',label:['점수 근거 한 줄','점수 근거'],ph:['예) 이게 바뀌면 나머지도 따라 바뀜','예) 2023 평가보고서 12p']}],
+ ok:()=>Object.keys(D('2-4').rt||{}).length>0},
+{id:'2-5',st:2,ic:'📌',min:3,title:['세 곳만 고르면?','레버리지 선정'],lead:['점수 높은 순서예요. 3개를 골라요.','3개를 선정하고 가치 A·B 부합 여부를 확인합니다.'],
+ why:['다 하려면 아무것도 못 해요. 세 곳에 힘을 모아요.','집중 개입 3개를 선정하고 두 가치에 부합하는지 점검합니다.'],
+ custom:'lever',ok:()=>levers().length>=1},
+
+{id:'3-1',st:3,ic:'🌅',min:4,title:['문제가 풀린 날의 하루','미래 장면'],lead:['10년 뒤 어느 날을 글로 그려요.','문제가 해소된 미래의 하루를 서술합니다.'],
+ why:['먼저 도착점을 그리면, 거꾸로 가는 길이 보여요.','백캐스팅은 바람직한 미래에서 현재로 역산하는 방법입니다.'],
+ fields:[{k:'scene',type:'long',label:['그날 아침, 무슨 일이 있나요?','미래 장면'],ph:['예) 아침 8시, 시장 골목 …','예) 2036년 3월, 접수 창구에서 …'],ex:{s:['아침에 눈을 떴을 때','가게 문을 여는 시간에'],g:['사업 종료 후 3년차,','정기 평가 회의에서']}}],
+ ok:()=>tr(D('3-1').scene).length>0},
+{id:'3-2',st:3,ic:'⏪',min:5,title:['거꾸로 거슬러 가요','역방향 타임라인'],lead:['장면에서 시작해 10년→5년→2년→올해.','미래 장면에서 거꾸로 해별 필요한 일을 적습니다.'],
+ why:['“그 직전엔 뭐가 있어야 하지?”만 반복하면 돼요.','후방 질문을 반복하면 의존 관계가 드러납니다.'],
+ fields:[{k:'y10',type:'text',label:['10년 뒤 (장면)','10년 후'],ph:['한 줄']},{k:'y5',type:'text',label:['5년 뒤엔 무엇이 있어야?','5년 후'],ph:['한 줄']},{k:'y2',type:'text',label:['2년 뒤엔?','2년 후'],ph:['한 줄']},{k:'y0',type:'text',label:['올해 할 일은?','올해'],ph:['한 줄']}],
+ ok:()=>['y10','y5','y2','y0'].every(k=>tr(D('3-2')[k]))},
+{id:'3-3',st:3,ic:'🧹',min:4,title:['관성으로 하는 일은?','관행 점검'],lead:['지금 하는 일을 적고 표시해요.','현재 업무 중 관성으로 지속되는 일을 표시합니다.'],
+ why:['새 일을 하려면 낡은 일을 덜어내야 해요.','자원 제약상 신규 추진 전 중단·변경 후보를 먼저 식별해야 합니다.'],
+ fields:[{k:'cards',type:'cards',min:[1,1],max:5,addLabel:'＋ 하는 일 추가',title:'일',seed:'hab',
+   fields:[{k:'name',label:'지금 하는 일',ph:'예) 매년 하는 행사'}],
+   chips:[{k:'in',label:()=>'이 일은',opts:['관성이에요|1','이유가 있어요|0']},{k:'dec',label:()=>'그래서',opts:['중단|중단','변경|변경','유지|유지']}]}],
+ ok:()=>filledN(cardsOf('3-3','cards'),'name')>=1},
+{id:'3-4',st:3,ic:'🚀',min:3,title:['올해 첫걸음','첫 행동'],lead:['작아도 괜찮아요. 올해 시작할 것 하나.','올해 시작할 행동을 정합니다.'],
+ why:['작고 구체적인 행동이 가장 오래 가요.','실행 가능한 최소 단위로 정의해야 4단계 구조화가 가능합니다.'],
+ fields:[{k:'cards',type:'cards',min:[1,1],max:5,addLabel:'＋ 행동 추가',title:'행동',
+   fields:[{k:'act',label:'무엇을?',ph:'예) 매달 첫 주 골목 청소 모임'},{k:'who',label:'누가?',ph:'예) 사장님 3명'},{k:'dept',lv:'g',label:'담당 부서·예산 근거',ph:'예) 경제과 / 지역상권 보조금'}],
+   chips:[{k:'when',label:()=>'언제?',opts:['바로|바로','상반기|상반기','하반기|하반기']}]}],
+ ok:()=>actions().length>=1},
+
+{id:'4-1',st:4,ic:'🔎',min:4,title:['활동일까요, 구조일까요?','활동·구조 판별'],lead:['세 가지 질문에 예/아니오만 눌러요.','각 항목을 세 가지 판별 질문으로 점검합니다.'],
+ why:['사람이 바뀌면 사라지는 건 “활동”, 계속 돌아가는 건 “구조”예요.','구조는 인력·예산 변동과 무관하게 유지되는 규칙·역할·재원입니다.'],
+ fields:[{k:'yn',type:'rate',rows:()=>actions().map(a=>tr(a.act)),cols:[['p','담당자가 바뀌어도?'],['b','예산이 줄어도?'],['r','규칙·문서로 남나?']],opts:['예|1','아니오|0'],badge:true,empty:'3-4에서 행동을 먼저 적어 주세요.'}],
+ ok:()=>Object.keys(D('4-1').yn||{}).length>0},
+{id:'4-2',st:4,ic:'🏗️',min:6,title:['오래 가는 틀 만들기','구조 설계 캔버스'],lead:['5칸을 한 줄씩 채워요.','규칙·역할·재원 순환·데이터·의사결정 5칸을 작성합니다.'],
+ why:['한 칸이라도 비면 그 지점에서 멈춰요.','구조 5요소가 모두 있어야 지속 운영이 가능합니다.'],
+ fields:[
+  {k:'rule',type:'text',label:['📜 규칙: 우리끼리 정한 약속','📜 규칙·규정'],ph:['예) 매달 첫 주는 모임','예) 조례·운영지침 근거 조항']},
+  {k:'role',type:'text',label:['🎭 역할: 누가 맡나','🎭 역할·거버넌스'],ph:['예) 번갈아 맡는 당번','예) 총괄·실무·자문 역할 분담']},
+  {k:'money',type:'text',label:['💰 재원: 돈이 어떻게 돌아오나','💰 재원 순환'],ph:['예) 수익 일부를 다음 모임에','예) 보조금→자체수익 전환 경로']},
+  {k:'data',type:'text',label:['📊 데이터: 무엇을 기록하나','📊 데이터·성과관리'],ph:['예) 참여 인원 기록','예) 지표·수집 주기·공개 방식']},
+  {k:'decide',type:'text',label:['🗳️ 결정: 어떻게 정하나','🗳️ 의사결정'],ph:['예) 참여자 투표','예) 협의체 구성·의결 방식']}],
+ ok:()=>['rule','role','money','data','decide'].every(k=>tr(D('4-2')[k]))},
+{id:'4-3',st:4,ic:'🔄',min:4,title:['활동을 구조로 바꾸면?','활동→구조 전환표'],lead:['“활동”으로 나온 항목만 바꿔 써요.','활동으로 판별된 항목을 구조로 바꿔 씁니다.'],
+ why:['“매달 모인다”는 활동, “당번표와 회비 규칙이 있다”는 구조예요.','일회성 실행을 제도·규칙으로 치환하는 단계입니다.'],
+ custom:'convert',ok:()=>{const r=actions().filter(a=>!isStruct(a));return r.length===0?actions().length>0:r.every(a=>tr((D('4-3').map||{})[tr(a.act)]))}},
+{id:'4-4',st:4,ic:'🛡️',min:3,title:['오래 갈까요?','지속성 점검'],lead:['네 가지만 확인해요.','예산·담당자 변동 시 지속 여부를 확인합니다.'],
+ why:['끝까지 와서 한 번 더 흔들어 보는 단계예요.','변동 시나리오 점검 결과를 제안서에 반영합니다.'],
+ fields:[{k:'chk',type:'checks',label:['모두 체크되면 튼튼해요','점검 항목'],items:[['p','담당자가 바뀌어도 이어진다'],['b','예산이 절반이 되어도 이어진다'],['r','규칙·기록이 문서로 남는다'],['n','새로 온 사람이 혼자 따라 할 수 있다']]},
+  {k:'note',type:'text',label:['걱정되는 점 (선택)','보완 필요사항 (선택)'],ph:['한 줄']}],
+ ok:()=>Object.keys(D('4-4').chk||{}).length>0},
+
+{id:'F-1',st:5,ic:'📄',min:3,title:['내 제안서 한 장','제안서 미리보기'],lead:['빨간 “미완” 표시를 눌러 고칠 수 있어요.','단계별 산출물을 A4 한 장으로 확인하고 수정합니다.'],custom:'preview',ok:()=>true},
+{id:'F-2',st:5,ic:'📤',min:2,title:['저장하고 나누기','내보내기·공유'],lead:['PDF로 받거나 기록에 남겨요.','PDF 저장, 포트폴리오 보관, 새 정의문으로 재시작.'],custom:'export',ok:()=>true}
+];
+/* 단계 점검 화면 삽입 */
+[1,2,3,4].forEach(n=>{const last=SCREENS.map(s=>s.id).lastIndexOf(`${n}-${n===1?5:n===2?5:4}`);
+  SCREENS.splice(last+1,0,{id:`${n}-C`,st:n,ic:'✅',min:1,title:['한 번 짚고 가요','단계 점검'],lead:['못 채워도 넘어갈 수 있어요.','기준을 채우지 못해도 진행할 수 있고, 제안서에 “미완”으로 표시됩니다.'],custom:'check',ok:()=>true,check:true})});
+const REAL=SCREENS.filter(s=>!s.check);
+const idx=id=>SCREENS.findIndex(s=>s.id===id);
+const scr=id=>SCREENS[idx(id)];
+const ST=[{n:'시작',c:'var(--slate)',bg:'var(--slate-soft)'},{n:'① 통합',c:'var(--primary)',bg:'var(--primary-soft)'},{n:'② 업스트림',c:'var(--teal)',bg:'var(--teal-soft)'},{n:'③ 백캐스팅',c:'var(--amber)',bg:'var(--amber-soft)'},{n:'④ 구조',c:'var(--violet)',bg:'var(--violet-soft)'},{n:'마무리',c:'var(--slate)',bg:'var(--slate-soft)'}];
+const STSUB=['','같이 보기','뿌리 찾기','미래에서 거꾸로','오래 가게'];
+
+/* ================= 단계 점검 기준 ================= */
+function stageCheck(n){
+  if(n===1){const rep=D('1-4').rep;return{items:[
+    {ok:crit5()>=4,t:`정의문 기준 5개 중 4개 충족 (지금 ${crit5()}개)`},
+    {ok:rep!=null&&!!cardsOf('1-4','cards')[+rep],t:'대표안 1개 선택'}],back:[]}}
+  if(n===2){const d=dist(),layers=LAYERS.filter(l=>d[l]>0).length,br=cardsOf('2-1','cards').filter(b=>tr(b.w1)).length;return{items:[
+    {ok:br>=2,t:`원인 사슬 2갈래 이상 (지금 ${br}갈래)`},
+    {ok:layers>=3,t:`원인이 3개 층위 이상에 분포 (지금 ${layers}개)`},
+    {ok:levers().length>=3,t:`레버리지 포인트 3개 선정 (지금 ${levers().length}개)`}],
+    back:[['1-5','원인을 파다 보니 정의문이 증상에 가깝다고 느껴져요 → 정의문(1-5)으로']]}}
+  if(n===3){return{items:[
+    {ok:!!tr(D('3-1').scene),t:'미래 장면 1개'},
+    {ok:['y10','y5','y2','y0'].every(k=>tr(D('3-2')[k])),t:'마일스톤 4개'},
+    {ok:cardsOf('3-3','cards').filter(c=>tr(c.name)&&c.in!=null).length>=1,t:'관행 점검 1건 이상'},
+    {ok:actions().length>=1,t:'첫 행동 1개 이상'}],
+    back:[['2-5','미래 장면이 고른 레버리지와 이어지지 않아요 → 레버리지 선정(2-5)으로'],['1-3','가치 A·B 중 하나가 장면에 없어요 → 관점 충돌(1-3)으로']]}}
+  const d=D('4-2');const five=['rule','role','money','data','decide'].every(k=>tr(d[k]));
+  return{items:[{ok:five,t:'구조 5칸 모두 작성'},{ok:Object.keys(D('4-4').chk||{}).length>0,t:'지속성 점검 완료'}],
+    back:[['3-4','구조 칸을 채울 수 없는 행동이 있어요 → 첫 행동(3-4)으로']]}
+}
+
+/* ================= 렌더링 ================= */
+const $=s=>document.querySelector(s);
+function stagePillStates(){return [1,2,3,4].map(n=>REAL.filter(s=>s.st===n).every(s=>s.ok()))}
+function drawChrome(){
+  const cur=scr(S.cur);
+  $('#lvBadge').hidden=!S.level;$('#lvBadge').textContent=S.level==='g'?'중급 · 공무원·리더':'초급 · 시민·청년';
+  const done=stagePillStates();
+  $('#stepper').innerHTML=[1,2,3,4].map(n=>`<button class="pill ${cur.st===n?'on':''} ${done[n-1]?'done':''}" data-act="goStage" data-n="${n}" style="${cur.st===n?'background:'+ST[n].c:''}">${done[n-1]&&cur.st!==n?'✓ ':''}${ST[n].n.replace(/^.\s/,'')}</button>`).join('');
+  const nDone=REAL.filter(s=>s.ok()&&D(s.id)&&(Object.keys(D(s.id)).length||s.id==='0-1'||s.id==='0-2')).length;
+  const pos=REAL.findIndex(s=>s.id===S.cur);
+  $('#prog').style.width=(Math.max(0,idx(S.cur))/(SCREENS.length-1)*100)+'%';
+  $('#cnt').textContent=cur.check?'점검':`${REAL.findIndex(s=>s.id===cur.id)+1}/${REAL.length}`;
+  $('#prev').disabled=idx(S.cur)===0;
+  const last=idx(S.cur)===SCREENS.length-1;$('#next').style.display=last?'none':'';
+  $('#next').disabled=cur.id==='0-1'&&!S.level;
+  const nx=SCREENS[idx(S.cur)+1];$('#next').textContent=nx&&nx.check?'점검하기 →':'다음 →';
+}
+function draw(){
+  const s=scr(S.cur);if(!s){S.cur='0-1';return draw()}
+  drawChrome();
+  const stc=ST[s.st];
+  let h=`<section class="card" data-screen="${s.id}">`;
+  if(s.id!=='0-1'){h+=`<div class="kick" style="color:${stc.c}">${s.ic} ${stc.n}${STSUB[s.st]?' · '+STSUB[s.st]:''} · ${s.id} · ⏱ 약 ${s.min}분</div>`;
+    h+=`<h1>${esc(t(s.title))}</h1><p class="lead">${esc(t(s.lead))}</p>`;
+    h+=changedBanner(s)}
+  if(s.custom)h+=CUSTOM[s.custom](s);else h+=(s.fields||[]).map(f=>fieldHTML(s,f)).join('');
+  if(Q[s.id])h+=`<div id="coach"></div>`;
+  if(s.why)h+=`<details class="why"><summary>💬 왜 하나요?</summary><p>${esc(t(s.why))}</p></details>`;
+  if(!s.check&&!['0-1','0-2','F-1','F-2'].includes(s.id))h+=`<div class="skip">비워 두고 넘어가도 괜찮아요. 언제든 앞으로 돌아올 수 있어요.</div>`;
+  h+='</section>';
+  $('#app').innerHTML=h;
+  refreshCoach();
+  window.scrollTo(0,0);
+}
+function changedBanner(s){
+  if(s.check||!D(s.id)||!S.mod[s.id])return '';
+  const i=idx(s.id);for(let j=0;j<i;j++){const p=SCREENS[j];if(S.mod[p.id]&&S.mod[p.id]>S.mod[s.id])return `<div class="banner">⚠️ 앞 단계 내용이 바뀌었습니다 (${p.id} ${esc(Array.isArray(p.title)?p.title[1]:p.title)}). 이 화면을 한 번 확인해 보세요.</div>`}
+  return '';
+}
+function refreshCoach(){
+  const el=$('#coach');if(!el)return;const q=Q[S.cur];if(!q)return;
+  const auto=q.when();
+  if(!auto&&!altOn){el.innerHTML=`<button class="ghost" data-act="coachAlt" style="margin-top:14px">🧭 코치에게 물어보기</button>`;return}
+  const txt=auto&&!altOn?t(q.q):(auto?t(q.q):q.alt);
+  el.innerHTML=`<div class="coach"><div class="av">🧭</div><div><p>${esc(txt)}</p>${auto||altOn?`<button data-act="coachAlt">${altOn&&auto?'접기':'다른 질문 보기'}</button>`:''}</div></div>`;
+  if(altOn&&auto)el.innerHTML=`<div class="coach"><div class="av">🧭</div><div><p>${esc(t(q.q))}</p><p>${esc(q.alt)}</p><button data-act="coachAlt">접기</button></div></div>`;
+}
+
+/* ---------- 필드 ---------- */
+const pair=o=>(o||'').split('|');
+function exChips(s,f){const arr=(f.ex&&f.ex[lv()])||[];return arr.length?`<div class="chips" style="margin-top:8px">${arr.map(x=>`<button class="chip ex" data-act="ex" data-s="${s.id}" data-k="${f.k}" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:''}
+function fieldHTML(s,f){
+  if(f.lv&&f.lv!==lv())return '';
+  const v=D(s.id)[f.k];const L=f.label?esc(t(f.label)):'';
+  switch(f.type){
+  case 'text':return `${L?`<label class="lab">${L}</label>`:''}<input type="text" data-act="in" data-s="${s.id}" data-k="${f.k}" value="${esc(v||'')}" placeholder="${esc(t(f.ph||''))}">${exChips(s,f)}`;
+  case 'long':return `<label class="lab">${L}</label><textarea data-act="in" data-s="${s.id}" data-k="${f.k}" placeholder="${esc(t(f.ph||''))}">${esc(v||'')}</textarea>${exChips(s,f)}`;
+  case 'choice':return `<label class="lab">${L}</label><div class="chips">${f.opts.map(o=>{const[a,b]=pair(o);const val=b||a;return `<button class="chip ${v===val?'sel':''}" data-act="ch" data-s="${s.id}" data-k="${f.k}" data-v="${esc(val)}">${esc(a)}</button>`}).join('')}</div>`;
+  case 'pick':{const o=f.opts();if(!o.length&&!f.optional)return `<label class="lab">${L}</label><div class="info">앞 화면에서 먼저 카드를 적어 주세요.</div>`;
+    return `<label class="lab">${L}</label><select data-act="sel" data-s="${s.id}" data-k="${f.k}"><option value="">선택…</option>${o.map(x=>`<option ${v===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`}
+  case 'info':{const h=f.html();return h?`<div class="info" id="i_${f.k}" data-live="${s.id}:${f.k}">${h}</div>`:`<div id="i_${f.k}" data-live="${s.id}:${f.k}"></div>`}
+  case 'checks':{const m=v||{};return `<label class="lab">${L}</label>`+f.items.map(([k,l])=>`<button class="chk ${m[k]?'on':''}" data-act="ck" data-s="${s.id}" data-k="${f.k}" data-i="${k}"><span class="bx">✓</span><span>${esc(l)}</span></button>`).join('')}
+  case 'classify':{const rows=f.rows(),m=v||{};if(!rows.length)return `<div class="info">${esc(f.empty)}</div>`;
+    return rows.map((r,i)=>`<div class="row3"><div class="nm">${esc(r)}</div><div class="chips">${f.cats.map(c=>`<button class="chip ${m[r]===c?'sel':''}" data-act="cl" data-s="${s.id}" data-k="${f.k}" data-r="${i}" data-v="${c}">${c}</button>`).join('')}</div></div>`).join('')}
+  case 'rate':{const rows=f.rows(),m=v||{};if(!rows.length)return `<div class="info">${esc(f.empty)}</div>`;
+    const opts=(f.opts||['하|1','중|2','상|3']).map(pair);
+    return rows.map((r,i)=>{const rr=m[r]||{};const sum=f.badge?'':`<span class="tot">합 ${(rr.i||0)+(rr.f||0)+(rr.s||0)}</span>`;
+      let badge='';if(f.badge&&['p','b','r'].every(c=>rr[c]!=null))badge=rr.p===1&&rr.b===1&&rr.r===1?'<span class="res s">구조 ✔</span>':'<span class="res a">활동</span>';
+      return `<div class="row3"><div style="display:flex;justify-content:space-between;gap:8px"><span class="nm">${esc(r)}</span>${sum}${badge}</div>${f.cols.map(([ck,cl])=>`<div class="seg"><span class="cl">${cl}</span>${opts.map(([a,b])=>`<button class="${rr[ck]===+b?'sel':''}" data-act="rt" data-s="${s.id}" data-k="${f.k}" data-r="${i}" data-c="${ck}" data-v="${b}">${a}</button>`).join('')}</div>`).join('')}</div>`}).join('')}
+  case 'cards':return cardsHTML(s,f);
+  case 'rep':return `<div id="repbox">${repHTML(s.id)}</div>`;
+  }
+  return '';
+}
+function repHTML(sid){const all=cardsOf(sid,'cards');if(!all.some(x=>tr(x.name)))return '';
+  return `<label class="lab">⭐ 대표안은?</label><div class="chips">${all.map((x,i)=>tr(x.name)?`<button class="chip ${D(sid).rep===i?'sel':''}" data-act="rep" data-s="${sid}" data-i="${i}">${esc(x.name)}</button>`:'').join('')}</div>`}
+function seedList(f){return f.seed==='stk'?SEED_STK[lv()]:f.seed==='hab'?['회의만 하는 정기모임','매년 하는 행사','같은 홍보물 재배포','서류 확인 절차']:[]}
+function cardsHTML(s,f){
+  const arr=D(s.id)[f.k]||(D(s.id)[f.k]=[]);
+  const min=f.min[lv()==='g'?1:0];
+  while(arr.length<Math.min(min,3))arr.push({});
+  let h=arr.map((c,i)=>`<div class="mini"><div class="hd"><span>${f.title} ${i+1}</span>${arr.length>1?`<button class="x" data-act="cdel" data-s="${s.id}" data-k="${f.k}" data-i="${i}" aria-label="삭제">✕</button>`:''}</div>
+   ${f.fields.filter(x=>!x.lv||x.lv===lv()).map(x=>`<small class="sl">${esc(x.label)}</small><input type="text" data-act="cin" data-s="${s.id}" data-k="${f.k}" data-i="${i}" data-f="${x.k}" value="${esc(c[x.k]||'')}" placeholder="${esc(x.ph)}" aria-label="${esc(x.label)}">`).join('')}
+   ${(f.chips||[]).map(ch=>`<div class="seg" style="margin-top:6px"><span class="cl">${esc(ch.label())}</span>${ch.opts.map(o=>{const[a,b]=pair(o);return `<button class="${String(c[ch.k])===b?'sel':''}" data-act="cch" data-s="${s.id}" data-k="${f.k}" data-i="${i}" data-c="${ch.k}" data-v="${b}">${a}</button>`}).join('')}</div>`).join('')}
+  </div>`).join('');
+  if(arr.length<f.max)h+=`<button class="add" data-act="cadd" data-s="${s.id}" data-k="${f.k}">${f.addLabel}</button>`;
+  const sd=seedList(f);
+  if(sd.length)h+=`<div class="hint" style="margin-top:12px">탭하면 카드가 채워져요</div><div class="chips">${sd.map(x=>`<button class="chip ex" data-act="cseed" data-s="${s.id}" data-k="${f.k}" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`;
+  const n=arr.filter(c=>f.fields.some(x=>tr(c[x.k]))).length;
+  if(f.min[0]>1)h+=`<div class="hint" style="margin-top:10px">권장 ${min}장 이상 · 지금 ${n}장</div>`;
+  return h;
+}
+
+/* ---------- 커스텀 화면 ---------- */
+const CUSTOM={
+ start(){
+  const has=Object.values(S.d).some(o=>Object.values(o).some(v=>v&&(typeof v!=='object'||Object.keys(v).length)))||tr(S.problem);
+  let h=`<div class="kick" style="color:var(--primary)">🧭 4단계 사고 학습</div><h1>문제를 풀기 전에,<br>생각의 순서부터 익혀요</h1><p class="lead">글을 읽지 않아도 돼요. 카드를 고르고, 한 줄씩 적으면 제안서 한 장이 완성됩니다.</p>`;
+  h+=`<label class="lab">나는 어떤 사람인가요?</label><div class="big">
+   <button class="opt ${S.level==='s'?'sel':''}" data-act="lvl" data-v="s"><span class="tag">초급</span><b>🌱 시민·청년</b><span>쉬운 말, 생활 속 사례, 눌러서 고르기 중심</span></button>
+   <button class="opt ${S.level==='g'?'sel':''}" data-act="lvl" data-v="g"><span class="tag">중급</span><b>🏛️ 공무원·행정·리더</b><span>정책 용어, 행정 사례, 근거·부서·예산 항목 추가</span></button></div>`;
+  h+=`<div style="margin-top:18px"><button class="btn pri" style="width:100%" data-act="quick" ${S.level?'':'disabled'}>⚡ 바로 시작 (혼자 · 기본 설정)</button></div>`;
+  if(has)h+=`<div class="info" style="margin-top:16px">이어서 하던 기록이 있어요. <b>${S.round}회차</b> · ${esc(S.problem||'문제 미설정')}<br><button class="chip" style="margin-top:8px" data-act="go" data-v="${S.cur==='0-1'?'0-3':S.cur}">이어서 하기 →</button></div>`;
+  if(S.rounds.length||S.portfolio.length){h+=`<h2>📚 내 학습 기록</h2>`+S.rounds.map(r=>`<div class="mini"><div class="hd"><span>${r.n}회차 · ${esc(r.date)}</span></div>${esc(r.problem)}<small>${esc(r.def||'정의문 없음')}</small></div>`).join('')+S.portfolio.map(p=>`<div class="mini"><div class="hd"><span>포트폴리오 · ${esc(p.date)}</span></div>${esc(p.problem)}</div>`).join('')}
+  h+=`<div class="skip">입력한 내용은 이 기기 브라우저에만 저장돼요.</div>`;
+  return h},
+ mode(){
+  return `<div class="big">
+  <button class="opt sel" data-act="mode" data-v="solo"><b>🙋 혼자</b><span>내 속도로, 코치 질문 더 자주</span></button>
+  <button class="opt" disabled><span class="tag">2차 오픈</span><b>👥 팀</b><span>팀 코드로 함께 작성 (준비 중)</span></button>
+  <button class="opt" disabled><span class="tag">2차 오픈</span><b>🎤 진행자</b><span>조별 현황·타이머 (준비 중)</span></button></div>
+  <div class="hint" style="margin-top:12px">팀·진행자 모드는 실시간 연결이 필요해 다음 버전에 붙입니다. 지금은 화면 공유 + PDF로 함께 쓰실 수 있어요.</div>`},
+ problem(){
+  return `<div class="chips">${CASES[lv()].map(c=>`<button class="chip ${S.problem===c?'sel':''}" data-act="case" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+  <label class="lab">또는 직접 한 문장으로</label><input type="text" id="prob" data-act="prob" value="${esc(S.problem)}" placeholder="${lv()==='g'?'예) 관내 전통시장 상권 활성화 사업이 단기 효과에 그친다':'예) 우리 동네 시장 골목에 손님이 줄어요'}">`},
+ lever(s){
+  const c=causes();if(!c.length)return `<div class="info">2-1에서 원인을 먼저 적어 주세요.</div>`;
+  const sel=levers(),fit=D(s.id).fit||{};
+  const sorted=[...c].sort((a,b)=>rated(b)-rated(a));
+  let h=`<div class="chips">${sorted.map(x=>`<button class="chip ${sel.includes(x)?'sel':''}" data-act="lev" data-v="${esc(x)}">${esc(x)} ${rated(x)?`· ${rated(x)}점`:''}</button>`).join('')}</div><div class="hint" style="margin-top:8px">선택 ${sel.length}/3</div>`;
+  if(sel.length)h+=`<label class="lab">가치에 맞나요?</label>`+sel.map((x,i)=>{const f=fit[x]||{};return `<div class="row3"><div class="nm">${esc(x)}</div><div class="chips"><button class="chip ${f.a?'sel':''}" data-act="fit" data-v="${esc(x)}" data-c="a">‘${esc(vA()||'가치 A')}’에 맞아요</button><button class="chip ${f.b?'sel':''}" data-act="fit" data-v="${esc(x)}" data-c="b">‘${esc(vB()||'가치 B')}’에 맞아요</button></div></div>`}).join('');
+  return h},
+ convert(s){
+  const rows=actions().filter(a=>!isStruct(a));
+  if(!actions().length)return `<div class="info">3-4에서 행동을 먼저 적어 주세요.</div>`;
+  if(!Object.keys(D('4-1').yn||{}).length)return `<div class="info">4-1에서 먼저 판별해 주세요.</div>`;
+  if(!rows.length)return `<div class="info">🎉 모든 항목이 이미 구조예요. 바로 다음으로 가요!</div>`;
+  const m=D(s.id).map||{};
+  return rows.map(a=>`<div class="mini"><div class="hd"><span>활동</span></div><b>${esc(a.act)}</b><input type="text" data-act="map" data-s="${s.id}" data-r="${esc(tr(a.act))}" value="${esc(m[tr(a.act)]||'')}" placeholder="→ 구조로 바꾸면? 예) 당번표와 회비 규칙을 문서로 만든다"></div>`).join('')},
+ check(s){
+  const n=s.st,c=stageCheck(n);
+  let h=`<div>${c.items.map(i=>`<div class="crit"><span class="st">${i.ok?'✅':'⬜'}</span><span>${esc(i.t)}</span></div>`).join('')}</div>`;
+  if(c.items.some(i=>!i.ok))h+=`<div class="info" style="margin-top:14px">못 채운 항목은 제안서에 <b>“미완”</b>으로 표시돼요. 그대로 넘어가도 됩니다.</div>`;
+  else h+=`<div class="info" style="margin-top:14px">🎉 ${ST[n].n} 기준을 모두 채웠어요!</div>`;
+  if(c.back.length)h+=`<h2>혹시 이런 느낌이라면 되돌아가요</h2>`+c.back.map(([id,l])=>`<button class="back" data-act="go" data-v="${id}">↩ ${esc(l)}</button>`).join('');
+  h+=`<div class="skip">되돌아가서 고쳐도 앞 단계 내용은 그대로 보존돼요.</div>`;return h},
+ preview(){return `<div id="paper">${paperHTML(true)}</div>`},
+ export(){
+  const doc=buildDoc();const missing=doc.filter(x=>!x.done).length;
+  return `<div class="info">${missing?`미완 항목이 <b>${missing}개</b> 있어요. 그대로 내보내도 돼요.`:'🎉 모든 항목을 채웠어요!'}</div>
+  <div style="display:grid;gap:10px">
+   <button class="btn pri" data-act="print">🖨️ PDF로 저장 (인쇄 창에서 PDF 선택)</button>
+   <button class="btn sec" data-act="copy">📋 텍스트로 복사</button>
+   <button class="btn sec" data-act="dl">⬇️ 파일로 받기 (.md)</button>
+   <button class="btn sec" data-act="port">⭐ 내 포트폴리오에 저장</button>
+   <button class="btn sec" disabled>👥 팀 공유 (2차 오픈 예정)</button>
+  </div>
+  <h2>🔁 다음 회차</h2><p class="hint">새 정의문으로 ①부터 다시 돌아요. 이번 회차는 학습 기록에 남아요.</p>
+  <button class="btn sec" style="width:100%" data-act="again">새 정의문으로 다시 시작</button>
+  <div id="toast" class="hint" style="margin-top:10px;font-weight:700;color:var(--ok)"></div>
+  <div class="printzone print-only">${paperHTML(false)}</div>`}
+};
+
+/* ---------- 제안서 ---------- */
+function buildDoc(){
+  const sec=[];const add=(title,scr,done,items)=>sec.push({title,scr,done,items:items.filter(Boolean)});
+  const stk=cardsOf('1-2','cards').filter(c=>tr(c.name));
+  const rep=cardsOf('1-4','cards')[+D('1-4').rep];
+  const sc=stageCheck(1);
+  add('문제',['0-3'],!!tr(S.problem),[S.problem]);
+  add('① 공통 문제 정의문','1-5',!!defText()&&crit5()>=4,[defText(),vA()&&vB()?`충돌: ‘${vA()}’ ↔ ‘${vB()}’ (${tr(D('1-3').pa)} · ${tr(D('1-3').pb)})`:'',rep?`대표안: ${rep.name}${tr(rep.how)?' — '+rep.how:''}`:'',stk.length?`이해관계자: ${stk.map(c=>c.name).join(', ')}`:'']);
+  const d=dist(),dn=LAYERS.filter(l=>d[l]).map(l=>`${l} ${d[l]}`).join(' · ');
+  add('② 원인과 레버리지','2-5',stageCheck(2).items.every(i=>i.ok),[dn?`원인 층위 분포: ${dn}`:'',...levers().map((l,i)=>`레버리지 ${i+1}: ${l}`),D('2-3').a?`악순환: ${[D('2-3').a,D('2-3').b,D('2-3').c,D('2-3').d].map(tr).filter(Boolean).join(' → ')} → 반복`:'']);
+  const t2=D('3-2');
+  add('③ 미래 장면과 거꾸로 계획','3-4',stageCheck(3).items.every(i=>i.ok),[tr(D('3-1').scene)?`장면: ${tr(D('3-1').scene)}`:'',tr(t2.y10)?`10년: ${t2.y10}`:'',tr(t2.y5)?`5년: ${t2.y5}`:'',tr(t2.y2)?`2년: ${t2.y2}`:'',tr(t2.y0)?`올해: ${t2.y0}`:'',...cardsOf('3-3','cards').filter(c=>tr(c.name)&&c.dec&&c.dec!=='유지').map(c=>`${c.dec} 후보: ${c.name}`),...actions().map(a=>`첫 행동: ${a.act}${tr(a.who)?' ('+a.who+')':''}${a.when?' · '+a.when:''}`)]);
+  const s2=D('4-2'),lb={rule:'규칙',role:'역할',money:'재원 순환',data:'데이터',decide:'의사결정'};
+  const st4=D('4-4').chk||{};
+  add('④ 구조 설계','4-2',stageCheck(4).items.every(i=>i.ok),[...Object.keys(lb).filter(k=>tr(s2[k])).map(k=>`${lb[k]}: ${s2[k]}`),...actions().filter(a=>!isStruct(a)&&tr(((D('4-3').map||{})[tr(a.act)]))).map(a=>`활동→구조: ${a.act} → ${D('4-3').map[tr(a.act)]}`),Object.keys(st4).length?`지속성 점검 ${Object.values(st4).filter(Boolean).length}/4 충족`:'']);
+  return sec;
+}
+function paperHTML(editable){
+  const doc=buildDoc();
+  return `<div class="paper"><h3>${esc(S.problem||'(문제 미설정)')}</h3><div class="meta">4단계 사고 학습 제안서 · ${S.round}회차 · ${new Date().toLocaleDateString('ko-KR')} · ${S.level==='g'?'중급':'초급'}</div>`+
+   doc.map(x=>`<h4><span>${esc(x.title)}</span><span>${x.done?'':'<span class="miss">미완</span> '}${editable?`<button class="ed" data-act="go" data-v="${[].concat(x.scr)[0]}">수정</button>`:''}</span></h4>${x.items.length?`<ul>${x.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul>`:'<div class="meta">아직 비어 있어요.</div>'}`).join('')+`</div>`;
+}
+function docText(){return `# ${S.problem||'제안서'}\n(${S.round}회차 · ${new Date().toLocaleDateString('ko-KR')})\n\n`+buildDoc().map(x=>`## ${x.title}${x.done?'':' [미완]'}\n${x.items.map(i=>'- '+i).join('\n')||'- (비어 있음)'}`).join('\n\n')+'\n'}
+
+/* ================= 이벤트 ================= */
+function touch(sid){S.mod[sid]=Date.now();save();refreshLive();refreshCoach();drawChromeLight()}
+function drawChromeLight(){drawChrome()}
+function refreshLive(){const rb=document.getElementById('repbox');if(rb)rb.innerHTML=repHTML(S.cur);document.querySelectorAll('[data-live]').forEach(el=>{const[sid,k]=el.dataset.live.split(':');const f=(scr(sid).fields||[]).find(x=>x.k===k);if(f&&f.html){const h=f.html();el.innerHTML=h;el.className=h?'info':''}})}
+function go(id){if(idx(id)<0)return;S.cur=id;altOn=false;save();history.replaceState(null,'','#/'+id);draw()}
+function toast(m){const e=$('#toast');if(e){e.textContent=m}}
+document.addEventListener('input',e=>{
+  const a=e.target.dataset;if(!a||!a.act)return;
+  if(a.act==='in'){D(a.s)[a.k]=e.target.value;if(a.s==='1-5')D(a.s).def=defText();touch(a.s)}
+  else if(a.act==='cin'){const arr=D(a.s)[a.k];arr[+a.i][a.f]=e.target.value;touch(a.s)}
+  else if(a.act==='prob'){S.problem=e.target.value;touch('0-3')}
+  else if(a.act==='map'){const m=D(a.s).map||(D(a.s).map={});m[a.r]=e.target.value;touch(a.s)}
+});
+document.addEventListener('change',e=>{const a=e.target.dataset;if(a&&a.act==='sel'){D(a.s)[a.k]=e.target.value;touch(a.s);}});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.tagName==='INPUT'||b.tagName==='TEXTAREA'||b.tagName==='SELECT')return;
+  const a=b.dataset,act=a.act;
+  const re=(sid)=>{S.mod[sid]=Date.now();save();draw();};
+  switch(act){
+   case 'lvl':S.level=a.v;save();draw();break;
+   case 'quick':S.mode='solo';go('0-3');break;
+   case 'mode':S.mode=a.v;save();break;
+   case 'case':S.problem=a.v;re('0-3');break;
+   case 'go':go(a.v);break;
+   case 'goStage':{const n=+a.n;const f=SCREENS.find(s=>s.st===n);go(f.id);break}
+   case 'ex':{const d=D(a.s);d[a.k]=tr(d[a.k])?tr(d[a.k])+' '+a.v:a.v;if(a.s==='1-5')d.def=defText();re(a.s);break}
+   case 'ch':D(a.s)[a.k]=a.v;re(a.s);break;
+   case 'ck':{const m=D(a.s)[a.k]||(D(a.s)[a.k]={});m[a.i]=!m[a.i];if(a.s==='1-5')D(a.s).def=defText();re(a.s);break}
+   case 'cl':{const rows=causes();const m=D(a.s)[a.k]||(D(a.s)[a.k]={});m[rows[+a.r]]=a.v;re(a.s);break}
+   case 'rt':{const f=scr(a.s).fields.find(x=>x.k===a.k);const rows=f.rows();const m=D(a.s)[a.k]||(D(a.s)[a.k]={});const r=rows[+a.r];(m[r]||(m[r]={}))[a.c]=+a.v;re(a.s);break}
+   case 'cadd':{(D(a.s)[a.k]||(D(a.s)[a.k]=[])).push({});re(a.s);break}
+   case 'cdel':{D(a.s)[a.k].splice(+a.i,1);re(a.s);break}
+   case 'cseed':{const f=scr(a.s).fields.find(x=>x.k===a.k);const arr=D(a.s)[a.k]||(D(a.s)[a.k]=[]);const first=f.fields[0].k;const empty=arr.findIndex(c=>!f.fields.some(x=>tr(c[x.k])));if(empty>=0)arr[empty][first]=a.v;else if(arr.length<f.max)arr.push({[first]:a.v});re(a.s);break}
+   case 'cch':{const c=D(a.s)[a.k][+a.i];c[a.c]=String(c[a.c])===a.v?undefined:(/^\d+$/.test(a.v)?+a.v:a.v);re(a.s);break}
+   case 'rep':D(a.s).rep=+a.i;re(a.s);break;
+   case 'lev':{const d=D('2-5');const sel=d.sel||(d.sel=[]);const i=sel.indexOf(a.v);if(i>=0)sel.splice(i,1);else if(sel.length<3)sel.push(a.v);re('2-5');break}
+   case 'fit':{const d=D('2-5');const f=d.fit||(d.fit={});const x=f[a.v]||(f[a.v]={});x[a.c]=!x[a.c];re('2-5');break}
+   case 'coachAlt':altOn=!altOn;refreshCoach();break;
+   case 'print':window.print();break;
+   case 'copy':{const x=docText();(navigator.clipboard?navigator.clipboard.writeText(x):Promise.reject()).then(()=>toast('복사했어요!')).catch(()=>{const ta=document.createElement('textarea');ta.value=x;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('복사했어요!')}catch(_){toast('복사하지 못했어요. 직접 선택해 주세요.')}ta.remove()});break}
+   case 'dl':{const u=URL.createObjectURL(new Blob([docText()],{type:'text/markdown'}));const l=document.createElement('a');l.href=u;l.download='제안서.md';l.click();URL.revokeObjectURL(u);break}
+   case 'port':S.portfolio.push({date:new Date().toLocaleDateString('ko-KR'),problem:S.problem,text:docText()});save();toast('포트폴리오에 저장했어요 (시작 화면에서 볼 수 있어요)');break;
+   case 'again':if(confirm('이번 회차를 학습 기록에 남기고, 새 정의문으로 ①단계부터 다시 시작할까요?')){S.rounds.push({n:S.round,date:new Date().toLocaleDateString('ko-KR'),problem:S.problem,def:defText(),text:docText()});S.round++;S.d={};S.mod={};save();go('1-1')}break;
+  }
+});
+$('#prev').onclick=()=>{const i=idx(S.cur);if(i>0)go(SCREENS[i-1].id)};
+$('#next').onclick=()=>{const i=idx(S.cur);if(i<SCREENS.length-1)go(SCREENS[i+1].id)};
+$('#brand').onclick=()=>go('0-1');
+$('#menuBtn').onclick=()=>{const c=prompt('메뉴: 1) 처음으로  2) 이 기기 기록 모두 지우기\n번호를 입력하세요');if(c==='1')go('0-1');else if(c==='2'&&confirm('이 기기의 모든 학습 기록이 삭제됩니다. 계속할까요?')){S=blank();save();go('0-1')}};
+window.addEventListener('hashchange',()=>{const id=location.hash.replace('#/','');if(id&&id!==S.cur&&idx(id)>=0){S.cur=id;draw()}});
+(function init(){const id=location.hash.replace('#/','');if(id&&idx(id)>=0)S.cur=id;if(!S.level&&S.cur!=='0-1')S.cur='0-1';draw()})();
+</script>
+</body>
+</html>
